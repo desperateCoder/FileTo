@@ -12,6 +12,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
+import java.net.InetAddress;
 
 import javax.swing.DefaultListModel;
 import javax.swing.DefaultListSelectionModel;
@@ -79,18 +80,20 @@ public class ChatClient {
 		});
 
 		// Request the host from the user.
-		String input = (String)JOptionPane.showInputDialog(null, "Host:", "Connect to chat server", JOptionPane.QUESTION_MESSAGE,
-			null, null, "localhost");
-		if (input == null || input.trim().length() == 0) System.exit(1);
-		final String host = input.trim();
+//		String input = (String)JOptionPane.showInputDialog(null, "Host:", "Connect to chat server", JOptionPane.QUESTION_MESSAGE,
+//			null, null, "localhost");
+//		if (input == null || input.trim().length() == 0) System.exit(1);
+//		final String host = input.trim();
 
 		// Request the user's name.
-		input = (String)JOptionPane.showInputDialog(null, "Name:", "Connect to chat server", JOptionPane.QUESTION_MESSAGE, null,
-			null, "Test");
-		if (input == null || input.trim().length() == 0) System.exit(1);
-		name = input.trim();
+//		String input = (String)JOptionPane.showInputDialog(null, "Name:", "Connect to chat server", JOptionPane.QUESTION_MESSAGE, null,
+//			null, "Test");
+//		if (input == null || input.trim().length() == 0) System.exit(1);
+		name = "TEST";
 
 		// All the ugly Swing stuff is hidden in ChatFrame so it doesn't clutter the KryoNet example code.
+		InetAddress addr = client.discoverHost(Network.UDP_PORT, 10000);
+		final String host = addr.getHostAddress();
 		chatFrame = new ChatFrame(host);
 		// This listener is called when the send button is clicked.
 		chatFrame.setSendListener(new Runnable() {
@@ -113,7 +116,7 @@ public class ChatClient {
 		new Thread("Connect") {
 			public void run () {
 				try {
-					client.connect(5000, host, Network.port);
+					client.connect(5000, host, Network.TCP_PORT);
 					// Server communication after connection can go here, or in Listener#connected().
 				} catch (IOException ex) {
 					ex.printStackTrace();
@@ -240,6 +243,7 @@ public class ChatClient {
 	}
 
 	public static void main (String[] args) {
+		System.setProperty("java.net.preferIPv4Stack" , "true");
 		Log.set(Log.LEVEL_DEBUG);
 		new ChatClient();
 	}

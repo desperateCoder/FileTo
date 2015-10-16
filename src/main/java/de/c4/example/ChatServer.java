@@ -84,7 +84,7 @@ public class ChatServer {
 				}
 			}
 		});
-		server.bind(Network.port);
+		server.bind(Network.TCP_PORT, Network.UDP_PORT);
 		server.start();
 
 		// Open a window to provide an easy way to stop the server.
