@@ -94,6 +94,7 @@ public class ChatClient {
 		// All the ugly Swing stuff is hidden in ChatFrame so it doesn't clutter the KryoNet example code.
 		InetAddress addr = client.discoverHost(Network.UDP_PORT, 10000);
 		final String host = addr.getHostAddress();
+//		final String host = "localhost";
 		chatFrame = new ChatFrame(host);
 		// This listener is called when the send button is clicked.
 		chatFrame.setSendListener(new Runnable() {
