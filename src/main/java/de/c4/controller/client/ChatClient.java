@@ -1,4 +1,4 @@
-package main.java.de.c4.example;
+package main.java.de.c4.controller.client;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Container;
@@ -20,15 +20,16 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 
-import main.java.de.c4.example.Network.ChatMessage;
-import main.java.de.c4.example.Network.RegisterName;
-import main.java.de.c4.example.Network.UpdateNames;
+import main.java.de.c4.controller.shared.Network;
+import main.java.de.c4.controller.shared.Network.ChatMessage;
+import main.java.de.c4.controller.shared.Network.UpdateNames;
+import main.java.de.c4.model.messages.ContactDto;
+import main.java.de.c4.model.messages.OnlineStateChange;
 
 import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Connection;
@@ -50,8 +51,10 @@ public class ChatClient {
 
 		client.addListener(new Listener() {
 			public void connected (Connection connection) {
-				RegisterName registerName = new RegisterName();
-				registerName.name = name;
+				OnlineStateChange registerName = new OnlineStateChange();
+				ContactDto contact = new ContactDto();
+				contact.name = name;
+				registerName.contact = contact;
 				client.sendTCP(registerName);
 			}
 

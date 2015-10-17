@@ -1,4 +1,7 @@
-package main.java.de.c4.example;
+package main.java.de.c4.controller.shared;
+import main.java.de.c4.model.messages.ContactDto;
+import main.java.de.c4.model.messages.OnlineStateChange;
+
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryonet.EndPoint;
 
@@ -10,15 +13,13 @@ public class Network {
 	// This registers objects that are going to be sent over the network.
 	static public void register (EndPoint endPoint) {
 		Kryo kryo = endPoint.getKryo();
-		kryo.register(RegisterName.class);
+		kryo.register(OnlineStateChange.class);
+		kryo.register(ContactDto.class);
 		kryo.register(String[].class);
 		kryo.register(UpdateNames.class);
 		kryo.register(ChatMessage.class);
 	}
 
-	static public class RegisterName {
-		public String name;
-	}
 
 	static public class UpdateNames {
 		public String[] names;

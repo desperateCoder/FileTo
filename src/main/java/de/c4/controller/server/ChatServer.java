@@ -1,4 +1,4 @@
-package main.java.de.c4.example;
+package main.java.de.c4.controller.server;
 
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -8,25 +8,25 @@ import java.util.ArrayList;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 
+import main.java.de.c4.controller.shared.Network;
+import main.java.de.c4.controller.shared.Network.ChatMessage;
+import main.java.de.c4.controller.shared.Network.UpdateNames;
+import main.java.de.c4.model.connections.ChatConnection;
+import main.java.de.c4.model.messages.ContactDto;
+import main.java.de.c4.model.messages.OnlineStateChange;
+
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.kryonet.Server;
 import com.esotericsoftware.minlog.Log;
 
-import main.java.de.c4.example.Network.ChatMessage;
-import main.java.de.c4.example.Network.RegisterName;
-import main.java.de.c4.example.Network.UpdateNames;
-
 public class ChatServer {
-	Server server;
+	private Server server;
 
 	public ChatServer() throws IOException {
+		new PingServer().start();
 		server = new Server() {
 			protected Connection newConnection() {
-				// By providing our own connection implementation, we can store
-				// per
-				// connection state without a connection ID to state look up.
-
 				return new ChatConnection();
 			}
 		};
@@ -41,22 +41,25 @@ public class ChatServer {
 				// ChatConnections.
 				ChatConnection connection = (ChatConnection) c;
 
-				if (object instanceof RegisterName) {
+				if (object instanceof OnlineStateChange) {
 					// Ignore the object if a client has already registered a
 					// name. This is
 					// impossible with our client, but a hacker could send
 					// messages at any time.
-					if (connection.name != null)
+					if (connection.contact != null && connection.contact.name != null)
 						return;
 					// Ignore the object if the name is invalid.
-					String name = ((RegisterName) object).name;
+					String name = ((OnlineStateChange) object).contact.name;
 					if (name == null)
 						return;
 					name = name.trim();
 					if (name.length() == 0)
 						return;
 					// Store the name on the connection.
-					connection.name = name;
+					if (connection.contact == null) {
+						connection.contact = new ContactDto();
+					}
+					connection.contact.name = name;
 					// Send a "connected" message to everyone except the new
 					// client.
 					ChatMessage chatMessage = new ChatMessage();
@@ -70,7 +73,7 @@ public class ChatServer {
 				if (object instanceof ChatMessage) {
 					// Ignore the object if a client tries to chat before
 					// registering a name.
-					if (connection.name == null)
+					if (connection.contact.name == null)
 						return;
 					ChatMessage chatMessage = (ChatMessage) object;
 					// Ignore the object if the chat message is invalid.
@@ -81,7 +84,7 @@ public class ChatServer {
 					if (message.length() == 0)
 						return;
 					// Prepend the connection's name and send to everyone.
-					chatMessage.text = connection.name + ": " + message;
+					chatMessage.text = connection.contact.name + ": " + message;
 					server.sendToAllTCP(chatMessage);
 					return;
 				}
@@ -89,11 +92,11 @@ public class ChatServer {
 
 			public void disconnected(Connection c) {
 				ChatConnection connection = (ChatConnection) c;
-				if (connection.name != null) {
+				if (connection.contact.name != null) {
 					// Announce to everyone that someone (with a registered
 					// name) has left.
 					ChatMessage chatMessage = new ChatMessage();
-					chatMessage.text = connection.name + " disconnected.";
+					chatMessage.text = connection.contact.name + " disconnected.";
 					server.sendToAllTCP(chatMessage);
 					updateNames();
 				}
@@ -122,7 +125,7 @@ public class ChatServer {
 		ArrayList names = new ArrayList(connections.length);
 		for (int i = connections.length - 1; i >= 0; i--) {
 			ChatConnection connection = (ChatConnection) connections[i];
-			names.add(connection.name);
+			names.add(connection.contact.name);
 		}
 		// Send the names to everyone.
 		UpdateNames updateNames = new UpdateNames();
@@ -130,23 +133,9 @@ public class ChatServer {
 		server.sendToAllTCP(updateNames);
 	}
 
-	// This holds per connection state.
-	static class ChatConnection extends Connection {
-		public String name;
-	}
-
 	public static void main(String[] args) throws IOException {
 		Log.set(Log.LEVEL_DEBUG);
-		new Thread(new Runnable() {
-
-			public void run() {
-				try {
-					new PingServer();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-		}).start();
+		
 		new ChatServer();
 	}
 }
