@@ -29,7 +29,7 @@ import main.java.de.c4.controller.shared.Network;
 import main.java.de.c4.controller.shared.Network.ChatMessage;
 import main.java.de.c4.controller.shared.Network.UpdateNames;
 import main.java.de.c4.model.messages.ContactDto;
-import main.java.de.c4.model.messages.ContactList;
+import main.java.de.c4.model.messages.ContactListDto;
 import main.java.de.c4.model.messages.EOnlineState;
 import main.java.de.c4.model.messages.OnlineStateChange;
 import main.java.de.c4.model.messages.RequestKnownOnlineClients;
@@ -66,8 +66,8 @@ public class ChatClient {
 
 			public void received (Connection connection, Object object) {
 
-				if (object instanceof ContactList){
-					ContactList list = (ContactList)object;
+				if (object instanceof ContactListDto){
+					ContactListDto list = (ContactListDto)object;
 					Log.info("Recieved ContactList!");
 					for (ContactDto dto : list.contacts) {
 						System.out.println(dto.name + " ("+dto.ip+"): "+dto.state);

@@ -1,11 +1,11 @@
 package main.java.de.c4.model.messages;
 
-public class ContactList {
+public class ContactListDto {
 	public ContactDto[] contacts;
 	
-	public ContactList(ContactDto[] contacts) {
+	public ContactListDto(ContactDto[] contacts) {
 		this.contacts = contacts;
 	}
-	public ContactList() {
+	public ContactListDto() {
 	}
 }
