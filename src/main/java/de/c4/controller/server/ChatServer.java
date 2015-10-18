@@ -8,22 +8,22 @@ import java.net.InetAddress;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 
-import com.esotericsoftware.kryonet.Connection;
-import com.esotericsoftware.kryonet.Listener;
-import com.esotericsoftware.kryonet.Server;
-import com.esotericsoftware.minlog.Log;
-
+import main.java.de.c4.controller.shared.ConnectionPeer;
 import main.java.de.c4.controller.shared.ContactList;
 import main.java.de.c4.controller.shared.Network;
 import main.java.de.c4.controller.shared.Network.ChatMessage;
-import main.java.de.c4.controller.shared.listener.MessageRecievedListener;
 import main.java.de.c4.model.connections.ChatConnection;
 import main.java.de.c4.model.messages.ContactDto;
 import main.java.de.c4.model.messages.ContactListDto;
 import main.java.de.c4.model.messages.OnlineStateChange;
 import main.java.de.c4.model.messages.RequestKnownOnlineClients;
 
-public class ChatServer {
+import com.esotericsoftware.kryonet.Connection;
+import com.esotericsoftware.kryonet.Listener;
+import com.esotericsoftware.kryonet.Server;
+import com.esotericsoftware.minlog.Log;
+
+public class ChatServer extends ConnectionPeer{
 	
 	private Server server;
 	
@@ -40,44 +40,7 @@ public class ChatServer {
 		// registered by the same method for both the client and server.
 		Network.register(server);
 
-		server.addListener(new Listener() {
-			public void received(Connection c, Object object) {
-				// We know all connections for this server are actually
-				// ChatConnections.
-
-				if (object instanceof ChatMessage) {
-					
-					// Ignore the object if a client tries to chat before it is registered.
-					ChatMessage chatMessage = (ChatMessage) object;
-					ContactDto contact = ContactList.INSTANCE.findByAddr(c.getRemoteAddressTCP().getAddress());
-					if (contact == null)
-						return;
-					
-					// Ignore the object if the chat message is invalid.
-					String message = chatMessage.text;
-					if (message == null || message.length()==0)
-						return;
-					Log.debug("Nachricht von "+contact.name+" ("+contact.ip+") bekommen: "+message);
-					server.sendToAllTCP(object);
-					ContactList.INSTANCE.messageRecieved(contact, chatMessage);
-					
-				} else if (object instanceof OnlineStateChange) {
-					
-					InetAddress ip = c.getRemoteAddressTCP().getAddress();
-					OnlineStateChange onlineState = (OnlineStateChange) object;
-					ContactList.INSTANCE.contactStateChanged(onlineState, ip);
-					
-				} else if (object instanceof RequestKnownOnlineClients) {
-					InetAddress address = c.getRemoteAddressTCP().getAddress();
-					ContactListDto contacts = ContactList.INSTANCE.getContactListForContactsRequest(address);
-					c.sendTCP(contacts);
-				}
-			}
-
-			public void disconnected(Connection c) {
-				// listener?? eigentlich nicht interessant...
-			}
-		});
+		server.addListener(new Listener() {});
 		server.bind(Network.TCP_PORT);//
 		server.start();
 
@@ -121,5 +84,16 @@ public class ChatServer {
 		Log.set(Log.LEVEL_DEBUG);
 		
 		new ChatServer();
+	}
+
+	@Override
+	public void sendData(Object o) {
+		
+	}
+
+	@Override
+	public void run() {
+		// TODO Auto-generated method stub
+		
 	}
 }

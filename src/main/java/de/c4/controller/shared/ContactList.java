@@ -6,14 +6,15 @@ import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.esotericsoftware.minlog.Log;
-
 import main.java.de.c4.controller.shared.Network.ChatMessage;
 import main.java.de.c4.controller.shared.listener.MessageRecievedListener;
 import main.java.de.c4.model.messages.ContactDto;
 import main.java.de.c4.model.messages.ContactListDto;
 import main.java.de.c4.model.messages.EOnlineState;
 import main.java.de.c4.model.messages.OnlineStateChange;
+
+import com.esotericsoftware.kryonet.Connection;
+import com.esotericsoftware.minlog.Log;
 /**
  * Singleton, which provides the ContactList and States of the Contacts
  * @author Artur Dawtjan
@@ -24,9 +25,10 @@ public class ContactList {
 	public static final ContactList INSTANCE = new ContactList();
 	
 	private Set<ContactDto> knownOnlineContacts = new HashSet<ContactDto>();
-	private Set<MessageRecievedListener> messageRecievedListener = new HashSet<MessageRecievedListener>();
 	
 	public static final String LOCAL_IP = getLocalIP();
+	
+	private ContactDto me = null;
 	
 	public ContactList() {
 	}
@@ -72,19 +74,13 @@ public class ContactList {
 		ContactDto[] contacts = knownOnlineContacts.toArray(new ContactDto[]{});
 		for (int i = 0; i < contacts.length; i++) {
 			if (endPointAdress.getHostAddress().equals(contacts[i].ip)) {
-				ContactDto contactDto = new ContactDto("server", EOnlineState.ONLINE);
-				contactDto.ip = LOCAL_IP;
-				contacts[i] = contactDto;
+				contacts[i] = me;
 			}
 		}
 		return new ContactListDto(contacts);
 	}
 	
-	public void messageRecieved(ContactDto contact, ChatMessage chatMessage){
-		for (MessageRecievedListener l : messageRecievedListener) {
-			l.messageRecieved(contact, chatMessage);
-		}
-	}
+	
 
 	public void contactStateChanged(OnlineStateChange onlineState, InetAddress ip){
 		if (onlineState.contact == null || onlineState.contact.name == null)
@@ -117,5 +113,50 @@ public class ContactList {
 			knownOnlineContacts.add(contact);
 
 		}
+	}
+	
+	public void setOnlineContacts(ContactDto[] contacts){
+		knownOnlineContacts.clear();
+		for (ContactDto c : contacts) {
+			knownOnlineContacts.add(c);
+		}
+	}
+	
+	public void setOwnContact(String name, EOnlineState onlineState){
+		if (me==null) {
+			me = new ContactDto();
+		}
+		me.ip = LOCAL_IP;
+		me.name = name;
+		me.state = onlineState;
+	}
+
+	/**
+	 * Sets the OnlineState and notifies all known other clients, 
+	 * if, and only if, it has changed.
+	 * @param onlineState new online-state
+	 */
+	public void setOnlineState(final EOnlineState onlineState) {
+		new Thread(new Runnable() {
+			
+			public void run() {
+				if (me.state != onlineState) {
+					me.state = onlineState;
+					OnlineStateChange change = new OnlineStateChange();
+					change.contact = me;
+					change.newState = me.state;
+					for (ContactDto c : knownOnlineContacts) {
+						Connection connection = ConnectionManager.createConnectionTo(c);
+						connection.sendTCP(change);
+						ConnectionManager.closeAndRemoveConnection(connection);
+					}
+				} else me.state = onlineState;
+			}
+		}).start();
+		
+	}
+	
+	public static ContactDto getMe(){
+		return INSTANCE.me;
 	}
 }
