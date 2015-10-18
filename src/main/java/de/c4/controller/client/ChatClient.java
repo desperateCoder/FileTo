@@ -29,7 +29,10 @@ import main.java.de.c4.controller.shared.Network;
 import main.java.de.c4.controller.shared.Network.ChatMessage;
 import main.java.de.c4.controller.shared.Network.UpdateNames;
 import main.java.de.c4.model.messages.ContactDto;
+import main.java.de.c4.model.messages.ContactList;
+import main.java.de.c4.model.messages.EOnlineState;
 import main.java.de.c4.model.messages.OnlineStateChange;
+import main.java.de.c4.model.messages.RequestKnownOnlineClients;
 
 import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Connection;
@@ -51,21 +54,25 @@ public class ChatClient {
 
 		client.addListener(new Listener() {
 			public void connected (Connection connection) {
-				OnlineStateChange registerName = new OnlineStateChange();
-				ContactDto contact = new ContactDto();
-				contact.name = name;
-				registerName.contact = contact;
-				client.sendTCP(registerName);
+				Log.debug("TCP Connected to Server: "+connection.getRemoteAddressTCP());
+				OnlineStateChange state = new OnlineStateChange();
+				state.contact = new ContactDto("Test "+System.currentTimeMillis());
+				state.newState = EOnlineState.ONLINE;
+				client.sendTCP(state);
+				
+				RequestKnownOnlineClients req = new RequestKnownOnlineClients();
+				client.sendTCP(req);
 			}
 
 			public void received (Connection connection, Object object) {
-				if (object instanceof UpdateNames) {
-					UpdateNames updateNames = (UpdateNames)object;
-					chatFrame.setNames(updateNames.names);
-					return;
-				}
 
-				if (object instanceof ChatMessage) {
+				if (object instanceof ContactList){
+					ContactList list = (ContactList)object;
+					Log.info("Recieved ContactList!");
+					for (ContactDto dto : list.contacts) {
+						System.out.println(dto.name + " ("+dto.ip+"): "+dto.state);
+					}
+				} else if (object instanceof ChatMessage) {
 					ChatMessage chatMessage = (ChatMessage)object;
 					chatFrame.addMessage(chatMessage.text);
 					return;
@@ -114,6 +121,7 @@ public class ChatClient {
 			}
 		});
 		chatFrame.setVisible(true);
+		
 
 		// We'll do the connect on a new thread so the ChatFrame can show a progress bar.
 		// Connecting to localhost is usually so fast you won't see the progress bar.
@@ -192,6 +200,7 @@ public class ChatClient {
 					sendButton.doClick();
 				}
 			});
+			setNames(new String[]{});
 		}
 
 		public void setSendListener (final Runnable listener) {

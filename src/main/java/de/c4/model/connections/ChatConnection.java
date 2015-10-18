@@ -6,5 +6,4 @@ import com.esotericsoftware.kryonet.Connection;
 
 // This holds per connection state.
 public class ChatConnection extends Connection {
-	public ContactDto contact;
 }
