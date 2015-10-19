@@ -3,25 +3,18 @@ package main.java.de.c4.controller.server;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
-import java.net.InetAddress;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 
-import main.java.de.c4.controller.shared.ConnectionPeer;
-import main.java.de.c4.controller.shared.ContactList;
-import main.java.de.c4.controller.shared.Network;
-import main.java.de.c4.controller.shared.Network.ChatMessage;
-import main.java.de.c4.model.connections.ChatConnection;
-import main.java.de.c4.model.messages.ContactDto;
-import main.java.de.c4.model.messages.ContactListDto;
-import main.java.de.c4.model.messages.OnlineStateChange;
-import main.java.de.c4.model.messages.RequestKnownOnlineClients;
-
 import com.esotericsoftware.kryonet.Connection;
-import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.kryonet.Server;
 import com.esotericsoftware.minlog.Log;
+
+import main.java.de.c4.controller.shared.ConnectionPeer;
+import main.java.de.c4.controller.shared.MessageHandler;
+import main.java.de.c4.controller.shared.Network;
+import main.java.de.c4.model.connections.ChatConnection;
 
 public class ChatServer extends ConnectionPeer{
 	
@@ -34,15 +27,16 @@ public class ChatServer extends ConnectionPeer{
 			protected Connection newConnection() {
 				return new ChatConnection();
 			}
+		
 		};
 
 		// For consistency, the classes to be sent over the network are
 		// registered by the same method for both the client and server.
 		Network.register(server);
 
-		server.addListener(new Listener() {});
+		MessageHandler messageHandler = new MessageHandler();
+		server.addListener(messageHandler);
 		server.bind(Network.TCP_PORT);//
-		server.start();
 
 		// Open a window to provide an easy way to stop the server.
 		JFrame frame = new JFrame("Chat Server");
@@ -83,7 +77,7 @@ public class ChatServer extends ConnectionPeer{
 	public static void main(String[] args) throws IOException {
 		Log.set(Log.LEVEL_DEBUG);
 		
-		new ChatServer();
+		new ChatServer().start();
 	}
 
 	@Override
@@ -93,7 +87,7 @@ public class ChatServer extends ConnectionPeer{
 
 	@Override
 	public void run() {
-		// TODO Auto-generated method stub
-		
+
+		server.start();
 	}
 }

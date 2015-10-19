@@ -3,7 +3,9 @@ package main.java.de.c4.controller.shared;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import main.java.de.c4.controller.shared.Network.ChatMessage;
@@ -158,5 +160,9 @@ public class ContactList {
 	
 	public static ContactDto getMe(){
 		return INSTANCE.me;
+	}
+
+	public Set<ContactDto> getContacts() {
+		return knownOnlineContacts;
 	}
 }

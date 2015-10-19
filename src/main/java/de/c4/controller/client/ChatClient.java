@@ -2,7 +2,10 @@ package main.java.de.c4.controller.client;
 import java.awt.EventQueue;
 import java.io.IOException;
 import java.net.InetAddress;
+import java.util.Set;
 
+import main.java.de.c4.controller.shared.ConnectionManager;
+import main.java.de.c4.controller.shared.ContactList;
 import main.java.de.c4.controller.shared.Network;
 import main.java.de.c4.controller.shared.Network.ChatMessage;
 import main.java.de.c4.model.messages.ContactDto;
@@ -66,6 +69,7 @@ public class ChatClient extends Thread{
 			}
 		});
 
+		host = hostAdress;
 
 		// Request the user's name.
 //		String input = (String)JOptionPane.showInputDialog(null, "Name:", "Connect to chat server", JOptionPane.QUESTION_MESSAGE, null,
@@ -76,22 +80,7 @@ public class ChatClient extends Thread{
 		// All the ugly Swing stuff is hidden in ChatFrame so it doesn't clutter the KryoNet example code.
 		
 //		final String host = "localhost";
-		chatFrame = new ChatFrame(host);
-		// This listener is called when the send button is clicked.
-		chatFrame.setSendListener(new Runnable() {
-			public void run () {
-				ChatMessage chatMessage = new ChatMessage();
-				chatMessage.text = chatFrame.getSendText();
-				client.sendTCP(chatMessage);
-			}
-		});
-		// This listener is called when the chat window is closed.
-		chatFrame.setCloseListener(new Runnable() {
-			public void run () {
-				client.stop();
-			}
-		});
-		chatFrame.setVisible(true);
+		
 		
 		
 	}
@@ -108,6 +97,23 @@ public class ChatClient extends Thread{
 			ex.printStackTrace();
 			System.exit(1);
 		}
+//		Set<ContactDto> contacts = ContactList.INSTANCE.getContacts();
+		chatFrame = new ChatFrame(host);
+		// This listener is called when the send button is clicked.
+		chatFrame.setSendListener(new Runnable() {
+			public void run () {
+				ChatMessage chatMessage = new ChatMessage();
+				chatMessage.text = chatFrame.getSendText();
+				client.sendTCP(chatMessage);
+			}
+		});
+		// This listener is called when the chat window is closed.
+		chatFrame.setCloseListener(new Runnable() {
+			public void run () {
+				client.stop();
+			}
+		});
+		chatFrame.setVisible(true);
 	}
 
 	public static String discoverRandomServer(){
@@ -122,6 +128,7 @@ public class ChatClient extends Thread{
 	public static void main (String[] args) {
 		System.setProperty("java.net.preferIPv4Stack" , "true");
 		Log.set(Log.LEVEL_DEBUG);
-		new ChatClient(discoverRandomServer());
+		new ChatClient(discoverRandomServer()).start();
+		
 	}
 }
