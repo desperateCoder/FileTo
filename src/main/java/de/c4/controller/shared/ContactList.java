@@ -3,13 +3,9 @@ package main.java.de.c4.controller.shared;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
-import main.java.de.c4.controller.shared.Network.ChatMessage;
-import main.java.de.c4.controller.shared.listener.MessageRecievedListener;
 import main.java.de.c4.model.messages.ContactDto;
 import main.java.de.c4.model.messages.ContactListDto;
 import main.java.de.c4.model.messages.EOnlineState;
@@ -24,7 +20,7 @@ import com.esotericsoftware.minlog.Log;
  */
 public class ContactList {
 
-	public static final ContactList INSTANCE = new ContactList();
+	public static final ContactList INSTANCE = new ContactList(true);
 	
 	private Set<ContactDto> knownOnlineContacts = new HashSet<ContactDto>();
 	
@@ -33,6 +29,15 @@ public class ContactList {
 	private ContactDto me = null;
 	
 	public ContactList() {
+		this(false);
+	}
+	private ContactList(boolean isInternalCall) {
+		if (!isInternalCall) {
+			throw new RuntimeException("This Class is a Singleton and " +
+					"should be accessed by its Instance-Field");
+		}
+		setOwnContact(Settings.INSTANCE.get(Settings.CONTACT_NAME), 
+				EOnlineState.getByNr(Integer.parseInt(Settings.INSTANCE.get(Settings.CONTACT_ONLINE_STATE))));
 	}
 	
 	public ContactDto findByAddr(InetAddress ad){
@@ -124,7 +129,7 @@ public class ContactList {
 		}
 	}
 	
-	public void setOwnContact(String name, EOnlineState onlineState){
+	private void setOwnContact(String name, EOnlineState onlineState){
 		if (me==null) {
 			me = new ContactDto();
 		}
