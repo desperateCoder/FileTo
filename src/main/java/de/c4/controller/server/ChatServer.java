@@ -7,14 +7,14 @@ import java.io.IOException;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 
-import com.esotericsoftware.kryonet.Connection;
-import com.esotericsoftware.kryonet.Server;
-import com.esotericsoftware.minlog.Log;
-
 import main.java.de.c4.controller.shared.ConnectionPeer;
 import main.java.de.c4.controller.shared.MessageHandler;
 import main.java.de.c4.controller.shared.Network;
 import main.java.de.c4.model.connections.ChatConnection;
+
+import com.esotericsoftware.kryonet.Connection;
+import com.esotericsoftware.kryonet.Server;
+import com.esotericsoftware.minlog.Log;
 
 public class ChatServer extends ConnectionPeer{
 	

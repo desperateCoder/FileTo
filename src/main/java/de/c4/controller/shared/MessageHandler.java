@@ -18,7 +18,8 @@ import com.esotericsoftware.minlog.Log;
 public class MessageHandler extends Listener{
 
 	private Set<MessageRecievedListener> messageRecievedListener = new HashSet<MessageRecievedListener>();
-	
+
+	@Override
 	public void received(Connection c, Object object) {
 		// We know all connections for this server are actually
 		// ChatConnections.
@@ -43,7 +44,7 @@ public class MessageHandler extends Listener{
 			InetAddress ip = c.getRemoteAddressTCP().getAddress();
 			OnlineStateChange onlineState = (OnlineStateChange) object;
 			ContactList.INSTANCE.contactStateChanged(onlineState, ip);
-			
+			ConnectionManager.registerConnection(onlineState.contact, c);
 		} else if (object instanceof RequestKnownOnlineClients) {
 			InetAddress address = c.getRemoteAddressTCP().getAddress();
 			ContactListDto contacts = ContactList.INSTANCE.getContactListForContactsRequest(address);
@@ -51,8 +52,15 @@ public class MessageHandler extends Listener{
 		}
 	}
 
+	@Override
 	public void disconnected(Connection c) {
-		// listener?? eigentlich nicht interessant...
+		super.disconnected(c);
+		ConnectionManager.removeConnection(c);
+	}
+	
+	@Override
+	public void connected(Connection connection) {
+		super.connected(connection);
 	}
 	
 	

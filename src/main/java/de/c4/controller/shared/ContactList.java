@@ -24,7 +24,7 @@ public class ContactList {
 	
 	private Set<ContactDto> knownOnlineContacts = new HashSet<ContactDto>();
 	
-	public static final String LOCAL_IP = getLocalIP();
+	private static String LOCAL_IP = null;
 	
 	private ContactDto me = null;
 	
@@ -36,6 +36,7 @@ public class ContactList {
 			throw new RuntimeException("This Class is a Singleton and " +
 					"should be accessed by its Instance-Field");
 		}
+		LOCAL_IP = getLocalIP();
 		setOwnContact(Settings.INSTANCE.get(Settings.CONTACT_NAME), 
 				EOnlineState.getByNr(Integer.parseInt(Settings.INSTANCE.get(Settings.CONTACT_ONLINE_STATE))));
 	}
