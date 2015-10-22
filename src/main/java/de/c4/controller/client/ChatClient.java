@@ -2,10 +2,7 @@ package main.java.de.c4.controller.client;
 import java.awt.EventQueue;
 import java.io.IOException;
 import java.net.InetAddress;
-import java.util.Set;
 
-import main.java.de.c4.controller.shared.ConnectionManager;
-import main.java.de.c4.controller.shared.ContactList;
 import main.java.de.c4.controller.shared.Network;
 import main.java.de.c4.controller.shared.Network.ChatMessage;
 import main.java.de.c4.model.messages.ContactDto;
@@ -20,7 +17,7 @@ import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.minlog.Log;
 
-public class ChatClient extends Thread{
+public class ChatClient{
 	ChatFrame chatFrame;
 	private Client client;
 	private String host;
@@ -89,7 +86,7 @@ public class ChatClient extends Thread{
 		return client;
 	}
 	
-	public void run () {
+	public void connect () {
 		try {
 			client.connect(Network.DEFAULT_TIMEOUT, host, Network.TCP_PORT);
 			// Server communication after connection can go here, or in Listener#connected().
@@ -128,7 +125,7 @@ public class ChatClient extends Thread{
 	public static void main (String[] args) {
 		System.setProperty("java.net.preferIPv4Stack" , "true");
 		Log.set(Log.LEVEL_DEBUG);
-		new ChatClient(discoverRandomServer()).start();
+		new ChatClient(discoverRandomServer()).connect();
 		
 	}
 }

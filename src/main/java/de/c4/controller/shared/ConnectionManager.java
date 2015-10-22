@@ -38,7 +38,7 @@ public class ConnectionManager extends HashMap<ContactDto, Set<Connection>> {
 		Set<Connection> list = new HashSet<Connection>();
 		if (createIfNone) {
 			ChatClient client = new ChatClient(contact.ip);
-			client.start();
+			client.connect();
 			list.add(client.getClient());
 		}
 		INSTANCE.put(contact, list);
@@ -48,7 +48,7 @@ public class ConnectionManager extends HashMap<ContactDto, Set<Connection>> {
 	
 	public static Connection createConnectionTo(ContactDto contact){
 		ChatClient client = new ChatClient(contact.ip);
-		client.start();
+		client.connect();
 		Set<Connection> list = null;
 		if (INSTANCE.containsKey(contact)) {
 			list = INSTANCE.get(contact);

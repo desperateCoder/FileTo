@@ -7,7 +7,6 @@ import java.io.IOException;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 
-import main.java.de.c4.controller.shared.ConnectionPeer;
 import main.java.de.c4.controller.shared.MessageHandler;
 import main.java.de.c4.controller.shared.Network;
 import main.java.de.c4.model.connections.ChatConnection;
@@ -16,7 +15,7 @@ import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Server;
 import com.esotericsoftware.minlog.Log;
 
-public class ChatServer extends ConnectionPeer{
+public class ChatServer extends Thread{
 	
 	private Server server;
 	
@@ -78,11 +77,6 @@ public class ChatServer extends ConnectionPeer{
 		Log.set(Log.LEVEL_DEBUG);
 		
 		new ChatServer().start();
-	}
-
-	@Override
-	public void sendData(Object o) {
-		
 	}
 
 	@Override
