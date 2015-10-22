@@ -3,6 +3,7 @@ import java.awt.EventQueue;
 import java.io.IOException;
 import java.net.InetAddress;
 
+import main.java.de.c4.controller.shared.MessageHandler;
 import main.java.de.c4.controller.shared.Network;
 import main.java.de.c4.controller.shared.Network.ChatMessage;
 import main.java.de.c4.model.messages.ContactDto;
@@ -10,7 +11,6 @@ import main.java.de.c4.model.messages.ContactListDto;
 import main.java.de.c4.model.messages.EOnlineState;
 import main.java.de.c4.model.messages.OnlineStateChange;
 import main.java.de.c4.model.messages.RequestKnownOnlineClients;
-import main.java.de.c4.view.ChatFrame;
 
 import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Connection;
@@ -18,7 +18,6 @@ import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.minlog.Log;
 
 public class ChatClient{
-	ChatFrame chatFrame;
 	private Client client;
 	private String host;
 //	String name;
@@ -29,42 +28,7 @@ public class ChatClient{
 
 		Network.register(client);
 
-		client.addListener(new Listener() {
-			public void connected (Connection connection) {
-				Log.debug("TCP Connected to Server: "+connection.getRemoteAddressTCP());
-				OnlineStateChange state = new OnlineStateChange();
-				state.contact = new ContactDto("Test "+System.currentTimeMillis());
-				state.newState = EOnlineState.ONLINE;
-				client.sendTCP(state);
-				
-				RequestKnownOnlineClients req = new RequestKnownOnlineClients();
-				client.sendTCP(req);
-			}
-
-			public void received (Connection connection, Object object) {
-
-				if (object instanceof ContactListDto){
-					ContactListDto list = (ContactListDto)object;
-					Log.info("Recieved ContactList!");
-					for (ContactDto dto : list.contacts) {
-						System.out.println(dto.name + " ("+dto.ip+"): "+dto.state);
-					}
-				} else if (object instanceof ChatMessage) {
-					ChatMessage chatMessage = (ChatMessage)object;
-					chatFrame.addMessage(chatMessage.text);
-					return;
-				}
-			}
-
-			public void disconnected (Connection connection) {
-				EventQueue.invokeLater(new Runnable() {
-					public void run () {
-						// Closing the frame calls the close listener which will stop the client's update thread.
-						chatFrame.dispose();
-					}
-				});
-			}
-		});
+		client.addListener(new MessageHandler());
 
 		host = hostAdress;
 
@@ -74,12 +38,6 @@ public class ChatClient{
 //		if (input == null || input.trim().length() == 0) System.exit(1);
 //		name = "TEST";
 
-		// All the ugly Swing stuff is hidden in ChatFrame so it doesn't clutter the KryoNet example code.
-		
-//		final String host = "localhost";
-		
-		
-		
 	}
 	
 	public Client getClient() {
@@ -94,23 +52,6 @@ public class ChatClient{
 			ex.printStackTrace();
 			System.exit(1);
 		}
-//		Set<ContactDto> contacts = ContactList.INSTANCE.getContacts();
-		chatFrame = new ChatFrame(host);
-		// This listener is called when the send button is clicked.
-		chatFrame.setSendListener(new Runnable() {
-			public void run () {
-				ChatMessage chatMessage = new ChatMessage();
-				chatMessage.text = chatFrame.getSendText();
-				client.sendTCP(chatMessage);
-			}
-		});
-		// This listener is called when the chat window is closed.
-		chatFrame.setCloseListener(new Runnable() {
-			public void run () {
-				client.stop();
-			}
-		});
-		chatFrame.setVisible(true);
 	}
 
 	public static String discoverRandomServer(){

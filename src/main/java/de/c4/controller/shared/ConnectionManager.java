@@ -61,6 +61,10 @@ public class ConnectionManager extends HashMap<ContactDto, Set<Connection>> {
 		return c;
 	}
 	
+	/**
+	 * Removes connection if registered.
+	 * @param connection Connection to remove
+	 */
 	public static void removeConnection(Connection connection){
 		Set<ContactDto> keys = INSTANCE.keySet();
 		for (ContactDto key : keys) {

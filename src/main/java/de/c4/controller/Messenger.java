@@ -1,6 +1,10 @@
 package main.java.de.c4.controller;
 
 import main.java.de.c4.controller.client.ChatClient;
+import main.java.de.c4.model.messages.RequestKnownOnlineClients;
+
+import com.esotericsoftware.kryonet.Client;
+import com.esotericsoftware.minlog.Log;
 
 
 
@@ -18,7 +22,13 @@ public class Messenger {
 		}
 		ChatClient chatClient = new ChatClient(ChatClient.discoverRandomServer());
 		chatClient.connect();
+		Client client = chatClient.getClient();
+		Log.debug("TCP Connected to Server: "+client.getRemoteAddressTCP());
+		
+		RequestKnownOnlineClients req = new RequestKnownOnlineClients();
+		client.sendTCP(req);
 	}
+	
 	
 	/**
 	 * @param args
