@@ -12,7 +12,7 @@ import com.esotericsoftware.minlog.Log;
 
 public class IconProvider {
 	public static BufferedImage getImage(EIcons icon) {
-		InputStream stream = IconProvider.class.getResourceAsStream("./icons/"+icon.getPath());
+		InputStream stream = IconProvider.class.getResourceAsStream("./smileys/"+icon.getPath());
 		try {
 			return ImageIO.read(stream);
 		} catch (IOException e) {

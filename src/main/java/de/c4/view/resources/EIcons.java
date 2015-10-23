@@ -2,7 +2,7 @@ package main.java.de.c4.view.resources;
 
 public enum EIcons {
 
-	APP_ICON("");
+	APP_ICON("1.png");
 	
 	private String path;
 	
