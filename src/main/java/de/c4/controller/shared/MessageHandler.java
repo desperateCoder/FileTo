@@ -55,10 +55,11 @@ public class MessageHandler extends Listener{
 			c.close();
 		} else if (object instanceof ContactListDto){
 			ContactListDto list = (ContactListDto)object;
+			ContactList.INSTANCE.setOnlineContacts(list.contacts);
 			Log.info("Recieved ContactList!");
-			for (ContactDto dto : list.contacts) {
-				System.out.println(dto.name + " ("+dto.ip+"): "+dto.state);
-			}
+//			for (ContactDto dto : list.contacts) {
+//				System.out.println(dto.name + " ("+dto.ip+"): "+dto.state);
+//			}
 		}
 	}
 

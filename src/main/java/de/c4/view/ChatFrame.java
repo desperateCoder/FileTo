@@ -2,10 +2,15 @@ package main.java.de.c4.view;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Set;
 
 import javax.swing.JFrame;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
+
+import main.java.de.c4.controller.Messenger;
+import main.java.de.c4.controller.shared.ContactList;
+import main.java.de.c4.model.messages.ContactDto;
 
 
 public class ChatFrame extends JFrame implements ActionListener{
@@ -17,10 +22,12 @@ public class ChatFrame extends JFrame implements ActionListener{
 	
 	public ChatFrame() {
 		
-		for (int i = 0; i < 7; i++) {
-			tabbedPane.addTab(new ChatPanel());
-		}
 		
+		Set<ContactDto> contacts = ContactList.INSTANCE.getContacts();
+		
+		for (ContactDto contactDto : contacts) {
+			tabbedPane.addTab(new ChatPanel(contactDto));
+		}
 		
 		
 		setContentPane(tabbedPane);
@@ -36,6 +43,7 @@ public class ChatFrame extends JFrame implements ActionListener{
 	
 	
 	public static void main(String[] args) {
+		Messenger.init();
 		try {
 		    for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
 		        if ("Nimbus".equals(info.getName())) {

@@ -15,7 +15,9 @@ import java.awt.dnd.DropTargetDropEvent;
 import java.awt.dnd.DropTargetEvent;
 import java.awt.dnd.DropTargetListener;
 import java.io.File;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -30,6 +32,7 @@ import javax.swing.text.Document;
 import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.text.html.StyleSheet;
 
+import main.java.de.c4.model.messages.ContactDto;
 import main.java.de.c4.view.resources.EIcons;
 import main.java.de.c4.view.resources.IconProvider;
 
@@ -38,15 +41,16 @@ public class ChatPanel extends JSplitPane implements DropTargetListener {
 
 	private static final long serialVersionUID = 1L;
 	
-	private String title = "(2) [G] Stefan Niedermann";
+	private Set<ContactDto> contacts = new HashSet<ContactDto>();
 	
 	private JEditorPane messageBox = new JEditorPane();
 	JScrollPane messageScrollPane;
 	
 	private JTextArea inputArea = new JTextArea();
 
-	public ChatPanel() {
+	public ChatPanel(ContactDto contact) {
 		super(JSplitPane.HORIZONTAL_SPLIT);
+		contacts.add(contact);
 		messageBox.setEditable(false);
 
 		HTMLEditorKit kit = new HTMLEditorKit();
@@ -143,7 +147,12 @@ public class ChatPanel extends JSplitPane implements DropTargetListener {
 	
 	
 	public String getTitle() {
-		return title;
+		String buf = "";
+		if (contacts.size()>1) {
+			buf+="[G] ";
+		}
+		buf += contacts.iterator().next().name;
+		return buf;
 	}
 
 

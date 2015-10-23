@@ -1,19 +1,14 @@
 package main.java.de.c4.controller.server;
 
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.io.IOException;
-
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-
-import main.java.de.c4.controller.shared.MessageHandler;
-import main.java.de.c4.controller.shared.Network;
-import main.java.de.c4.model.connections.ChatConnection;
 
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Server;
 import com.esotericsoftware.minlog.Log;
+
+import main.java.de.c4.controller.shared.MessageHandler;
+import main.java.de.c4.controller.shared.Network;
+import main.java.de.c4.model.connections.ChatConnection;
 
 public class ChatServer extends Thread{
 	
@@ -37,18 +32,18 @@ public class ChatServer extends Thread{
 		server.addListener(messageHandler);
 		server.bind(Network.TCP_PORT);//
 
-		// Open a window to provide an easy way to stop the server.
-		JFrame frame = new JFrame("Chat Server");
-		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		frame.addWindowListener(new WindowAdapter() {
-			public void windowClosed(WindowEvent evt) {
-				server.stop();
-			}
-		});
-		frame.getContentPane().add(new JLabel("Close to stop the chat server."));
-		frame.setSize(320, 200);
-		frame.setLocationRelativeTo(null);
-		frame.setVisible(true);
+//		// Open a window to provide an easy way to stop the server.
+//		JFrame frame = new JFrame("Chat Server");
+//		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+//		frame.addWindowListener(new WindowAdapter() {
+//			public void windowClosed(WindowEvent evt) {
+//				server.stop();
+//			}
+//		});
+//		frame.getContentPane().add(new JLabel("Close to stop the chat server."));
+//		frame.setSize(320, 200);
+//		frame.setLocationRelativeTo(null);
+//		frame.setVisible(true);
 	}
 	
 //	private ContactDto buildByAddr(InetAddress ad){

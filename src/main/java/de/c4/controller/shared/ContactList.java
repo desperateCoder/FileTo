@@ -2,6 +2,7 @@ package main.java.de.c4.controller.shared;
 
 import java.net.InetAddress;
 import java.net.NetworkInterface;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Set;
@@ -79,13 +80,18 @@ public class ContactList {
 	} 
 	
 	public ContactListDto getContactListForContactsRequest(InetAddress endPointAdress){
-		ContactDto[] contacts = knownOnlineContacts.toArray(new ContactDto[]{});
-		for (int i = 0; i < contacts.length; i++) {
-			if (endPointAdress.getHostAddress().equals(contacts[i].ip)) {
-				contacts[i] = me;
+		ArrayList<ContactDto> contacts = new ArrayList<ContactDto>(knownOnlineContacts);
+		boolean includedMe = false;
+		for (int i = 0; i < contacts.size(); i++) {
+			if (endPointAdress.getHostAddress().equals(contacts.get(i).ip)) {
+				contacts.set(i, me);
+				includedMe=true;
 			}
 		}
-		return new ContactListDto(contacts);
+		if (!includedMe) {
+			contacts.add(me);
+		}
+		return new ContactListDto(contacts.toArray(new ContactDto[]{}));
 	}
 	
 	
