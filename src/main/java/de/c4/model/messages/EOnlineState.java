@@ -1,15 +1,21 @@
 package main.java.de.c4.model.messages;
 
+import main.java.de.c4.view.resources.EIcons;
+
 public enum EOnlineState {
-	ONLINE(1),
-	OFFLINE(2), 
-	AFK(3), 
-	DND(4);
+	ONLINE(1, "Online", EIcons.STATE_ONLINE),
+	AFK(2, "AFK (Abwesend)", EIcons.STATE_AFK), 
+	DND(3, "DND (Bitte nicht stören)", EIcons.STATE_DND),
+	OFFLINE(4, "Offline", EIcons.STATE_OFFLINE); 
 	
 	private int nr;
+	private String title;
+	private EIcons icon;
 
-	private EOnlineState(int nr) {
+	private EOnlineState(int nr, String title, EIcons icon) {
 		this.nr = nr;
+		this.icon = icon;
+		this.title = title;
 	}
 
 	public int getNr() {
@@ -22,5 +28,13 @@ public enum EOnlineState {
 			}
 		}
 		throw new RuntimeException("Unbekannter Online-Status: "+i);
+	}
+	
+	@Override
+	public String toString() {
+		return title;
+	}
+	public EIcons getIcon() {
+		return icon;
 	}
 }

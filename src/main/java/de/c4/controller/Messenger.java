@@ -28,19 +28,21 @@ public class Messenger {
 			throw new RuntimeException("This Class is a Singleton and " +
 					"should be accessed by its Instance-Field");
 		}
-		ChatClient chatClient = new ChatClient(ChatClient.discoverRandomServer());
-		chatClient.connect();
-		Client client = chatClient.getClient();
-		Log.debug("TCP Connected to Server: "+client.getRemoteAddressTCP());
-		
-		RequestKnownOnlineClients req = new RequestKnownOnlineClients();
-		client.sendTCP(req);
 		
 		try {
+			ChatClient chatClient = new ChatClient(ChatClient.discoverRandomServer());
+			chatClient.connect();
+			Client client = chatClient.getClient();
+			Log.debug("TCP Connected to Server: "+client.getRemoteAddressTCP());
+			
+			RequestKnownOnlineClients req = new RequestKnownOnlineClients();
+			client.sendTCP(req);
 			chatServer = new ChatServer();
 			chatServer.start();
 		} catch (IOException e) {
-			Log.error("Fehler beim starten des Servers: " + ExceptionUtil.getStacktrace(e));
+			Log.error("I/O-Error starting the server: " + ExceptionUtil.getStacktrace(e));
+		} catch (NullPointerException e) {
+			Log.info("Server started, but: " + e.getMessage());
 		}
 		
 	}

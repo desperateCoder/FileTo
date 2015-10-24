@@ -1,4 +1,4 @@
-package main.java.de.c4.view;
+package main.java.de.c4.view.components;
 
 import java.awt.BorderLayout;
 import java.awt.Desktop;

@@ -1,21 +1,11 @@
 package main.java.de.c4.controller.client;
-import java.awt.EventQueue;
 import java.io.IOException;
 import java.net.InetAddress;
 
+import com.esotericsoftware.kryonet.Client;
+
 import main.java.de.c4.controller.shared.MessageHandler;
 import main.java.de.c4.controller.shared.Network;
-import main.java.de.c4.controller.shared.Network.ChatMessage;
-import main.java.de.c4.model.messages.ContactDto;
-import main.java.de.c4.model.messages.ContactListDto;
-import main.java.de.c4.model.messages.EOnlineState;
-import main.java.de.c4.model.messages.OnlineStateChange;
-import main.java.de.c4.model.messages.RequestKnownOnlineClients;
-
-import com.esotericsoftware.kryonet.Client;
-import com.esotericsoftware.kryonet.Connection;
-import com.esotericsoftware.kryonet.Listener;
-import com.esotericsoftware.minlog.Log;
 
 public class ChatClient{
 	private Client client;
@@ -54,19 +44,21 @@ public class ChatClient{
 		}
 	}
 
-	public static String discoverRandomServer(){
+	public static String discoverRandomServer() throws NullPointerException{
 		Client client = new Client();
 		client.start();
 		InetAddress addr = client.discoverHost(Network.UDP_PORT, 10000);
-		String host = addr.getHostAddress();
 		client.stop();
+		if (addr == null) {
+			throw new NullPointerException("There is no other server online.");
+		}
+		String host = addr.getHostAddress();
 		return host;
 	}
 	
-	public static void main (String[] args) {
-		System.setProperty("java.net.preferIPv4Stack" , "true");
-		Log.set(Log.LEVEL_DEBUG);
-		new ChatClient(discoverRandomServer()).connect();
-		
-	}
+//	public static void main (String[] args) {
+//		System.setProperty("java.net.preferIPv4Stack" , "true");
+//		Log.set(Log.LEVEL_DEBUG);
+//		new ChatClient(discoverRandomServer()).connect();
+//	}
 }

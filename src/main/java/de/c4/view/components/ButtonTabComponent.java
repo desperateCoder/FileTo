@@ -1,4 +1,4 @@
-package main.java.de.c4.view;
+package main.java.de.c4.view.components;
 
 import java.awt.BasicStroke;
 import java.awt.BorderLayout;
@@ -19,6 +19,8 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.plaf.basic.BasicButtonUI;
+
+import main.java.de.c4.view.listener.TabCloseListener;
 
 public class ButtonTabComponent extends JPanel {
 

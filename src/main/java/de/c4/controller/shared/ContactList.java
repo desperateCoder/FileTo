@@ -3,17 +3,18 @@ package main.java.de.c4.controller.shared;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Set;
+
+import com.esotericsoftware.kryonet.Connection;
+import com.esotericsoftware.minlog.Log;
 
 import main.java.de.c4.model.messages.ContactDto;
 import main.java.de.c4.model.messages.ContactListDto;
 import main.java.de.c4.model.messages.EOnlineState;
 import main.java.de.c4.model.messages.OnlineStateChange;
-
-import com.esotericsoftware.kryonet.Connection;
-import com.esotericsoftware.minlog.Log;
 /**
  * Singleton, which provides the ContactList and States of the Contacts
  * @author Artur Dawtjan

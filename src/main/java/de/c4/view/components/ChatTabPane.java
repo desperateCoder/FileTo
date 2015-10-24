@@ -1,10 +1,12 @@
-package main.java.de.c4.view;
+package main.java.de.c4.view.components;
 
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.JTabbedPane;
+
+import main.java.de.c4.view.listener.TabCloseListener;
 
 
 public class ChatTabPane extends JTabbedPane implements ActionListener, TabCloseListener{

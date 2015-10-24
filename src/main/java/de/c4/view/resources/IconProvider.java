@@ -6,13 +6,13 @@ import java.io.InputStream;
 
 import javax.imageio.ImageIO;
 
-import main.java.de.c4.controller.shared.ExceptionUtil;
-
 import com.esotericsoftware.minlog.Log;
+
+import main.java.de.c4.controller.shared.ExceptionUtil;
 
 public class IconProvider {
 	public static BufferedImage getImage(EIcons icon) {
-		InputStream stream = IconProvider.class.getResourceAsStream("./smileys/"+icon.getPath());
+		InputStream stream = IconProvider.class.getClassLoader().getSystemResourceAsStream(icon.getPath());
 		try {
 			return ImageIO.read(stream);
 		} catch (IOException e) {
