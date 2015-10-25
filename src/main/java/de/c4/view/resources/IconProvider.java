@@ -12,7 +12,7 @@ import main.java.de.c4.controller.shared.ExceptionUtil;
 
 public class IconProvider {
 	public static BufferedImage getImage(EIcons icon) {
-		InputStream stream = IconProvider.class.getClassLoader().getSystemResourceAsStream(icon.getPath());
+		InputStream stream = IconProvider.class.getResourceAsStream("./"+icon.getPath());
 		try {
 			return ImageIO.read(stream);
 		} catch (IOException e) {

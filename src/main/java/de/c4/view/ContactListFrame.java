@@ -40,6 +40,7 @@ public class ContactListFrame extends JFrame implements ActionListener {
 		
 		JComboBox<EOnlineState> stateCombo = new JComboBox<EOnlineState>(EOnlineState.values());
 		stateCombo.setRenderer(new ListCellRenderer<EOnlineState>() {
+			private static final int SIZE = 26;
 			private final Font FONT = new Font("Helvetica", Font.BOLD, 16);
 			public Component getListCellRendererComponent(JList<? extends EOnlineState> list, EOnlineState value,
 					int index, boolean isSelected, boolean cellHasFocus) {
@@ -47,7 +48,8 @@ public class ContactListFrame extends JFrame implements ActionListener {
 				JLabel l = new JLabel(value.toString());
 				l.setFont(FONT);
 				comp.add(l, BorderLayout.CENTER);
-				JLabel image = new JLabel(new ImageIcon(IconProvider.getImage(value.getIcon())), 0);
+				
+				JLabel image = new JLabel(new ImageIcon(IconProvider.getImage(value.getIcon()).getScaledInstance(SIZE, SIZE, 0)), 0);
 				comp.add(image, BorderLayout.WEST);
 				return comp;
 			}
@@ -68,7 +70,7 @@ public class ContactListFrame extends JFrame implements ActionListener {
 	}
 
 	public static void main(String[] args) {
-		new JLabel(new ImageIcon(IconProvider.getImage(EOnlineState.OFFLINE.getIcon())), 0);
+//		new JLabel(new ImageIcon(IconProvider.getImage(EOnlineState.OFFLINE.getIcon())), 0);
 		System.setProperty("java.net.preferIPv4Stack" , "true");
 		new Thread(new Runnable() {
 			
