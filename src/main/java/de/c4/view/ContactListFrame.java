@@ -5,7 +5,13 @@ import java.awt.Component;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.util.ArrayList;
 
+import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
@@ -18,17 +24,25 @@ import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
 
 import main.java.de.c4.controller.Messenger;
+import main.java.de.c4.controller.shared.ContactList;
+import main.java.de.c4.controller.shared.listener.ContactListReceivedListener;
+import main.java.de.c4.controller.shared.listener.OnlineStateChangeListener;
 import main.java.de.c4.model.messages.ContactDto;
 import main.java.de.c4.model.messages.EOnlineState;
+import main.java.de.c4.model.messages.OnlineStateChange;
 import main.java.de.c4.view.resources.IconProvider;
 
-public class ContactListFrame extends JFrame implements ActionListener {
+public class ContactListFrame extends JFrame implements ActionListener, OnlineStateChangeListener, ContactListReceivedListener, ItemListener {
 
 	private static final long serialVersionUID = 1L;
 
-	private JList<ContactDto> contactList = new JList<ContactDto>();
+	private JList<ContactDto> contactList = new JList<ContactDto>(new DefaultListModel<ContactDto>());
 
+	private ChatFrame chatFrame = new ChatFrame();
+	
 	public ContactListFrame() {
+		ContactList.INSTANCE.addReceivedContactListListener(this);
+		ContactList.INSTANCE.addOnlineStateChangeListener(this);
 		
 		JPanel content = new JPanel(new BorderLayout());
 		
@@ -37,11 +51,46 @@ public class ContactListFrame extends JFrame implements ActionListener {
 		content.add(labelPanel, BorderLayout.NORTH);
 		
 		content.add(new JScrollPane(contactList), BorderLayout.CENTER);
+		contactList.setCellRenderer(new ListCellRenderer<ContactDto>() {
+			private static final int SIZE = 40;
+			private final Font FONT = new Font("SansSerif", Font.BOLD, 16);
+			private final Font IP_FONT = new Font("SansSerif", Font.PLAIN, 14);
+			
+			public Component getListCellRendererComponent(
+					JList<? extends ContactDto> list, ContactDto value,
+					int index, boolean isSelected, boolean cellHasFocus) {
+				JPanel comp = new JPanel(new BorderLayout());
+				JLabel l = new JLabel(value.name);
+				l.setFont(FONT);
+				JPanel text = new JPanel(new BorderLayout());
+				text.add(l, BorderLayout.NORTH);
+				l = new JLabel(value.ip);
+				l.setFont(IP_FONT);
+				text.add(l, BorderLayout.SOUTH);
+				
+				comp.add(text, BorderLayout.CENTER);
+				
+				JLabel image = new JLabel(new ImageIcon(IconProvider.getImage(value.state.getIcon()).getScaledInstance(SIZE, SIZE, 0)), 0);
+				comp.add(image, BorderLayout.WEST);
+				return comp;
+			}
+		});
+		contactList.addMouseListener(new MouseAdapter() {
+		    public void mouseClicked(MouseEvent evt) {
+		        @SuppressWarnings("unchecked")
+				JList<ContactDto> list = (JList<ContactDto>)evt.getSource();
+		        if (evt.getClickCount() == 2) {
+		            int index = list.locationToIndex(evt.getPoint());
+		            ContactDto c = list.getModel().getElementAt(index);
+		            chatFrame.showContactTab(c);
+		        } 
+		    }
+		});
 		
 		JComboBox<EOnlineState> stateCombo = new JComboBox<EOnlineState>(EOnlineState.values());
 		stateCombo.setRenderer(new ListCellRenderer<EOnlineState>() {
 			private static final int SIZE = 26;
-			private final Font FONT = new Font("Helvetica", Font.BOLD, 16);
+			private final Font FONT = new Font("SansSerif", Font.BOLD, 18);
 			public Component getListCellRendererComponent(JList<? extends EOnlineState> list, EOnlineState value,
 					int index, boolean isSelected, boolean cellHasFocus) {
 				JPanel comp = new JPanel(new BorderLayout());
@@ -54,6 +103,8 @@ public class ContactListFrame extends JFrame implements ActionListener {
 				return comp;
 			}
 		});
+		stateCombo.setSelectedItem(ContactList.getMe().state);
+		stateCombo.addItemListener(this);
 		
 		
 		content.add(stateCombo, BorderLayout.SOUTH);
@@ -89,5 +140,30 @@ public class ContactListFrame extends JFrame implements ActionListener {
 		    // Nimbus is not available. Take default-LaF. Just do nothing.
 		}
 		new ContactListFrame();
+	}
+
+	public void receivedContactList(ContactDto[] list) {
+		for (ContactDto c : list) {
+			((DefaultListModel<ContactDto>)(contactList.getModel())).addElement(c);
+		}
+		Messenger.goOnline();
+	}
+
+	public void itemStateChanged(ItemEvent e) {
+		if (e.getStateChange()==ItemEvent.SELECTED) {
+			EOnlineState state = (EOnlineState)e.getItem();
+			ContactList.INSTANCE.setOnlineState(state);
+			if (state == EOnlineState.OFFLINE) {
+				((DefaultListModel<ContactDto>)(contactList.getModel())).clear();
+			}
+		}
+	}
+
+	public void onlineStateChanged(OnlineStateChange change) {
+		((DefaultListModel<ContactDto>)(contactList.getModel())).clear();
+		ArrayList<ContactDto> list = ContactList.INSTANCE.getContacts();
+		for (ContactDto c : list) {
+			((DefaultListModel<ContactDto>)(contactList.getModel())).addElement(c);
+		}
 	}
 }

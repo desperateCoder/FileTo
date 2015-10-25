@@ -2,10 +2,10 @@ package main.java.de.c4.controller.client;
 import java.io.IOException;
 import java.net.InetAddress;
 
-import com.esotericsoftware.kryonet.Client;
-
 import main.java.de.c4.controller.shared.MessageHandler;
 import main.java.de.c4.controller.shared.Network;
+
+import com.esotericsoftware.kryonet.Client;
 
 public class ChatClient{
 	private Client client;
@@ -47,7 +47,7 @@ public class ChatClient{
 	public static String discoverRandomServer() throws NullPointerException{
 		Client client = new Client();
 		client.start();
-		InetAddress addr = client.discoverHost(Network.UDP_PORT, 10000);
+		InetAddress addr = client.discoverHost(Network.UDP_PORT, 2000);
 		client.stop();
 		if (addr == null) {
 			throw new NullPointerException("There is no other server online.");

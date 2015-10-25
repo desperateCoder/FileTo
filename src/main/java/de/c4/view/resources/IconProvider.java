@@ -3,16 +3,17 @@ package main.java.de.c4.view.resources;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 
 import javax.imageio.ImageIO;
 
-import com.esotericsoftware.minlog.Log;
-
 import main.java.de.c4.controller.shared.ExceptionUtil;
+
+import com.esotericsoftware.minlog.Log;
 
 public class IconProvider {
 	public static BufferedImage getImage(EIcons icon) {
-		InputStream stream = IconProvider.class.getResourceAsStream("./"+icon.getPath());
+		InputStream stream = IconProvider.class.getResourceAsStream(icon.getPath());
 		try {
 			return ImageIO.read(stream);
 		} catch (IOException e) {
@@ -23,5 +24,9 @@ public class IconProvider {
 			Log.error(ExceptionUtil.getStacktrace(e));
 		}
 		return null;
+	}
+	
+	public static URL getImageAsURL(EIcons icon) {
+		return IconProvider.class.getResource("./"+icon.getPath());
 	}
 }

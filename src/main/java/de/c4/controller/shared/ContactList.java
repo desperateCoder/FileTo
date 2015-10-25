@@ -2,29 +2,35 @@ package main.java.de.c4.controller.shared;
 
 import java.net.InetAddress;
 import java.net.NetworkInterface;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.esotericsoftware.kryonet.Connection;
-import com.esotericsoftware.minlog.Log;
-
+import main.java.de.c4.controller.shared.listener.ContactListReceivedListener;
+import main.java.de.c4.controller.shared.listener.OnlineStateChangeListener;
 import main.java.de.c4.model.messages.ContactDto;
 import main.java.de.c4.model.messages.ContactListDto;
 import main.java.de.c4.model.messages.EOnlineState;
 import main.java.de.c4.model.messages.OnlineStateChange;
+
+import com.esotericsoftware.kryonet.Connection;
+import com.esotericsoftware.minlog.Log;
 /**
  * Singleton, which provides the ContactList and States of the Contacts
  * @author Artur Dawtjan
  *
  */
 public class ContactList {
+	
+
+	private Set<ContactListReceivedListener> contactListReceivedListener = new HashSet<ContactListReceivedListener>();
+	private Set<OnlineStateChangeListener> onlineStateChangeListener = new HashSet<OnlineStateChangeListener>();
 
 	public static final ContactList INSTANCE = new ContactList(true);
 	
-	private Set<ContactDto> knownOnlineContacts = new HashSet<ContactDto>();
+	private ArrayList<ContactDto> knownOnlineContacts = new ArrayList<ContactDto>();
 	
 	private static String LOCAL_IP = null;
 	
@@ -63,21 +69,28 @@ public class ContactList {
 				while (a.hasMoreElements()) {
 					InetAddress addr = a.nextElement();
 					String hostAddress = addr.getHostAddress();
+					Log.debug("Host-Address: " + hostAddress);
 					if (hostAddress.matches("[0-9]{1,3}(.)[0-9]{1,3}(.)[0-9]{1,3}(.)[0-9]{1,3}")
 							&& !hostAddress.equals("127.0.0.1")) {
 						Log.debug("Found local Host-Address: " + hostAddress);
 						return hostAddress;
 					}
 				}
-				Log.error("No local Host-Address Found!");
-				System.exit(1);
+				Log.error("No local Host-Address Found! (No interfaces detected)");
 			} 
 		} catch(Exception e) {
 			Log.error("No local Host-Address Found! Cause:");
 			Log.error(ExceptionUtil.getStacktrace(e));
-	        System.exit(1);
+//	        System.exit(1);
 		}
-	    return null;
+	    try {
+			return InetAddress.getLocalHost().getHostAddress();
+		} catch (UnknownHostException e) {
+			Log.error("No local Host-Address Found! Cause:");
+			Log.error(ExceptionUtil.getStacktrace(e));
+		}
+	    return "";
+	    
 	} 
 	
 	public ContactListDto getContactListForContactsRequest(InetAddress endPointAdress){
@@ -114,7 +127,9 @@ public class ContactList {
 		
 		switch (onlineState.newState) {
 		case ONLINE:
-			knownOnlineContacts.add(contact);
+			if (!knownOnlineContacts.contains(contact)) {
+				knownOnlineContacts.add(contact);
+			}
 			break;
 		case OFFLINE:
 			knownOnlineContacts.remove(contact);
@@ -128,12 +143,22 @@ public class ContactList {
 			knownOnlineContacts.add(contact);
 
 		}
+		for (OnlineStateChangeListener l : onlineStateChangeListener) {
+			l.onlineStateChanged(onlineState);
+		}
+	}
+	
+	public void addOnlineStateChangeListener(OnlineStateChangeListener l){
+		onlineStateChangeListener.add(l);
 	}
 	
 	public void setOnlineContacts(ContactDto[] contacts){
 		knownOnlineContacts.clear();
 		for (ContactDto c : contacts) {
 			knownOnlineContacts.add(c);
+		}
+		for (ContactListReceivedListener l : contactListReceivedListener) {
+			l.receivedContactList(contacts);
 		}
 	}
 	
@@ -147,35 +172,61 @@ public class ContactList {
 	}
 
 	/**
-	 * Sets the OnlineState and notifies all known other clients, 
+	 * Sets the OnlineState and notifies all known other clients and updates the settings, 
 	 * if, and only if, it has changed.
 	 * @param onlineState new online-state
 	 */
 	public void setOnlineState(final EOnlineState onlineState) {
-		new Thread(new Runnable() {
-			
-			public void run() {
+		setOnlineState(onlineState, true);
+	}
+	
+	/**
+	 * Sets the OnlineState and notifies all known other clients and updates the settings, 
+	 * if, and only if, it has changed.
+	 * @param setInSettings if true, settings-file will be updated
+	 * @param onlineState new online-state
+	 */
+	public void setOnlineState(final EOnlineState onlineState, boolean setInSettings) {
+		
 				if (me.state != onlineState) {
 					me.state = onlineState;
 					OnlineStateChange change = new OnlineStateChange();
 					change.contact = me;
 					change.newState = me.state;
-					for (ContactDto c : knownOnlineContacts) {
-						Connection connection = ConnectionManager.createConnectionTo(c);
-						connection.sendTCP(change);
-						ConnectionManager.closeAndRemoveConnection(connection);
-					}
+					broadcast(change);
 				} else me.state = onlineState;
+
+			
+		if (me.state != onlineState && setInSettings) {
+			Settings.INSTANCE.set(Settings.CONTACT_ONLINE_STATE, onlineState.getNr()+"");
+			Settings.INSTANCE.save();
+		}
+	}
+	public void broadcast(final Object o) {
+		new Thread(new Runnable() {
+			
+			public void run() {
+				for (ContactDto c : knownOnlineContacts) {
+					Connection connection = ConnectionManager.createConnectionTo(c);
+					connection.sendTCP(o);
+					ConnectionManager.closeAndRemoveConnection(connection);
+				}
 			}
+			
 		}).start();
-		
 	}
 	
 	public static ContactDto getMe(){
 		return INSTANCE.me;
 	}
 
-	public Set<ContactDto> getContacts() {
+	public ArrayList<ContactDto> getContacts() {
 		return knownOnlineContacts;
+	}
+	public void addReceivedContactListListener(ContactListReceivedListener l) {
+		contactListReceivedListener.add(l);
+		if (knownOnlineContacts.size()>0) {
+			l.receivedContactList(knownOnlineContacts.toArray(new ContactDto[]{}));
+		}
 	}
 }

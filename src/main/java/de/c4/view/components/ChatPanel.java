@@ -3,8 +3,6 @@ package main.java.de.c4.view.components;
 import java.awt.BorderLayout;
 import java.awt.Desktop;
 import java.awt.FlowLayout;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
@@ -14,6 +12,8 @@ import java.awt.dnd.DropTargetDragEvent;
 import java.awt.dnd.DropTargetDropEvent;
 import java.awt.dnd.DropTargetEvent;
 import java.awt.dnd.DropTargetListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.io.File;
 import java.util.HashSet;
 import java.util.List;
@@ -28,10 +28,14 @@ import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
+import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.text.html.StyleSheet;
 
+import main.java.de.c4.controller.TimestampUtil;
+import main.java.de.c4.controller.shared.ContactList;
+import main.java.de.c4.controller.shared.Network.ChatMessage;
 import main.java.de.c4.model.messages.ContactDto;
 import main.java.de.c4.view.resources.EIcons;
 import main.java.de.c4.view.resources.IconProvider;
@@ -44,13 +48,35 @@ public class ChatPanel extends JSplitPane implements DropTargetListener {
 	private Set<ContactDto> contacts = new HashSet<ContactDto>();
 	
 	private JEditorPane messageBox = new JEditorPane();
-	JScrollPane messageScrollPane;
+	private JScrollPane messageScrollPane;
 	
+	private final long CHAT_ID;
+	private StringBuffer sb = new StringBuffer();
 	private JTextArea inputArea = new JTextArea();
 
 	public ChatPanel(ContactDto contact) {
 		super(JSplitPane.HORIZONTAL_SPLIT);
-		contacts.add(contact);
+		CHAT_ID = System.currentTimeMillis();
+		
+		inputArea.addKeyListener(new KeyListener() {
+			public void keyTyped(KeyEvent arg0) {
+				
+			}
+			public void keyReleased(KeyEvent arg0) {}
+			public void keyPressed(KeyEvent arg0) {
+				if (arg0.getKeyCode()==KeyEvent.VK_ENTER) {
+					if (arg0.isControlDown()) {
+						inputArea.append("\n");
+						inputArea.setCaretPosition(inputArea.getText().length()-1);
+					} else {
+						sendMessage(inputArea.getText());
+						inputArea.setText("");
+					}
+				}
+			}
+		});
+		
+		getContacts().add(contact);
 		messageBox.setEditable(false);
 
 		HTMLEditorKit kit = new HTMLEditorKit();
@@ -66,14 +92,17 @@ public class ChatPanel extends JSplitPane implements DropTargetListener {
 		
 		Document doc = kit.createDefaultDocument();
 		messageBox.setDocument(doc);
-		String imgsrc = 
-	            getClass().getResource("resources/smileys/1.png").toString();
-		messageBox.setText("<div class=\"oMessage\">hallo</div>"
-				+ "<div class=\"myMessage\"><a href=\"file:///home/artur\">Ordner</a></div>"
-				+ "<div class=\"myMessage\"><a href=\"file:///home/artur/arbeit/spielwiese/FileTo/src/ChatPanel.java\">Datei</a></div>"
-				+ "<div class=\"nMessage\">Datei bla uebertragen</div>"
-				+ "<div class=\"oMessage\">du bist doof! <img class=\"emote\" width=25 height=25 src='"+imgsrc+"'></img></div>"
-				+ "<div class=\"myMessage\">danke! das werde ich mir bei gelegenheit mal ansehen, du blöder horst du!</div>");
+		infoMessage("Chat mit "+contact.name+" gestartet");
+//		String imgsrc = 
+//	            IconProvider.getImageAsURL(EIcons.SMILEY_SMILE).toString();
+//		
+//		messageBox.setText("<div class=\"oMessage\">hallo</div>"
+//				+ "<div class=\"myMessage\"><a href=\"file:///home/artur\">Ordner</a></div>"
+//				+ "<div class=\"myMessage\"><a href=\"file:///home/artur/arbeit/spielwiese/FileTo/src/ChatPanel.java\">Datei</a></div>"
+//				+ "<div class=\"myMessage\"><a href=\"http://google.de\">Link</a></div>"
+//				+ "<div class=\"nMessage\">Datei bla uebertragen</div>"
+//				+ "<div class=\"oMessage\">du bist doof! <img class=\"emote\" width=25 height=25 src='"+imgsrc+"'></img></div>"
+//				+ "<div class=\"myMessage\">danke! das werde ich mir bei gelegenheit mal ansehen, du blöder horst du!</div>");
 		
 		
 		messageBox.addHyperlinkListener(new HyperlinkListener() {
@@ -99,19 +128,15 @@ public class ChatPanel extends JSplitPane implements DropTargetListener {
 		
 		JPanel inputPanel = new JPanel(new BorderLayout());
 		
-		GridBagConstraints c = new GridBagConstraints();
+		JPanel buttons = new JPanel(new BorderLayout());
 		
-		JPanel buttons = new JPanel(new GridBagLayout());
-		
-		c.gridx = c.gridy = 0;
-		c.anchor = GridBagConstraints.WEST; 
 		
 		FlowLayout l = new FlowLayout();
 		l.setHgap(1);
 		l.setVgap(1);
 		l.setAlignment(FlowLayout.LEFT);
 		JPanel left = new JPanel(l); 
-		JButton smileyBtn = new JButton(new ImageIcon(IconProvider.getImage(EIcons.APP_ICON).getScaledInstance(20, 20, 0)));
+		JButton smileyBtn = new JButton(new ImageIcon(IconProvider.getImage(EIcons.SMILEY_SMILE).getScaledInstance(20, 20, 0)));
 		Insets zeroInsets = new Insets(0, 0, 0, 0);
 		smileyBtn.setMargin(zeroInsets);
 		left.add(smileyBtn);
@@ -119,17 +144,13 @@ public class ChatPanel extends JSplitPane implements DropTargetListener {
 		left.add(new JButton("AG"));
 
 		
-		c.weightx = 1D;
-		buttons.add(left, c);
+		buttons.add(left, BorderLayout.WEST);
 		
-		c.gridx++;
-		c.anchor = GridBagConstraints.CENTER;
-		buttons.add(new JButton("!"), c);
+		JPanel right = new JPanel(l); 
+		right.add(new JButton("!"));
+		right.add(new JButton("senden"));
 
-		c.gridx++;
-		c.anchor = GridBagConstraints.EAST;
-		
-		buttons.add(new JButton("senden"), c);
+		buttons.add(right, BorderLayout.EAST);
 //		
 //		JPanel p = new JPanel();
 //		p.add();
@@ -148,10 +169,10 @@ public class ChatPanel extends JSplitPane implements DropTargetListener {
 	
 	public String getTitle() {
 		String buf = "";
-		if (contacts.size()>1) {
+		if (getContacts().size()>1) {
 			buf+="[G] ";
 		}
-		buf += contacts.iterator().next().name;
+		buf += getContacts().iterator().next().name;
 		return buf;
 	}
 
@@ -186,7 +207,8 @@ public class ChatPanel extends JSplitPane implements DropTargetListener {
              dtde.acceptDrop(dtde.getDropAction());
              try {
 
-                 List<File> transferData = (List<File>) transferable.getTransferData(DataFlavor.javaFileListFlavor);
+                 @SuppressWarnings("unchecked")
+				List<File> transferData = (List<File>) transferable.getTransferData(DataFlavor.javaFileListFlavor);
                  if (transferData != null && transferData.size() > 0) {
 //                     importFiles(transferData);
                 	 for (Object object : transferData) {
@@ -202,6 +224,40 @@ public class ChatPanel extends JSplitPane implements DropTargetListener {
              dtde.rejectDrop();
          }
      }
-	
 
+
+	public long getChatId() {
+		return CHAT_ID;
+	}
+
+
+	public Set<ContactDto> getContacts() {
+		return contacts;
+	}
+
+	public void receiveMessage(ChatMessage m){
+		sb.append("<div class=\"oMessage\">");
+		sb.append(m);
+		sb.append("</div>");
+		messageBox.setText(sb.toString());
+	}
+	
+	public void sendMessage(String m){
+		sb.append("<div class=\"myMessage\">");
+		sb.append("<div class=\"from\"><span>");
+		sb.append(ContactList.getMe().name);
+		sb.append(" (");
+		sb.append(TimestampUtil.getCurrentTimestamp());
+		sb.append("):</span></div>");
+		sb.append(m);
+		sb.append("</div>");
+		messageBox.setText(sb.toString());
+	}
+	
+	public void infoMessage(String m){
+		sb.append("<div class=\"nMessage\">");
+		sb.append(m);
+		sb.append("</div>");
+		messageBox.setText(sb.toString());
+	}
 }

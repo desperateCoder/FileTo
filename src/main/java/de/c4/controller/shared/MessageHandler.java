@@ -4,10 +4,6 @@ import java.net.InetAddress;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.esotericsoftware.kryonet.Connection;
-import com.esotericsoftware.kryonet.Listener;
-import com.esotericsoftware.minlog.Log;
-
 import main.java.de.c4.controller.shared.Network.ChatMessage;
 import main.java.de.c4.controller.shared.listener.MessageRecievedListener;
 import main.java.de.c4.model.messages.ContactDto;
@@ -15,6 +11,10 @@ import main.java.de.c4.model.messages.ContactListDto;
 import main.java.de.c4.model.messages.EOnlineState;
 import main.java.de.c4.model.messages.OnlineStateChange;
 import main.java.de.c4.model.messages.RequestKnownOnlineClients;
+
+import com.esotericsoftware.kryonet.Connection;
+import com.esotericsoftware.kryonet.Listener;
+import com.esotericsoftware.minlog.Log;
 
 public class MessageHandler extends Listener{
 
@@ -41,9 +41,9 @@ public class MessageHandler extends Listener{
 			messageRecieved(contact, chatMessage);
 			
 		} else if (object instanceof OnlineStateChange) {
-			
 			InetAddress ip = c.getRemoteAddressTCP().getAddress();
 			OnlineStateChange onlineState = (OnlineStateChange) object;
+			Log.debug("Online-State changed:  "+onlineState.contact.name+" ("+onlineState.newState+")");
 			ContactList.INSTANCE.contactStateChanged(onlineState, ip);
 			if (onlineState.newState!=EOnlineState.OFFLINE) {
 				ConnectionManager.registerConnection(onlineState.contact, c);
