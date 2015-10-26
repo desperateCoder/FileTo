@@ -51,7 +51,7 @@ public class ChatPanel extends JSplitPane implements DropTargetListener, Message
 	private JEditorPane messageBox = new JEditorPane();
 	private JScrollPane messageScrollPane;
 	
-	private final long CHAT_ID;
+	private long chatID;
 	private StringBuffer sb = new StringBuffer();
 	private JTextArea inputArea = new JTextArea();
 
@@ -61,7 +61,7 @@ public class ChatPanel extends JSplitPane implements DropTargetListener, Message
 	
 	public ChatPanel(ContactDto contact, long chatID) {
 		super(JSplitPane.HORIZONTAL_SPLIT);
-		CHAT_ID = chatID;
+		this.setChatID(chatID);
 		
 		inputArea.addKeyListener(new KeyListener() {
 			public void keyTyped(KeyEvent arg0) {
@@ -237,8 +237,8 @@ public class ChatPanel extends JSplitPane implements DropTargetListener, Message
      }
 
 
-	public long getChatId() {
-		return CHAT_ID;
+	public long getChatID() {
+		return chatID;
 	}
 
 
@@ -270,7 +270,7 @@ public class ChatPanel extends JSplitPane implements DropTargetListener, Message
 		messageBox.setText(sb.toString());
 		ChatMessage chatMessage = new ChatMessage();
 		chatMessage.text = m;
-		chatMessage.id = CHAT_ID;
+		chatMessage.id = getChatID();
 		Messenger.sendMessageTo(chatMessage, contacts);
 	}
 	
@@ -283,8 +283,13 @@ public class ChatPanel extends JSplitPane implements DropTargetListener, Message
 
 
 	public void messageRecieved(ContactDto contact, ChatMessage message) {
-		if (message.id == CHAT_ID && contacts.contains(contact)) {
+		if (message.id == getChatID() && contacts.contains(contact)) {
 			receiveMessage(message, contact);
 		}
+	}
+
+
+	public void setChatID(long chatID) {
+		this.chatID = chatID;
 	}
 }

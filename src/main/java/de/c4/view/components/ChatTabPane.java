@@ -1,8 +1,6 @@
 package main.java.de.c4.view.components;
 
 import java.awt.Component;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.Set;
 
 import javax.swing.JTabbedPane;
@@ -13,7 +11,7 @@ import main.java.de.c4.view.ChatFrame;
 import main.java.de.c4.view.listener.TabCloseListener;
 
 
-public class ChatTabPane extends JTabbedPane implements ActionListener, TabCloseListener{
+public class ChatTabPane extends JTabbedPane implements TabCloseListener{
 	
 	private static final long serialVersionUID = 1L;
 	
@@ -49,7 +47,7 @@ public class ChatTabPane extends JTabbedPane implements ActionListener, TabClose
 	public int indexOf(long chatId){
 		for (int i = 0; i < getTabCount(); i++) {
 			ChatPanel panel = (ChatPanel)getComponentAt(i);
-			if (chatId==panel.getChatId()) {
+			if (chatId==panel.getChatID()) {
 				return i;
 			}
 		}
@@ -59,19 +57,13 @@ public class ChatTabPane extends JTabbedPane implements ActionListener, TabClose
 	public void addTab(ChatPanel component) {
 		
 		for (int i = 0; i < getTabCount(); i++) {
-			if (component.getChatId()==((ChatPanel)getTabComponentAt(i)).getChatId()) {
+			if (component.getChatID()==((ChatPanel)getTabComponentAt(i)).getChatID()) {
 				setSelectedIndex(i);
 				return;
 			}
 		}
 		addTab(null, component);
 		setSelectedComponent(component);
-	}
-	
-	
-	public void actionPerformed(ActionEvent e) {
-		// TODO Auto-generated method stub
-		
 	}
 	
 	@Override
@@ -88,14 +80,25 @@ public class ChatTabPane extends JTabbedPane implements ActionListener, TabClose
 	}
 
 	public void messageReceived(ContactDto contact, ChatMessage message) {
+		//suche nach ID
 		for (int i = 0; i < getTabCount(); i++) {
 			ChatPanel p = (ChatPanel) getComponentAt(i);
-			if (p.getChatId()==message.id) {
+			if (p.getChatID()==message.id) {
 				p.messageRecieved(contact, message);
 				return;
 			}
 		}
-		addTab(new ChatPanel(contact));
+		// ID nicht gefunden, vllt ueber den Kontakt?
+		int i = indexOf(contact);
+		ChatPanel chatPanel = null;
+		if (i<0) { //nein, neuen erstellen
+			chatPanel = new ChatPanel(contact, message.id);
+			addTab(chatPanel);
+		} else {   // ja, messageID ueberschreiben.
+			chatPanel = (ChatPanel)getComponentAt(i);
+			chatPanel.setChatID(message.id);
+		}
+		chatPanel.receiveMessage(message, contact);
 	}
 
 }

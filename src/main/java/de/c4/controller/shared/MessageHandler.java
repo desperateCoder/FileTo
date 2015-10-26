@@ -2,18 +2,17 @@ package main.java.de.c4.controller.shared;
 
 import java.net.InetAddress;
 
+import com.esotericsoftware.kryonet.Connection;
+import com.esotericsoftware.kryonet.Listener;
+import com.esotericsoftware.minlog.Log;
+
 import main.java.de.c4.controller.Messenger;
 import main.java.de.c4.controller.shared.Network.ChatMessage;
-import main.java.de.c4.controller.shared.listener.MessageRecievedListener;
 import main.java.de.c4.model.messages.ContactDto;
 import main.java.de.c4.model.messages.ContactListDto;
 import main.java.de.c4.model.messages.EOnlineState;
 import main.java.de.c4.model.messages.OnlineStateChange;
 import main.java.de.c4.model.messages.RequestKnownOnlineClients;
-
-import com.esotericsoftware.kryonet.Connection;
-import com.esotericsoftware.kryonet.Listener;
-import com.esotericsoftware.minlog.Log;
 
 public class MessageHandler extends Listener{
 
@@ -37,7 +36,7 @@ public class MessageHandler extends Listener{
 			if (message == null || message.length()==0)
 				return;
 			Log.debug("Nachricht von "+contact.name+" ("+contact.ip+") bekommen: "+message);
-			messageRecieved(contact, chatMessage);
+			Messenger.receiveMessageFrom(contact, chatMessage);
 			
 		} else if (object instanceof OnlineStateChange) {
 			InetAddress ip = c.getRemoteAddressTCP().getAddress();
@@ -72,17 +71,4 @@ public class MessageHandler extends Listener{
 	public void connected(Connection connection) {
 		super.connected(connection);
 	}
-	
-	
-	private void messageRecieved(ContactDto contact, ChatMessage chatMessage){
-		Messenger.receiveMessageFrom(contact, chatMessage);
-//		for (MessageRecievedListener l : messageRecievedListener) {
-//			l.messageRecieved(contact, chatMessage);
-//		}
-	}
-	
-	public void addMessageRecievedListener(MessageRecievedListener l) {
-//		messageRecievedListener.add(l);
-	}
-
 }

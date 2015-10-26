@@ -2,11 +2,13 @@ package main.java.de.c4.controller;
 
 import java.io.IOException;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
+
+import com.esotericsoftware.kryonet.Client;
+import com.esotericsoftware.kryonet.Connection;
+import com.esotericsoftware.minlog.Log;
 
 import main.java.de.c4.controller.client.ChatClient;
 import main.java.de.c4.controller.server.ChatServer;
@@ -19,14 +21,10 @@ import main.java.de.c4.model.messages.ContactDto;
 import main.java.de.c4.model.messages.OnlineStateChange;
 import main.java.de.c4.model.messages.RequestKnownOnlineClients;
 
-import com.esotericsoftware.kryonet.Client;
-import com.esotericsoftware.kryonet.Connection;
-import com.esotericsoftware.minlog.Log;
-
 public class Messenger {
 
 	public static final Messenger INSTANCE = new Messenger(true);
-	private static final Map<Long, Set<MessageRecievedListener>> LISTENER = new HashMap<Long, Set<MessageRecievedListener>>();
+	private static final Set<MessageRecievedListener> LISTENER = new HashSet<MessageRecievedListener>();
 	private ChatServer chatServer;
 
 	public Messenger() {
@@ -93,25 +91,14 @@ public class Messenger {
 		}).start();
 	}
 	public static void receiveMessageFrom(ContactDto contact, ChatMessage message){
-		for (MessageRecievedListener l : LISTENER.get(Long.valueOf(message.id))) {
+		for (MessageRecievedListener l : LISTENER) {
 			l.messageRecieved(contact, message);
 		}
 	}
-	public static void addMessageReceivedListener(long chatId, MessageRecievedListener l){
-		Long id = Long.valueOf(chatId);
-		Set<MessageRecievedListener> listener = LISTENER.containsKey(id)?LISTENER.get(id):new HashSet<MessageRecievedListener>();
-		listener.add(l);
-		LISTENER.put(id, listener);
+	public static void addMessageReceivedListener(MessageRecievedListener l){
+		LISTENER.add(l);
 	}
-	public static void removeMessageReceivedListener(long chatId, MessageRecievedListener l){
-		Long id = Long.valueOf(chatId);
-		if (LISTENER.containsKey(id)) {
-			Set<MessageRecievedListener> set = LISTENER.get(id);
-			if (set.contains(l)) {
-				if (set.size()==1) {
-					LISTENER.remove(id);
-				} else set.remove(l);
-			}
-		}
+	public static void removeMessageReceivedListener(MessageRecievedListener l){
+		LISTENER.remove(l);
 	}
 }

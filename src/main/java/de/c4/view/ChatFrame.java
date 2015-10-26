@@ -27,7 +27,7 @@ public class ChatFrame extends JFrame implements ActionListener, MessageRecieved
 	
 	public ChatFrame() {
 
-		//TODO: register as MessageReceivedListener to Messenger
+		Messenger.addMessageReceivedListener(this);
 		
 //		List<ContactDto> contacts = ContactList.INSTANCE.getContacts();
 //		
