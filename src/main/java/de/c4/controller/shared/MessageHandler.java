@@ -1,8 +1,6 @@
 package main.java.de.c4.controller.shared;
 
 import java.net.InetAddress;
-import java.util.HashSet;
-import java.util.Set;
 
 import main.java.de.c4.controller.Messenger;
 import main.java.de.c4.controller.shared.Network.ChatMessage;
@@ -77,7 +75,7 @@ public class MessageHandler extends Listener{
 	
 	
 	private void messageRecieved(ContactDto contact, ChatMessage chatMessage){
-		Messenger.receiveMessageFrom(contact, message);
+		Messenger.receiveMessageFrom(contact, chatMessage);
 //		for (MessageRecievedListener l : messageRecievedListener) {
 //			l.messageRecieved(contact, chatMessage);
 //		}

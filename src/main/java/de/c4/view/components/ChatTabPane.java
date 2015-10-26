@@ -3,8 +3,6 @@ package main.java.de.c4.view.components;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
 
 import javax.swing.JTabbedPane;

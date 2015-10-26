@@ -3,14 +3,12 @@ package main.java.de.c4.view;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.List;
 
 import javax.swing.JFrame;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
 
 import main.java.de.c4.controller.Messenger;
-import main.java.de.c4.controller.shared.ContactList;
 import main.java.de.c4.controller.shared.Network.ChatMessage;
 import main.java.de.c4.controller.shared.listener.MessageRecievedListener;
 import main.java.de.c4.model.messages.ContactDto;
