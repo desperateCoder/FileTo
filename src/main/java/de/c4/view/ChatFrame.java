@@ -79,7 +79,9 @@ public class ChatFrame extends JFrame implements ActionListener, MessageRecieved
 		if (getSize().getHeight()<10) {
 			setSize(400, 500);
 		}
-		bringToFront();
+		if (!isVisible()) {
+			bringToFront();
+		}
 	}
 
 
@@ -97,10 +99,10 @@ public class ChatFrame extends JFrame implements ActionListener, MessageRecieved
 	public void messageRecieved(ContactDto contact, ChatMessage message) {
 		//TODO: Make window blink or something to get Attention
 		tabbedPane.messageReceived(contact, message);
+		
 		if (!isVisible()) {
 			bringToFront();
 		}
 	}
-
 
 }
