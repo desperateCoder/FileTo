@@ -32,7 +32,7 @@ public class ConnectionManager extends HashMap<ContactDto, Set<Connection>> {
 
 	public static Set<Connection> getConnectionsTo(ContactDto contact,
 			boolean createIfNone) {
-		if (INSTANCE.containsKey(contact)) {
+		if (INSTANCE.containsKey(contact) && INSTANCE.get(contact).size()>0) {
 			return INSTANCE.get(contact);
 		}
 		Set<Connection> list = new HashSet<Connection>();

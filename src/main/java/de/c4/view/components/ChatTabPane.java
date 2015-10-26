@@ -9,6 +9,7 @@ import java.util.Set;
 
 import javax.swing.JTabbedPane;
 
+import main.java.de.c4.controller.shared.Network.ChatMessage;
 import main.java.de.c4.model.messages.ContactDto;
 import main.java.de.c4.view.ChatFrame;
 import main.java.de.c4.view.listener.TabCloseListener;
@@ -19,16 +20,16 @@ public class ChatTabPane extends JTabbedPane implements ActionListener, TabClose
 	private static final long serialVersionUID = 1L;
 	
 	private ChatFrame parent;
-	private List<ContactDto> contacts = new ArrayList<ContactDto>();
+//	private List<ContactDto> contacts = new ArrayList<ContactDto>();
 	
 	public ChatTabPane(ChatFrame parent) {
 		super(JTabbedPane.TOP, JTabbedPane.SCROLL_TAB_LAYOUT);
 		this.parent = parent;
 	}
 	
-	public void addContact(ContactDto c) {
-		contacts.add(c);
-	}
+//	public void addContact(ContactDto c) {
+//		contacts.add(c);
+//	}
 	
 	@Override
 	public void addTab(String title, Component component) {
@@ -86,6 +87,17 @@ public class ChatTabPane extends JTabbedPane implements ActionListener, TabClose
 		if (getTabCount()<1) {
 			parent.allTabsClosed();
 		}
+	}
+
+	public void messageReceived(ContactDto contact, ChatMessage message) {
+		for (int i = 0; i < getTabCount(); i++) {
+			ChatPanel p = (ChatPanel) getComponentAt(i);
+			if (p.getChatId()==message.id) {
+				p.messageRecieved(contact, message);
+				return;
+			}
+		}
+		addTab(new ChatPanel(contact));
 	}
 
 }

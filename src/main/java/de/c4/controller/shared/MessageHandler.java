@@ -4,6 +4,7 @@ import java.net.InetAddress;
 import java.util.HashSet;
 import java.util.Set;
 
+import main.java.de.c4.controller.Messenger;
 import main.java.de.c4.controller.shared.Network.ChatMessage;
 import main.java.de.c4.controller.shared.listener.MessageRecievedListener;
 import main.java.de.c4.model.messages.ContactDto;
@@ -18,7 +19,7 @@ import com.esotericsoftware.minlog.Log;
 
 public class MessageHandler extends Listener{
 
-	private Set<MessageRecievedListener> messageRecievedListener = new HashSet<MessageRecievedListener>();
+//	private Set<MessageRecievedListener> messageRecievedListener = new HashSet<MessageRecievedListener>();
 
 	@Override
 	public void received(Connection c, Object object) {
@@ -76,13 +77,14 @@ public class MessageHandler extends Listener{
 	
 	
 	private void messageRecieved(ContactDto contact, ChatMessage chatMessage){
-		for (MessageRecievedListener l : messageRecievedListener) {
-			l.messageRecieved(contact, chatMessage);
-		}
+		Messenger.receiveMessageFrom(contact, message);
+//		for (MessageRecievedListener l : messageRecievedListener) {
+//			l.messageRecieved(contact, chatMessage);
+//		}
 	}
 	
 	public void addMessageRecievedListener(MessageRecievedListener l) {
-		messageRecievedListener.add(l);
+//		messageRecievedListener.add(l);
 	}
 
 }

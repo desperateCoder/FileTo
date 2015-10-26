@@ -28,20 +28,21 @@ import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
-import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.text.html.StyleSheet;
 
+import main.java.de.c4.controller.Messenger;
 import main.java.de.c4.controller.TimestampUtil;
 import main.java.de.c4.controller.shared.ContactList;
 import main.java.de.c4.controller.shared.Network.ChatMessage;
+import main.java.de.c4.controller.shared.listener.MessageRecievedListener;
 import main.java.de.c4.model.messages.ContactDto;
 import main.java.de.c4.view.resources.EIcons;
 import main.java.de.c4.view.resources.IconProvider;
 
 
-public class ChatPanel extends JSplitPane implements DropTargetListener {
+public class ChatPanel extends JSplitPane implements DropTargetListener, MessageRecievedListener {
 
 	private static final long serialVersionUID = 1L;
 	
@@ -55,8 +56,12 @@ public class ChatPanel extends JSplitPane implements DropTargetListener {
 	private JTextArea inputArea = new JTextArea();
 
 	public ChatPanel(ContactDto contact) {
+		this(contact, System.currentTimeMillis());
+	}
+	
+	public ChatPanel(ContactDto contact, long chatID) {
 		super(JSplitPane.HORIZONTAL_SPLIT);
-		CHAT_ID = System.currentTimeMillis();
+		CHAT_ID = chatID;
 		
 		inputArea.addKeyListener(new KeyListener() {
 			public void keyTyped(KeyEvent arg0) {
@@ -65,11 +70,16 @@ public class ChatPanel extends JSplitPane implements DropTargetListener {
 			public void keyReleased(KeyEvent arg0) {}
 			public void keyPressed(KeyEvent arg0) {
 				if (arg0.getKeyCode()==KeyEvent.VK_ENTER) {
+					arg0.consume();
+					String input = inputArea.getText().trim();
+					if (input.isEmpty()) {
+						return;
+					}
 					if (arg0.isControlDown()) {
 						inputArea.append("\n");
 						inputArea.setCaretPosition(inputArea.getText().length()-1);
 					} else {
-						sendMessage(inputArea.getText());
+						sendMessage(input);
 						inputArea.setText("");
 					}
 				}
@@ -88,6 +98,7 @@ public class ChatPanel extends JSplitPane implements DropTargetListener {
 		styleSheet.addRule(".oMessage {background-color : #3399FF; text-align: left; border-color: #1F5C99; margin-right: 20px;}");
 		styleSheet.addRule(".nMessage {background-color : #E6E6E6; text-align: center; border-color: #666666;}");
 		styleSheet.addRule(".myMessage {background-color : #99FF99; text-align: left; border-color: #4C804C; margin-left: 20px;}");
+		styleSheet.addRule(".from {text-decoration: underline; padding: 0; margin-bottom: 0; text-align: left; border: none; font-size: 11pt; color: #666666;}");
 		styleSheet.addRule(".emote {margin-bottom: -3px;}");
 		
 		Document doc = kit.createDefaultDocument();
@@ -235,8 +246,13 @@ public class ChatPanel extends JSplitPane implements DropTargetListener {
 		return contacts;
 	}
 
-	public void receiveMessage(ChatMessage m){
+	public void receiveMessage(ChatMessage m, ContactDto contact){
 		sb.append("<div class=\"oMessage\">");
+		sb.append("<div class=\"from\"><span>");
+		sb.append(contact.name);
+		sb.append(" (");
+		sb.append(TimestampUtil.getCurrentTimestamp());
+		sb.append("):</span></div>");
 		sb.append(m);
 		sb.append("</div>");
 		messageBox.setText(sb.toString());
@@ -252,6 +268,10 @@ public class ChatPanel extends JSplitPane implements DropTargetListener {
 		sb.append(m);
 		sb.append("</div>");
 		messageBox.setText(sb.toString());
+		ChatMessage chatMessage = new ChatMessage();
+		chatMessage.text = m;
+		chatMessage.id = CHAT_ID;
+		Messenger.sendMessageTo(chatMessage, contacts);
 	}
 	
 	public void infoMessage(String m){
@@ -259,5 +279,12 @@ public class ChatPanel extends JSplitPane implements DropTargetListener {
 		sb.append(m);
 		sb.append("</div>");
 		messageBox.setText(sb.toString());
+	}
+
+
+	public void messageRecieved(ContactDto contact, ChatMessage message) {
+		if (message.id == CHAT_ID && contacts.contains(contact)) {
+			receiveMessage(message, contact);
+		}
 	}
 }

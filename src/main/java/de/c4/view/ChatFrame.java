@@ -11,6 +11,8 @@ import javax.swing.UIManager.LookAndFeelInfo;
 
 import main.java.de.c4.controller.Messenger;
 import main.java.de.c4.controller.shared.ContactList;
+import main.java.de.c4.controller.shared.Network.ChatMessage;
+import main.java.de.c4.controller.shared.listener.MessageRecievedListener;
 import main.java.de.c4.model.messages.ContactDto;
 import main.java.de.c4.view.components.ChatPanel;
 import main.java.de.c4.view.components.ChatTabPane;
@@ -18,7 +20,7 @@ import main.java.de.c4.view.components.ChatTabPane;
 import com.esotericsoftware.minlog.Log;
 
 
-public class ChatFrame extends JFrame implements ActionListener{
+public class ChatFrame extends JFrame implements ActionListener, MessageRecievedListener{
 	
 	private static final long serialVersionUID = 1L;
 	
@@ -26,7 +28,8 @@ public class ChatFrame extends JFrame implements ActionListener{
 
 	
 	public ChatFrame() {
-		
+
+		//TODO: register as MessageReceivedListener to Messenger
 		
 //		List<ContactDto> contacts = ContactList.INSTANCE.getContacts();
 //		
@@ -78,6 +81,11 @@ public class ChatFrame extends JFrame implements ActionListener{
 		if (getSize().getHeight()<10) {
 			setSize(400, 500);
 		}
+		bringToFront();
+	}
+
+
+	private void bringToFront() {
 		EventQueue.invokeLater(new Runnable() {
 		    public void run() {
 		    	setVisible(true);
@@ -85,6 +93,15 @@ public class ChatFrame extends JFrame implements ActionListener{
 		        repaint();
 		    }
 		});
+	}
+
+
+	public void messageRecieved(ContactDto contact, ChatMessage message) {
+		//TODO: Make window blink or something to get Attention
+		tabbedPane.messageReceived(contact, message);
+		if (!isVisible()) {
+			bringToFront();
+		}
 	}
 
 
