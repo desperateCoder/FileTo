@@ -2,10 +2,6 @@ package main.java.de.c4.controller.shared;
 
 import java.net.InetAddress;
 
-import com.esotericsoftware.kryonet.Connection;
-import com.esotericsoftware.kryonet.Listener;
-import com.esotericsoftware.minlog.Log;
-
 import main.java.de.c4.controller.Messenger;
 import main.java.de.c4.controller.shared.Network.ChatMessage;
 import main.java.de.c4.model.messages.ContactDto;
@@ -13,6 +9,10 @@ import main.java.de.c4.model.messages.ContactListDto;
 import main.java.de.c4.model.messages.EOnlineState;
 import main.java.de.c4.model.messages.OnlineStateChange;
 import main.java.de.c4.model.messages.RequestKnownOnlineClients;
+
+import com.esotericsoftware.kryonet.Connection;
+import com.esotericsoftware.kryonet.Listener;
+import com.esotericsoftware.minlog.Log;
 
 public class MessageHandler extends Listener{
 

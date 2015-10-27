@@ -13,10 +13,10 @@ import com.esotericsoftware.minlog.Log;
 public class ChatServer extends Thread{
 	
 	private Server server;
-	
+	private PingServer pingServer;
 	
 	public ChatServer() throws IOException {
-		new PingServer().start();
+		startUDP();
 		server = new Server() {
 			protected Connection newConnection() {
 				return new ChatConnection();
@@ -44,6 +44,11 @@ public class ChatServer extends Thread{
 //		frame.setSize(320, 200);
 //		frame.setLocationRelativeTo(null);
 //		frame.setVisible(true);
+	}
+
+	public void startUDP() throws IOException {
+		pingServer = new PingServer();
+		pingServer.start();
 	}
 	
 //	private ContactDto buildByAddr(InetAddress ad){
@@ -78,5 +83,9 @@ public class ChatServer extends Thread{
 	public void run() {
 
 		server.start();
+	}
+	
+	public void killUDP() {
+		pingServer.kill();
 	}
 }

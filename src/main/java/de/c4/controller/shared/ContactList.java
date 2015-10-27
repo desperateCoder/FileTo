@@ -8,6 +8,7 @@ import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Set;
 
+import main.java.de.c4.controller.Messenger;
 import main.java.de.c4.controller.shared.listener.ContactListReceivedListener;
 import main.java.de.c4.controller.shared.listener.OnlineStateChangeListener;
 import main.java.de.c4.model.messages.ContactDto;
@@ -187,19 +188,27 @@ public class ContactList {
 	 * @param onlineState new online-state
 	 */
 	public void setOnlineState(final EOnlineState onlineState, boolean setInSettings) {
-		
-				if (me.state != onlineState) {
-					me.state = onlineState;
-					OnlineStateChange change = new OnlineStateChange();
-					change.contact = me;
-					change.newState = me.state;
-					broadcast(change);
-				} else me.state = onlineState;
+		boolean isFromOffToOn = false;
+		if (me.state==EOnlineState.OFFLINE && onlineState != EOnlineState.OFFLINE) {
+			isFromOffToOn = true;
+		} else if (onlineState == EOnlineState.OFFLINE) {
+			Messenger.goOffline();
+		}
+		if (me.state != onlineState) {
+			me.state = onlineState;
+			OnlineStateChange change = new OnlineStateChange();
+			change.contact = me;
+			change.newState = me.state;
+			broadcast(change);
+			if (setInSettings && onlineState != EOnlineState.OFFLINE) {
+				Settings.INSTANCE.set(Settings.CONTACT_ONLINE_STATE, onlineState.getNr()+"");
+				Settings.INSTANCE.save();
+			}
+		}
 
-			
-		if (me.state != onlineState && setInSettings) {
-			Settings.INSTANCE.set(Settings.CONTACT_ONLINE_STATE, onlineState.getNr()+"");
-			Settings.INSTANCE.save();
+		if (isFromOffToOn) {
+			Messenger.requestContacts();
+			Messenger.goOnline();
 		}
 	}
 	public void broadcast(final Object o) {

@@ -9,6 +9,8 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 
 import javax.swing.DefaultListModel;
@@ -17,6 +19,7 @@ import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ListCellRenderer;
@@ -108,9 +111,29 @@ public class ContactListFrame extends JFrame implements ActionListener, OnlineSt
 		
 		
 		content.add(stateCombo, BorderLayout.SOUTH);
-		
+		final JFrame me = this;
 		setContentPane(content);
-		setDefaultCloseOperation(EXIT_ON_CLOSE);
+		
+		addWindowListener(new WindowAdapter() {
+			
+			@Override
+			public void windowClosing(WindowEvent e) {
+				String[] options = new String[] {"Abbrechen", "Minimieren", "Beenden"};
+			    int response = JOptionPane.showOptionDialog(me, "Soll die Anwendung beendet oder minimiert werden?", "Wirklich beenden?",
+		        JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE,
+			        null, options, options[0]);
+			    switch (response) {
+				case 0:
+					return;
+				case 1:
+					//TODO: minimize to tray
+					break;
+				case 2:
+					ContactList.INSTANCE.setOnlineState(EOnlineState.OFFLINE, false);
+					break;
+				}
+			}
+		});
 		setTitle("Kontaktliste");
 		pack();
 		setVisible(true);

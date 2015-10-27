@@ -31,6 +31,12 @@ public class PingServer extends Thread{
 	public void run() {
 		server.start();
 	}
+	public void kill(){
+		if (server != null) {
+			server.stop();
+			server = null;
+		}
+	}
 
 	/**
 	 * Dummy, braucht halt Irgendwas...

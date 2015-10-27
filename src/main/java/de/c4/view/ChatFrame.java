@@ -37,7 +37,7 @@ public class ChatFrame extends JFrame implements ActionListener, MessageRecieved
 		
 		
 		setContentPane(tabbedPane);
-		setDefaultCloseOperation(EXIT_ON_CLOSE);
+		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		setTitle("Chat");
 //		setVisible(true);
 	}
@@ -60,7 +60,9 @@ public class ChatFrame extends JFrame implements ActionListener, MessageRecieved
 		} catch (Exception e) {
 		    Log.info("Nimbus LaF not found, proceeding with the default one!");
 		}
-		new ChatFrame().setVisible(true);
+		ChatFrame chatFrame = new ChatFrame();
+		chatFrame.setDefaultCloseOperation(EXIT_ON_CLOSE);
+		chatFrame.setVisible(true);
 	}
 
 
@@ -101,6 +103,9 @@ public class ChatFrame extends JFrame implements ActionListener, MessageRecieved
 		tabbedPane.messageReceived(contact, message);
 		
 		if (!isVisible()) {
+			if (getSize().getHeight()<10) {
+				setSize(400, 500);
+			}
 			bringToFront();
 		}
 	}

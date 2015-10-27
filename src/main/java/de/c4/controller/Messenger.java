@@ -6,10 +6,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import com.esotericsoftware.kryonet.Client;
-import com.esotericsoftware.kryonet.Connection;
-import com.esotericsoftware.minlog.Log;
-
 import main.java.de.c4.controller.client.ChatClient;
 import main.java.de.c4.controller.server.ChatServer;
 import main.java.de.c4.controller.shared.ConnectionManager;
@@ -21,11 +17,15 @@ import main.java.de.c4.model.messages.ContactDto;
 import main.java.de.c4.model.messages.OnlineStateChange;
 import main.java.de.c4.model.messages.RequestKnownOnlineClients;
 
+import com.esotericsoftware.kryonet.Client;
+import com.esotericsoftware.kryonet.Connection;
+import com.esotericsoftware.minlog.Log;
+
 public class Messenger {
 
 	public static final Messenger INSTANCE = new Messenger(true);
 	private static final Set<MessageRecievedListener> LISTENER = new HashSet<MessageRecievedListener>();
-	private ChatServer chatServer;
+	private ChatServer chatServer = null;
 
 	public Messenger() {
 		this(false);
@@ -36,7 +36,23 @@ public class Messenger {
 			throw new RuntimeException("This Class is a Singleton and " +
 					"should be accessed by its Instance-Field");
 		}
-		
+
+		requestContacts(false);
+		try {
+			chatServer = new ChatServer();
+			chatServer.start();
+		} catch (IOException e) {
+			Log.error("I/O-Error starting the server: " + ExceptionUtil.getStacktrace(e));
+			
+		}
+	}
+	public static void requestContacts() {
+		requestContacts(true);
+	}
+	private static void requestContacts(boolean killUDP) {
+		if (killUDP) {
+			INSTANCE.chatServer.killUDP();
+		}
 		try {
 			ChatClient chatClient = new ChatClient(ChatClient.discoverRandomServer());
 			chatClient.connect();
@@ -47,13 +63,14 @@ public class Messenger {
 			client.sendTCP(req);
 		} catch (NullPointerException e) {
 			Log.info("Server started, but: " + e.getMessage());
-		}
-		try {
-			chatServer = new ChatServer();
-			chatServer.start();
-		} catch (IOException e) {
-			Log.error("I/O-Error starting the server: " + ExceptionUtil.getStacktrace(e));
-			
+		} finally {
+			try {
+				if (killUDP) {
+					INSTANCE.chatServer.startUDP();
+				}
+			} catch (IOException e) {
+				Log.error("Cannot start UDP-Server: "+ExceptionUtil.getStacktrace(e));
+			}
 		}
 	}
 
@@ -100,5 +117,9 @@ public class Messenger {
 	}
 	public static void removeMessageReceivedListener(MessageRecievedListener l){
 		LISTENER.remove(l);
+	}
+
+	public static void goOffline() {
+		INSTANCE.chatServer.killUDP();
 	}
 }
