@@ -3,6 +3,7 @@ package main.java.de.c4.view.components;
 import java.awt.Adjustable;
 import java.awt.BorderLayout;
 import java.awt.Desktop;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Insets;
 import java.awt.Rectangle;
@@ -21,6 +22,7 @@ import java.awt.event.ComponentListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.File;
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -33,6 +35,7 @@ import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
+import javax.swing.SwingUtilities;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import javax.swing.text.Document;
@@ -92,7 +95,7 @@ public class ChatPanel extends JSplitPane implements DropTargetListener,
 					if (input.isEmpty()) {
 						return;
 					}
-					if (arg0.isControlDown()) {
+					if (arg0.isShiftDown()) {
 						inputArea.append("\n");
 						inputArea
 								.setCaretPosition(inputArea.getText().length() - 1);
@@ -197,7 +200,8 @@ public class ChatPanel extends JSplitPane implements DropTargetListener,
 		l.setAlignment(FlowLayout.LEFT);
 		JPanel left = new JPanel(l);
 		JButton smileyBtn = new JButton(IconProvider.getAsScaledIcon(EIcons.SMILEY_SMILE, 20, 20));
-
+		removeSpacing(smileyBtn);
+		smileyBtn.setPreferredSize(new Dimension(30, 30));
 		left.add(smileyBtn);
 		left.add(new JButton("Fi"));
 		left.add(new JButton("AG"));
@@ -297,17 +301,22 @@ public class ChatPanel extends JSplitPane implements DropTargetListener,
 		return contacts;
 	}
 
-	public void receiveMessage(ChatMessage m, ContactDto contact) {
-		sb.append("<div class=\"oMessage\">");
-		sb.append("<div class=\"from\"><span>");
-		sb.append(contact.name);
-		sb.append(" (");
-		sb.append(TimestampUtil.getCurrentTimestamp());
-		sb.append("):</span></div>");
-		sb.append(m.text);
-		sb.append("</div>");
-		messageBox.setText(sb.toString());
-		updateScrollDownButtonShown();
+	public void receiveMessage(final ChatMessage m, final ContactDto contact) {
+		SwingUtilities.invokeLater(new Runnable() {
+			
+			public void run() {
+				sb.append("<div class=\"oMessage\">");
+				sb.append("<div class=\"from\"><span>");
+				sb.append(contact.name);
+				sb.append(" (");
+				sb.append(TimestampUtil.getCurrentTimestamp());
+				sb.append("):</span></div>");
+				sb.append(textToHtml(m.text));
+				sb.append("</div>");
+				messageBox.setText(sb.toString());
+				updateScrollDownButtonShown();
+			}
+		});
 	}
 
 	public void sendMessage(String m) {
@@ -317,10 +326,17 @@ public class ChatPanel extends JSplitPane implements DropTargetListener,
 		sb.append(" (");
 		sb.append(TimestampUtil.getCurrentTimestamp());
 		sb.append("):</span></div>");
-		sb.append(m);
+		sb.append(textToHtml(m));
 		sb.append("</div>");
 		messageBox.setText(sb.toString());
-		updateScrollDownButtonShown();
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				if (!isScrolledDown()) {
+					scrollDown();
+				}
+			}
+		});
+//		updateScrollDownButtonShown();
 		ChatMessage chatMessage = new ChatMessage();
 		chatMessage.text = m;
 		chatMessage.id = getChatID();
@@ -333,6 +349,10 @@ public class ChatPanel extends JSplitPane implements DropTargetListener,
 		sb.append("</div>");
 		messageBox.setText(sb.toString());
 		updateScrollDownButtonShown();
+	}
+	
+	private String textToHtml(String s){
+		return s.replaceAll("\n", "<br/>");
 	}
 
 	public void messageRecieved(ContactDto contact, ChatMessage message) {
@@ -375,10 +395,14 @@ public class ChatPanel extends JSplitPane implements DropTargetListener,
 
 	public void actionPerformed(ActionEvent e) {
 		if (EButtonActions.SCROLL_DOWN.getActionCommand().equals(e.getActionCommand())) {
-			JScrollBar sb = messageScrollPane.getVerticalScrollBar();
-			sb.setValue(sb.getMaximum());
-			updateScrollDownButtonShown();
+			scrollDown();
 		}
+	}
+
+	private void scrollDown() {
+		JScrollBar sb = messageScrollPane.getVerticalScrollBar();
+		sb.setValue(sb.getMaximum());
+		layeredPane.remove(scrollDownBtn);
 	}
 	
 	private enum EButtonActions{ 

@@ -130,6 +130,12 @@ public class ContactListFrame extends JFrame implements ActionListener, OnlineSt
 					break;
 				case 2:
 					ContactList.INSTANCE.setOnlineState(EOnlineState.OFFLINE, false);
+					try {
+						Thread.sleep(1000);
+					} catch (InterruptedException e1) {
+						e1.printStackTrace();
+					}
+					System.exit(0);
 					break;
 				}
 			}
