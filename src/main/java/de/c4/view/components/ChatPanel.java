@@ -5,6 +5,7 @@ import java.awt.BorderLayout;
 import java.awt.Desktop;
 import java.awt.FlowLayout;
 import java.awt.Insets;
+import java.awt.Rectangle;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.dnd.DnDConstants;
@@ -13,6 +14,10 @@ import java.awt.dnd.DropTargetDragEvent;
 import java.awt.dnd.DropTargetDropEvent;
 import java.awt.dnd.DropTargetEvent;
 import java.awt.dnd.DropTargetListener;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.File;
@@ -20,15 +25,14 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JEditorPane;
+import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
-import javax.swing.SwingUtilities;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import javax.swing.text.Document;
@@ -46,7 +50,10 @@ import main.java.de.c4.view.resources.EIcons;
 import main.java.de.c4.view.resources.IconProvider;
 
 public class ChatPanel extends JSplitPane implements DropTargetListener,
-		MessageRecievedListener {
+		MessageRecievedListener, ActionListener {
+	
+	private static final int SCROLLDOWN_BTN_MARGIN = 5;
+	private static final Insets ZERO_INSETS = new Insets(0,0,0,0);
 
 	private static final long serialVersionUID = 1L;
 
@@ -54,6 +61,8 @@ public class ChatPanel extends JSplitPane implements DropTargetListener,
 
 	private JEditorPane messageBox = new JEditorPane();
 	private JScrollPane messageScrollPane;
+	private JLayeredPane layeredPane = new JLayeredPane();
+	private JButton scrollDownBtn;
 
 	private long chatID;
 	private StringBuffer sb = new StringBuffer();
@@ -103,6 +112,27 @@ public class ChatPanel extends JSplitPane implements DropTargetListener,
 		messageScrollPane = new JScrollPane(messageBox);
 		new SmartScroller(messageScrollPane);
 
+		
+		layeredPane.add(messageScrollPane, Integer.valueOf(0));
+		scrollDownBtn = new JButton(IconProvider.getAsScaledIcon(EIcons.ARROW_DOWN, 25, 25));
+		removeSpacing(scrollDownBtn);
+		scrollDownBtn.addActionListener(this);
+		scrollDownBtn.setActionCommand(EButtonActions.SCROLL_DOWN.getActionCommand());
+		
+		
+		layeredPane.addComponentListener(new ComponentListener() {
+			
+			public void componentResized(ComponentEvent arg0) {
+				Rectangle b = layeredPane.getBounds();
+				messageScrollPane.setBounds(b);
+				setScrollDownBtnPosition();
+			}
+
+			public void componentShown(ComponentEvent arg0) {}
+			public void componentMoved(ComponentEvent arg0) {}
+			public void componentHidden(ComponentEvent arg0) {}
+		});
+		
 		StyleSheet styleSheet = kit.getStyleSheet();
 		styleSheet
 				.addRule("div {padding: 3px; margin-bottom: 3px; border: 2px solid;}");
@@ -118,7 +148,6 @@ public class ChatPanel extends JSplitPane implements DropTargetListener,
 
 		Document doc = kit.createDefaultDocument();
 		messageBox.setDocument(doc);
-		infoMessage("Chat mit " + contact.name + " gestartet");
 		// String imgsrc =
 		// IconProvider.getImageAsURL(EIcons.SMILEY_SMILE).toString();
 		//
@@ -156,7 +185,7 @@ public class ChatPanel extends JSplitPane implements DropTargetListener,
 		});
 
 		JSplitPane innerSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
-		innerSplit.setLeftComponent(messageScrollPane);
+		innerSplit.setLeftComponent(layeredPane);
 
 		JPanel inputPanel = new JPanel(new BorderLayout());
 
@@ -167,10 +196,8 @@ public class ChatPanel extends JSplitPane implements DropTargetListener,
 		l.setVgap(1);
 		l.setAlignment(FlowLayout.LEFT);
 		JPanel left = new JPanel(l);
-		JButton smileyBtn = new JButton(new ImageIcon(IconProvider.getImage(
-				EIcons.SMILEY_SMILE).getScaledInstance(20, 20, 0)));
-		Insets zeroInsets = new Insets(0, 0, 0, 0);
-		smileyBtn.setMargin(zeroInsets);
+		JButton smileyBtn = new JButton(IconProvider.getAsScaledIcon(EIcons.SMILEY_SMILE, 20, 20));
+
 		left.add(smileyBtn);
 		left.add(new JButton("Fi"));
 		left.add(new JButton("AG"));
@@ -195,6 +222,14 @@ public class ChatPanel extends JSplitPane implements DropTargetListener,
 		innerSplit.setResizeWeight(0.8);
 		innerSplit.setDividerLocation(0.8);
 		setLeftComponent(innerSplit);
+
+		infoMessage("Chat mit " + contact.name + " gestartet");
+	}
+
+	private void removeSpacing(final JButton btn) {
+		btn.setBorder(null);
+		btn.setBorderPainted(false);
+		btn.setMargin(ZERO_INSETS);
 	}
 
 	public String getTitle() {
@@ -272,6 +307,7 @@ public class ChatPanel extends JSplitPane implements DropTargetListener,
 		sb.append(m.text);
 		sb.append("</div>");
 		messageBox.setText(sb.toString());
+		updateScrollDownButtonShown();
 	}
 
 	public void sendMessage(String m) {
@@ -284,6 +320,7 @@ public class ChatPanel extends JSplitPane implements DropTargetListener,
 		sb.append(m);
 		sb.append("</div>");
 		messageBox.setText(sb.toString());
+		updateScrollDownButtonShown();
 		ChatMessage chatMessage = new ChatMessage();
 		chatMessage.text = m;
 		chatMessage.id = getChatID();
@@ -295,6 +332,7 @@ public class ChatPanel extends JSplitPane implements DropTargetListener,
 		sb.append(m);
 		sb.append("</div>");
 		messageBox.setText(sb.toString());
+		updateScrollDownButtonShown();
 	}
 
 	public void messageRecieved(ContactDto contact, ChatMessage message) {
@@ -307,37 +345,54 @@ public class ChatPanel extends JSplitPane implements DropTargetListener,
 		this.chatID = chatID;
 	}
 
-	private class AppendThread extends Thread {
-		public void run() {
-			boolean scrollDown = textAreaBottomIsVisible();
-			final int val = messageScrollPane.getVerticalScrollBar().getValue();
-			messageBox.setText(sb.toString());
-			if (scrollDown) {
-				SwingUtilities.invokeLater(new Runnable() {
-					public void run() {
-						JScrollBar bar = messageScrollPane
-								.getVerticalScrollBar();
-						bar.setValue(bar.getMaximum());
-					}
-				});
-			} else {
-				SwingUtilities.invokeLater(new Runnable() {
-					public void run() {
-						JScrollBar bar = messageScrollPane
-								.getVerticalScrollBar();
-						bar.setValue(val);
-					}
-				});
+	private void updateScrollDownButtonShown(){
+		if (isScrolledDown()) {
+			if (layeredPane.isAncestorOf(scrollDownBtn)) {
+				layeredPane.remove(scrollDownBtn);
 			}
+		} else if (!layeredPane.isAncestorOf(scrollDownBtn)) {
+			layeredPane.add(scrollDownBtn, Integer.valueOf(5));
+			setScrollDownBtnPosition();
+		}
+	}
+
+	private boolean isScrolledDown() {
+		Adjustable sb = messageScrollPane.getVerticalScrollBar();
+		int val = sb.getValue();
+		int visibleAmount = sb.getVisibleAmount();
+		int lowest = val + visibleAmount;
+		int maxVal = sb.getMaximum();
+		boolean atBottom = maxVal == lowest || (visibleAmount==lowest && visibleAmount > maxVal) || messageBox.getHeight()<visibleAmount;
+		return atBottom;
+	}
+	
+	private void setScrollDownBtnPosition() {
+		Rectangle b = layeredPane.getBounds();
+		int x = (int)b.getWidth()-scrollDownBtn.getWidth()-messageScrollPane.getVerticalScrollBar().getWidth()-SCROLLDOWN_BTN_MARGIN;
+		int y = (int)b.getHeight()-scrollDownBtn.getHeight()- SCROLLDOWN_BTN_MARGIN;
+		scrollDownBtn.setBounds(x, y, 32, 32);
+	}
+
+	public void actionPerformed(ActionEvent e) {
+		if (EButtonActions.SCROLL_DOWN.getActionCommand().equals(e.getActionCommand())) {
+			JScrollBar sb = messageScrollPane.getVerticalScrollBar();
+			sb.setValue(sb.getMaximum());
+			updateScrollDownButtonShown();
+		}
+	}
+	
+	private enum EButtonActions{ 
+		SCROLL_DOWN("sd");
+		
+		private String actionCommand;
+		
+		private EButtonActions(String actionCommand) {
+			this.actionCommand = actionCommand;
 		}
 
-		private boolean textAreaBottomIsVisible() {
-			Adjustable sb = messageScrollPane.getVerticalScrollBar();
-			int val = sb.getValue();
-			int lowest = val + sb.getVisibleAmount();
-			int maxVal = sb.getMaximum();
-			boolean atBottom = maxVal == lowest;
-			return atBottom;
+		public String getActionCommand() {
+			return actionCommand;
 		}
+
 	}
 }

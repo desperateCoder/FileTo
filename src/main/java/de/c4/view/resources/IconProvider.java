@@ -6,6 +6,8 @@ import java.io.InputStream;
 import java.net.URL;
 
 import javax.imageio.ImageIO;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 
 import main.java.de.c4.controller.shared.ExceptionUtil;
 
@@ -28,5 +30,9 @@ public class IconProvider {
 	
 	public static URL getImageAsURL(EIcons icon) {
 		return IconProvider.class.getResource("./"+icon.getPath());
+	}
+
+	public static Icon getAsScaledIcon(EIcons icon, int width, int height) {
+		return new ImageIcon(IconProvider.getImage(icon).getScaledInstance(width, height, 0));
 	}
 }
