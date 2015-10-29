@@ -8,10 +8,10 @@ import java.util.Set;
 
 import main.java.de.c4.controller.client.ChatClient;
 import main.java.de.c4.controller.server.ChatServer;
+import main.java.de.c4.controller.shared.ChatMessage;
 import main.java.de.c4.controller.shared.ConnectionManager;
 import main.java.de.c4.controller.shared.ContactList;
 import main.java.de.c4.controller.shared.ExceptionUtil;
-import main.java.de.c4.controller.shared.Network.ChatMessage;
 import main.java.de.c4.controller.shared.listener.MessageRecievedListener;
 import main.java.de.c4.model.messages.ContactDto;
 import main.java.de.c4.model.messages.OnlineStateChange;
@@ -101,8 +101,12 @@ public class Messenger {
 		new Thread(new Runnable() {
 			public void run() {
 				for (ContactDto contactDto : contacts) {
-					Connection c = ConnectionManager.getConnectionsTo(contactDto, true).iterator().next();
-					c.sendTCP(chatMessage);
+					try {
+						Connection c = ConnectionManager.getConnectionsTo(contactDto, true).iterator().next();
+						c.sendTCP(chatMessage);
+					} catch (Exception e) {
+						Log.debug("Senden an "+contactDto.name+" nicht moeglich: "+e.getMessage());
+					}
 				}
 			}
 		}).start();

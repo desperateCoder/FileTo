@@ -5,7 +5,7 @@ import java.util.Set;
 
 import javax.swing.JTabbedPane;
 
-import main.java.de.c4.controller.shared.Network.ChatMessage;
+import main.java.de.c4.controller.shared.ChatMessage;
 import main.java.de.c4.model.messages.ContactDto;
 import main.java.de.c4.view.ChatFrame;
 import main.java.de.c4.view.listener.TabCloseListener;

@@ -1,8 +1,14 @@
 package main.java.de.c4.view.listener;
 import java.awt.Component;
-import java.awt.event.*;
-import javax.swing.*;
-import javax.swing.text.*;
+import java.awt.event.AdjustmentEvent;
+import java.awt.event.AdjustmentListener;
+
+import javax.swing.BoundedRangeModel;
+import javax.swing.JScrollBar;
+import javax.swing.JScrollPane;
+import javax.swing.SwingUtilities;
+import javax.swing.text.DefaultCaret;
+import javax.swing.text.JTextComponent;
 
 /**
  *  The SmartScroller will attempt to keep the viewport positioned based on

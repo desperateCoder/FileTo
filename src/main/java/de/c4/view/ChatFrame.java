@@ -9,7 +9,7 @@ import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
 
 import main.java.de.c4.controller.Messenger;
-import main.java.de.c4.controller.shared.Network.ChatMessage;
+import main.java.de.c4.controller.shared.ChatMessage;
 import main.java.de.c4.controller.shared.listener.MessageRecievedListener;
 import main.java.de.c4.model.messages.ContactDto;
 import main.java.de.c4.view.components.ChatPanel;

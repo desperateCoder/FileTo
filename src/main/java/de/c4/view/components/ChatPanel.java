@@ -22,7 +22,6 @@ import java.awt.event.ComponentListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.File;
-import java.lang.reflect.InvocationTargetException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -44,8 +43,8 @@ import javax.swing.text.html.StyleSheet;
 
 import main.java.de.c4.controller.Messenger;
 import main.java.de.c4.controller.TimestampUtil;
+import main.java.de.c4.controller.shared.ChatMessage;
 import main.java.de.c4.controller.shared.ContactList;
-import main.java.de.c4.controller.shared.Network.ChatMessage;
 import main.java.de.c4.controller.shared.listener.MessageRecievedListener;
 import main.java.de.c4.model.messages.ContactDto;
 import main.java.de.c4.view.listener.SmartScroller;

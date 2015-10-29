@@ -3,7 +3,6 @@ package main.java.de.c4.controller.shared;
 import java.net.InetAddress;
 
 import main.java.de.c4.controller.Messenger;
-import main.java.de.c4.controller.shared.Network.ChatMessage;
 import main.java.de.c4.model.messages.ContactDto;
 import main.java.de.c4.model.messages.ContactListDto;
 import main.java.de.c4.model.messages.EOnlineState;
