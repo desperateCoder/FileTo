@@ -63,7 +63,11 @@ public class FileTransferServer  extends Thread{
 				}
 			}
 		});
-		server.bind(Network.getFreePort());//
+		port = Network.getFreePort();
+		server.bind(port);//
+	}
+	public int getPort() {
+		return port;
 	}
 
 	@Override

@@ -62,7 +62,7 @@ public class FileTransferClient extends Thread {
 			}
 			@Override
 			public void disconnected(Connection connection) {
-				
+				listener.disconnected(answer.id);
 			}
 		});
 

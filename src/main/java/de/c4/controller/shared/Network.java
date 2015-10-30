@@ -41,6 +41,7 @@ public class Network {
 	public static void registerFileTransfer(EndPoint endPoint) {
 		Kryo kryo = endPoint.getKryo();
 		kryo.register(FileChunk.class);
+		kryo.register(byte[].class);
 	}
 
 	public static int getFreePort() {

@@ -5,5 +5,8 @@ public class FileTransferAnswer {
 	public long id;
 	public boolean accepted = false;
 	public int serverPort;
+	
+	public FileTransferAnswer() {
+	}
 
 }

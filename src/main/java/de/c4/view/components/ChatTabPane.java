@@ -6,12 +6,15 @@ import java.util.Set;
 import javax.swing.JTabbedPane;
 
 import main.java.de.c4.controller.shared.ChatMessage;
+import main.java.de.c4.controller.shared.ContactList;
+import main.java.de.c4.controller.shared.listener.OnlineStateChangeListener;
 import main.java.de.c4.model.messages.ContactDto;
+import main.java.de.c4.model.messages.OnlineStateChange;
 import main.java.de.c4.view.ChatFrame;
 import main.java.de.c4.view.listener.TabCloseListener;
 
 
-public class ChatTabPane extends JTabbedPane implements TabCloseListener{
+public class ChatTabPane extends JTabbedPane implements TabCloseListener, OnlineStateChangeListener{
 	
 	private static final long serialVersionUID = 1L;
 	
@@ -21,6 +24,7 @@ public class ChatTabPane extends JTabbedPane implements TabCloseListener{
 	public ChatTabPane(ChatFrame parent) {
 		super(JTabbedPane.TOP, JTabbedPane.SCROLL_TAB_LAYOUT);
 		this.parent = parent;
+		ContactList.INSTANCE.addOnlineStateChangeListener(this);
 	}
 	
 //	public void addContact(ContactDto c) {
@@ -30,7 +34,9 @@ public class ChatTabPane extends JTabbedPane implements TabCloseListener{
 	@Override
 	public void addTab(String title, Component component) {
 		super.addTab(title, component);
-		setTabComponentAt(indexOfComponent(component), new ButtonTabComponent(this, this));
+		ChatPanel pane = (ChatPanel) component;
+		ContactDto c = pane.getContacts().iterator().next();
+		setTabComponentAt(indexOfComponent(component), new ButtonTabComponent(this,c.state, this));
 	}
 	
 	public int indexOf(ContactDto c){
@@ -99,6 +105,13 @@ public class ChatTabPane extends JTabbedPane implements TabCloseListener{
 			chatPanel.setChatID(message.id);
 		}
 		chatPanel.receiveMessage(message, contact);
+	}
+
+	public void onlineStateChanged(OnlineStateChange change) {
+		int index = indexOf(change.contact);
+		if (index > -1) {
+			setTabComponentAt(index, new ButtonTabComponent(this, change.newState, this));
+		}
 	}
 
 }

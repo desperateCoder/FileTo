@@ -41,18 +41,21 @@ import javax.swing.text.Document;
 import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.text.html.StyleSheet;
 
+import main.java.de.c4.controller.FileTransferManager;
 import main.java.de.c4.controller.Messenger;
 import main.java.de.c4.controller.TimestampUtil;
 import main.java.de.c4.controller.shared.ChatMessage;
 import main.java.de.c4.controller.shared.ContactList;
+import main.java.de.c4.controller.shared.listener.FileTransferInfoListener;
 import main.java.de.c4.controller.shared.listener.MessageRecievedListener;
 import main.java.de.c4.model.messages.ContactDto;
+import main.java.de.c4.model.messages.file.FileTransferRequest;
 import main.java.de.c4.view.listener.SmartScroller;
 import main.java.de.c4.view.resources.EIcons;
 import main.java.de.c4.view.resources.IconProvider;
 
 public class ChatPanel extends JSplitPane implements DropTargetListener,
-		MessageRecievedListener, ActionListener {
+		MessageRecievedListener, ActionListener, FileTransferInfoListener {
 	
 	private static final int SCROLLDOWN_BTN_MARGIN = 5;
 	private static final Insets ZERO_INSETS = new Insets(0,0,0,0);
@@ -198,18 +201,48 @@ public class ChatPanel extends JSplitPane implements DropTargetListener,
 		l.setVgap(1);
 		l.setAlignment(FlowLayout.LEFT);
 		JPanel left = new JPanel(l);
-		JButton smileyBtn = new JButton(IconProvider.getAsScaledIcon(EIcons.SMILEY_SMILE, 20, 20));
+		final int iconSize = 20;
+		final Dimension buttonSize = new Dimension(30, 30);
+		JButton smileyBtn = new JButton(IconProvider.getAsScaledIcon(EIcons.SMILEY_SMILE, iconSize, iconSize));
 		removeSpacing(smileyBtn);
-		smileyBtn.setPreferredSize(new Dimension(30, 30));
+		smileyBtn.addActionListener(this);
+		smileyBtn.setActionCommand(EButtonActions.SHOW_SMILEYS.getActionCommand());
+		smileyBtn.setPreferredSize(buttonSize);
+		smileyBtn.setToolTipText("Smileys...");
 		left.add(smileyBtn);
-		left.add(new JButton("Fi"));
-		left.add(new JButton("AG"));
+		JButton attachBtn = new JButton(IconProvider.getAsScaledIcon(EIcons.ATTACH, iconSize, iconSize));
+		removeSpacing(attachBtn);
+		attachBtn.addActionListener(this);
+		attachBtn.setActionCommand(EButtonActions.ATTACH_FILE.getActionCommand());
+		attachBtn.setToolTipText("Datei senden...");
+		attachBtn.setPreferredSize(buttonSize);
+		left.add(attachBtn);
+		JButton addContactBtn = new JButton(IconProvider.getAsScaledIcon(EIcons.ADD, iconSize, iconSize));
+		removeSpacing(addContactBtn);
+		addContactBtn.addActionListener(this);
+		addContactBtn.setActionCommand(EButtonActions.ADD_TO_GROUP.getActionCommand());
+		addContactBtn.setToolTipText("Kontakt zur Konversation hinzufügen...");
+		addContactBtn.setPreferredSize(buttonSize);
+		left.add(addContactBtn);
 
 		buttons.add(left, BorderLayout.WEST);
 
 		JPanel right = new JPanel(l);
-		right.add(new JButton("!"));
-		right.add(new JButton("senden"));
+		JButton alarmBtn = new JButton(IconProvider.getAsScaledIcon(EIcons.ALARM, iconSize, iconSize));
+		removeSpacing(alarmBtn);
+		alarmBtn.addActionListener(this);
+		alarmBtn.setActionCommand(EButtonActions.ALARM.getActionCommand());
+		alarmBtn.setToolTipText("Aufmerksamkeit holen!");
+		alarmBtn.setPreferredSize(buttonSize);
+		right.add(alarmBtn);
+		JButton sendBtn = new JButton("senden", IconProvider.getAsScaledIcon(EIcons.SEND, iconSize, iconSize));
+		sendBtn.addActionListener(this);
+		sendBtn.setActionCommand(EButtonActions.SEND.getActionCommand());
+		sendBtn.setToolTipText("Nachricht senden");
+		removeSpacing(sendBtn);
+		Dimension sendDimension = new Dimension(85, buttonSize.height);
+		sendBtn.setPreferredSize(sendDimension);
+		right.add(sendBtn);
 
 		buttons.add(right, BorderLayout.EAST);
 		//
@@ -279,7 +312,15 @@ public class ChatPanel extends JSplitPane implements DropTargetListener,
 				if (transferData != null && transferData.size() > 0) {
 					// importFiles(transferData);
 					for (Object object : transferData) {
-						System.out.println(object);
+						File f = (File)object;
+						if (f.isDirectory()) {
+							infoMessage("Senden von Ordnern nicht möglich, bitte vorher ZIPen!<br/>(\""+f.getAbsolutePath()+"\")");
+							continue;
+						}
+						for (ContactDto c : contacts) {
+							FileTransferManager.INSTANCE.sendFileTo(f, c, this);
+							infoMessage("Sendeanfrage für Datei \""+f.getName()+"\" an "+c.name+" gesendet!");
+						}
 					}
 					dtde.dropComplete(true);
 				}
@@ -347,7 +388,13 @@ public class ChatPanel extends JSplitPane implements DropTargetListener,
 		sb.append(m);
 		sb.append("</div>");
 		messageBox.setText(sb.toString());
-		updateScrollDownButtonShown();
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				if (!isScrolledDown()) {
+					updateScrollDownButtonShown();
+				}
+			}
+		});
 	}
 	
 	private String textToHtml(String s){
@@ -405,7 +452,12 @@ public class ChatPanel extends JSplitPane implements DropTargetListener,
 	}
 	
 	private enum EButtonActions{ 
-		SCROLL_DOWN("sd");
+		SCROLL_DOWN("sd"),
+		ALARM("am"),
+		ADD_TO_GROUP("atg"),
+		SEND("sd"),
+		ATTACH_FILE("af"),
+		SHOW_SMILEYS("ssm");
 		
 		private String actionCommand;
 		
@@ -417,5 +469,25 @@ public class ChatPanel extends JSplitPane implements DropTargetListener,
 			return actionCommand;
 		}
 
+	}
+
+	public void started(File f, ContactDto c) {
+		infoMessage("Beginne mit der Dateiübertragung (\""+f.getName()+"\" an "+c.name+")...");
+	}
+
+	public void abroted(File f, ContactDto c) {
+		infoMessage("Senden der Datei \""+f.getName()+"\" an "+c.name+" Fehlgeschlagen!");
+	}
+
+	public void finnished(File f, ContactDto c) {
+		infoMessage("Datei \""+f.getName()+"\" wurde erfolgreich an "+c.name+" gesendet!");
+	}
+
+	public void declined(ContactDto contact, File file) {
+		infoMessage("Sendeanfrage fÜr Datei \""+file.getName()+"\" wurde von "+contact.name+" abgelehnt!");
+	}
+
+	public void fileTransferRequestRecieved(ContactDto contact,
+			FileTransferRequest request) {
 	}
 }

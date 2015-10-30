@@ -2,12 +2,15 @@ package main.java.de.c4.controller.shared;
 
 import java.net.InetAddress;
 
+import main.java.de.c4.controller.FileTransferManager;
 import main.java.de.c4.controller.Messenger;
 import main.java.de.c4.model.messages.ContactDto;
 import main.java.de.c4.model.messages.ContactListDto;
 import main.java.de.c4.model.messages.EOnlineState;
 import main.java.de.c4.model.messages.OnlineStateChange;
 import main.java.de.c4.model.messages.RequestKnownOnlineClients;
+import main.java.de.c4.model.messages.file.FileTransferAnswer;
+import main.java.de.c4.model.messages.file.FileTransferRequest;
 
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
@@ -37,6 +40,14 @@ public class MessageHandler extends Listener{
 			Log.debug("Nachricht von "+contact.name+" ("+contact.ip+") bekommen: "+message);
 			Messenger.receiveMessageFrom(contact, chatMessage);
 			
+		} else if (object instanceof FileTransferRequest) {
+			FileTransferRequest request = (FileTransferRequest)object;
+			ContactDto contact = ContactList.INSTANCE.findByAddr(c.getRemoteAddressTCP().getAddress());
+			Messenger.fileTransferRequestReceived(request, contact);
+		} else if (object instanceof FileTransferAnswer) {
+			FileTransferAnswer answer = (FileTransferAnswer)object;
+//			ContactDto contact = ContactList.INSTANCE.findByAddr(c.getRemoteAddressTCP().getAddress());
+			FileTransferManager.INSTANCE.requestAnswered(answer);
 		} else if (object instanceof OnlineStateChange) {
 			InetAddress ip = c.getRemoteAddressTCP().getAddress();
 			OnlineStateChange onlineState = (OnlineStateChange) object;
@@ -54,9 +65,6 @@ public class MessageHandler extends Listener{
 			ContactListDto list = (ContactListDto)object;
 			ContactList.INSTANCE.setOnlineContacts(list.contacts);
 			Log.info("Recieved ContactList!");
-//			for (ContactDto dto : list.contacts) {
-//				System.out.println(dto.name + " ("+dto.ip+"): "+dto.state);
-//			}
 		}
 	}
 

@@ -20,7 +20,9 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.plaf.basic.BasicButtonUI;
 
+import main.java.de.c4.model.messages.EOnlineState;
 import main.java.de.c4.view.listener.TabCloseListener;
+import main.java.de.c4.view.resources.IconProvider;
 
 public class ButtonTabComponent extends JPanel {
 
@@ -29,7 +31,7 @@ public class ButtonTabComponent extends JPanel {
 	private final ChatTabPane pane;
 	private TabCloseListener listener;
  
-    public ButtonTabComponent(final ChatTabPane pane, TabCloseListener tcl) {
+    public ButtonTabComponent(final ChatTabPane pane, EOnlineState state, TabCloseListener tcl) {
         //unset default FlowLayout' gaps
         super(new BorderLayout());
         listener = tcl;
@@ -53,6 +55,8 @@ public class ButtonTabComponent extends JPanel {
             }
         };
          
+        add(new JLabel(" ", IconProvider.getAsScaledIcon(state.getIcon(), 17, 17), JLabel.LEFT), BorderLayout.WEST);
+        
         add(label, BorderLayout.CENTER);
         //add more space between the label and the button
         label.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 5));

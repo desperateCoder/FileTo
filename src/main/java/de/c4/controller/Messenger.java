@@ -16,6 +16,7 @@ import main.java.de.c4.controller.shared.listener.MessageRecievedListener;
 import main.java.de.c4.model.messages.ContactDto;
 import main.java.de.c4.model.messages.OnlineStateChange;
 import main.java.de.c4.model.messages.RequestKnownOnlineClients;
+import main.java.de.c4.model.messages.file.FileTransferRequest;
 
 import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Connection;
@@ -125,5 +126,12 @@ public class Messenger {
 
 	public static void goOffline() {
 		INSTANCE.chatServer.killUDP();
+	}
+
+	public static void fileTransferRequestReceived(FileTransferRequest request,
+			ContactDto contact) {
+		for (MessageRecievedListener l : LISTENER) {
+			l.fileTransferRequestRecieved(contact, request);
+		}
 	}
 }
