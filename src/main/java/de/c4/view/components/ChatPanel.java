@@ -6,6 +6,7 @@ import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Insets;
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
@@ -51,12 +52,13 @@ import main.java.de.c4.controller.shared.listener.MessageRecievedListener;
 import main.java.de.c4.model.messages.ContactDto;
 import main.java.de.c4.model.messages.file.FileTransferRequest;
 import main.java.de.c4.view.listener.SmartScroller;
+import main.java.de.c4.view.listener.SmileySelectionListener;
 import main.java.de.c4.view.resources.EIcons;
 import main.java.de.c4.view.resources.ESmileys;
 import main.java.de.c4.view.resources.IconProvider;
 
 public class ChatPanel extends JSplitPane implements DropTargetListener,
-		MessageRecievedListener, ActionListener, FileTransferInfoListener {
+		MessageRecievedListener, ActionListener, FileTransferInfoListener, SmileySelectionListener {
 	
 	private static final int SCROLLDOWN_BTN_MARGIN = 5;
 	private static final Insets ZERO_INSETS = new Insets(0,0,0,0);
@@ -69,7 +71,8 @@ public class ChatPanel extends JSplitPane implements DropTargetListener,
 	private JScrollPane messageScrollPane;
 	private JLayeredPane layeredPane = new JLayeredPane();
 	private JButton scrollDownBtn;
-
+	private JButton smileyBtn;
+	
 	private long chatID;
 	private StringBuffer sb = new StringBuffer();
 	private JTextArea inputArea = new JTextArea();
@@ -204,7 +207,7 @@ public class ChatPanel extends JSplitPane implements DropTargetListener,
 		JPanel left = new JPanel(l);
 		final int iconSize = 20;
 		final Dimension buttonSize = new Dimension(30, 30);
-		JButton smileyBtn = new JButton(IconProvider.getAsScaledIcon(ESmileys.SMILEYS_28, iconSize, iconSize));
+		smileyBtn = new JButton(IconProvider.getAsScaledIcon(ESmileys.SMILEYS_28, iconSize, iconSize));
 		removeSpacing(smileyBtn);
 		smileyBtn.addActionListener(this);
 		smileyBtn.setActionCommand(EButtonActions.SHOW_SMILEYS.getActionCommand());
@@ -443,6 +446,25 @@ public class ChatPanel extends JSplitPane implements DropTargetListener,
 	public void actionPerformed(ActionEvent e) {
 		if (EButtonActions.SCROLL_DOWN.getActionCommand().equals(e.getActionCommand())) {
 			scrollDown();
+		} else if (EButtonActions.SCROLL_DOWN.getActionCommand().equals(e.getActionCommand())) {
+			scrollDown();
+		} else if (EButtonActions.ADD_TO_GROUP.getActionCommand().equals(e.getActionCommand())) {
+			//TODO implement
+		} else if (EButtonActions.ALARM.getActionCommand().equals(e.getActionCommand())) {
+			//TODO implement
+		} else if (EButtonActions.ATTACH_FILE.getActionCommand().equals(e.getActionCommand())) {
+			//TODO implement
+		} else if (EButtonActions.SEND.getActionCommand().equals(e.getActionCommand())) {
+			String input = inputArea.getText().trim();
+			if (input.isEmpty()) {
+				return;
+			}
+			sendMessage(input);
+			inputArea.setText("");
+		} else if (EButtonActions.SHOW_SMILEYS.getActionCommand().equals(e.getActionCommand())) {
+			Point locationOnScreen = smileyBtn.getLocationOnScreen();
+			locationOnScreen.y += smileyBtn.getHeight();
+			SmileyDialog.showUp(this, locationOnScreen);
 		}
 	}
 
@@ -490,5 +512,9 @@ public class ChatPanel extends JSplitPane implements DropTargetListener,
 
 	public void fileTransferRequestRecieved(ContactDto contact,
 			FileTransferRequest request) {
+	}
+
+	public void smileySelected(ESmileys s) {
+		inputArea.insert(":"+s.getNr()+":", inputArea.getCaretPosition());
 	}
 }
