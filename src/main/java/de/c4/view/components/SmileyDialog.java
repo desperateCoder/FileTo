@@ -50,6 +50,7 @@ public class SmileyDialog extends JDialog implements WindowFocusListener, Action
 		c.gridx = c.gridy = 0;
 		c.insets = ZERO_INSETS;
 		
+		
 		JPanel panel = new JPanel(new GridBagLayout());
 		for (ESmileys s : ESmileys.values()) {
 			if (s.getType() == ESmileyType.STUFF) {

@@ -478,7 +478,7 @@ public class ChatPanel extends JSplitPane implements DropTargetListener,
 		SCROLL_DOWN("sd"),
 		ALARM("am"),
 		ADD_TO_GROUP("atg"),
-		SEND("sd"),
+		SEND("snd"),
 		ATTACH_FILE("af"),
 		SHOW_SMILEYS("ssm");
 		
