@@ -35,4 +35,28 @@ public class IconProvider {
 	public static Icon getAsScaledIcon(EIcons icon, int width, int height) {
 		return new ImageIcon(IconProvider.getImage(icon).getScaledInstance(width, height, 0));
 	}
+	
+	
+	public static BufferedImage getImage(ESmileys icon) {
+		InputStream stream = IconProvider.class.getResourceAsStream(icon.getPath());
+		try {
+			return ImageIO.read(stream);
+		} catch (IOException e) {
+			Log.error("Datei \"" + icon.getPath() + "\" nicht gefunden.");
+			Log.error(ExceptionUtil.getStacktrace(e));
+		} catch (Exception e) {
+			Log.error("Fehler beim lesen der Datei.");
+			Log.error(ExceptionUtil.getStacktrace(e));
+		}
+		return null;
+	}
+	
+	public static URL getImageAsURL(ESmileys icon) {
+		return IconProvider.class.getResource("./"+icon.getPath());
+	}
+
+	public static Icon getAsScaledIcon(ESmileys icon, int width, int height) {
+		return new ImageIcon(IconProvider.getImage(icon).getScaledInstance(width, height, 0));
+	}
+	
 }

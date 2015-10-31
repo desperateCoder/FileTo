@@ -52,6 +52,7 @@ import main.java.de.c4.model.messages.ContactDto;
 import main.java.de.c4.model.messages.file.FileTransferRequest;
 import main.java.de.c4.view.listener.SmartScroller;
 import main.java.de.c4.view.resources.EIcons;
+import main.java.de.c4.view.resources.ESmileys;
 import main.java.de.c4.view.resources.IconProvider;
 
 public class ChatPanel extends JSplitPane implements DropTargetListener,
@@ -203,7 +204,7 @@ public class ChatPanel extends JSplitPane implements DropTargetListener,
 		JPanel left = new JPanel(l);
 		final int iconSize = 20;
 		final Dimension buttonSize = new Dimension(30, 30);
-		JButton smileyBtn = new JButton(IconProvider.getAsScaledIcon(EIcons.SMILEY_SMILE, iconSize, iconSize));
+		JButton smileyBtn = new JButton(IconProvider.getAsScaledIcon(ESmileys.SMILEYS_28, iconSize, iconSize));
 		removeSpacing(smileyBtn);
 		smileyBtn.addActionListener(this);
 		smileyBtn.setActionCommand(EButtonActions.SHOW_SMILEYS.getActionCommand());

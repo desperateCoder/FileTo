@@ -6,7 +6,6 @@ public enum EIcons {
 	STATE_AFK("states/afk.png"),
 	STATE_DND("states/dnd.png"),
 	STATE_OFFLINE("states/offline.png"),
-	SMILEY_SMILE("smileys/1.png"), 
 	CONTACTS("contacts.png"),
 	SEND("send.png"),
 	ADD("add.png"),
