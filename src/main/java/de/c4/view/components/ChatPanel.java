@@ -57,11 +57,11 @@ import main.java.de.c4.view.resources.EIcons;
 import main.java.de.c4.view.resources.ESmileys;
 import main.java.de.c4.view.resources.IconProvider;
 
-public class ChatPanel extends JSplitPane implements DropTargetListener,
-		MessageRecievedListener, ActionListener, FileTransferInfoListener, SmileySelectionListener {
-	
+public class ChatPanel extends JSplitPane implements DropTargetListener, MessageRecievedListener, ActionListener,
+		FileTransferInfoListener, SmileySelectionListener {
+
 	private static final int SCROLLDOWN_BTN_MARGIN = 5;
-	private static final Insets ZERO_INSETS = new Insets(0,0,0,0);
+	private static final Insets ZERO_INSETS = new Insets(0, 0, 0, 0);
 
 	private static final long serialVersionUID = 1L;
 
@@ -72,7 +72,7 @@ public class ChatPanel extends JSplitPane implements DropTargetListener,
 	private JLayeredPane layeredPane = new JLayeredPane();
 	private JButton scrollDownBtn;
 	private JButton smileyBtn;
-	
+
 	private long chatID;
 	private StringBuffer sb = new StringBuffer();
 	private JTextArea inputArea = new JTextArea();
@@ -84,7 +84,6 @@ public class ChatPanel extends JSplitPane implements DropTargetListener,
 	public ChatPanel(ContactDto contact, long chatID) {
 		super(JSplitPane.HORIZONTAL_SPLIT);
 		this.setChatID(chatID);
-		
 
 		inputArea.addKeyListener(new KeyListener() {
 			public void keyTyped(KeyEvent arg0) {
@@ -103,8 +102,7 @@ public class ChatPanel extends JSplitPane implements DropTargetListener,
 					}
 					if (arg0.isShiftDown()) {
 						inputArea.append("\n");
-						inputArea
-								.setCaretPosition(inputArea.getText().length() - 1);
+						inputArea.setCaretPosition(inputArea.getText().length() - 1);
 					} else {
 						sendMessage(input);
 						inputArea.setText("");
@@ -121,38 +119,41 @@ public class ChatPanel extends JSplitPane implements DropTargetListener,
 		messageScrollPane = new JScrollPane(messageBox);
 		new SmartScroller(messageScrollPane);
 
-		
 		layeredPane.add(messageScrollPane, Integer.valueOf(0));
 		scrollDownBtn = new JButton(IconProvider.getAsScaledIcon(EIcons.ARROW_DOWN, 25, 25));
 		removeSpacing(scrollDownBtn);
 		scrollDownBtn.addActionListener(this);
 		scrollDownBtn.setActionCommand(EButtonActions.SCROLL_DOWN.getActionCommand());
-		
-		
+
 		layeredPane.addComponentListener(new ComponentListener() {
-			
+
 			public void componentResized(ComponentEvent arg0) {
 				Rectangle b = layeredPane.getBounds();
 				messageScrollPane.setBounds(b);
 				setScrollDownBtnPosition();
 			}
 
-			public void componentShown(ComponentEvent arg0) {}
-			public void componentMoved(ComponentEvent arg0) {}
-			public void componentHidden(ComponentEvent arg0) {}
+			public void componentShown(ComponentEvent arg0) {
+			}
+
+			public void componentMoved(ComponentEvent arg0) {
+			}
+
+			public void componentHidden(ComponentEvent arg0) {
+			}
 		});
-		
+
 		StyleSheet styleSheet = kit.getStyleSheet();
-		styleSheet
-				.addRule("div {padding: 3px; margin-bottom: 3px; border: 2px solid;}");
-		styleSheet
-				.addRule(".oMessage {background-color : #C6FFC6; text-align: left; border-color: #DDFFDD; margin-right: 20px;}");
-		styleSheet
-				.addRule(".nMessage {background-color : #E6E6E6; text-align: center; border-color: #666666;}");
-		styleSheet
-				.addRule(".myMessage {background-color : #C2EBFF; text-align: left; border-color: #E2F5FF; margin-left: 20px;}");
-		styleSheet
-				.addRule(".from {text-decoration: underline; padding: 0; margin-bottom: 0; text-align: left; border: none; font-size: 11pt; color: #666666;}");
+		styleSheet.addRule("div {padding: 10px; margin-bottom: 3px;}");
+		styleSheet.addRule(".nMessage, .oMessage {text-align: left;}");
+		styleSheet.addRule(
+				".oMessage {background-color : #C6FFC6; border: 1px solid #AADDAA; border-left: 5px solid #AADDAA; margin-right: 20px;}");
+		styleSheet.addRule(
+				".myMessage {background-color : #C2EBFF; border: 1px solid #AACCFF; border-left: 5px solid #AACCFF; margin-left: 20px;}");
+		styleSheet.addRule(
+				".nMessage {background-color : #EEEEEE; border: 1px solid #CCCCCC; border-left: 5px solid #CCCCCC; color: #666;}");
+		styleSheet.addRule(
+				".from {padding: 0; margin-bottom: 0; text-align: left; border: none; font-size: 11pt; color: #666666;}");
 		styleSheet.addRule(".emote {margin-bottom: -3px;}");
 
 		Document doc = kit.createDefaultDocument();
@@ -162,21 +163,25 @@ public class ChatPanel extends JSplitPane implements DropTargetListener,
 		//
 		// messageBox.setText("<div class=\"oMessage\">hallo</div>"
 		// +
-		// "<div class=\"myMessage\"><a href=\"file:///home/artur\">Ordner</a></div>"
+		// "<div class=\"myMessage\"><a
+		// href=\"file:///home/artur\">Ordner</a></div>"
 		// +
-		// "<div class=\"myMessage\"><a href=\"file:///home/artur/arbeit/spielwiese/FileTo/src/ChatPanel.java\">Datei</a></div>"
+		// "<div class=\"myMessage\"><a
+		// href=\"file:///home/artur/arbeit/spielwiese/FileTo/src/ChatPanel.java\">Datei</a></div>"
 		// +
-		// "<div class=\"myMessage\"><a href=\"http://google.de\">Link</a></div>"
+		// "<div class=\"myMessage\"><a
+		// href=\"http://google.de\">Link</a></div>"
 		// + "<div class=\"nMessage\">Datei bla uebertragen</div>"
 		// +
-		// "<div class=\"oMessage\">du bist doof! <img class=\"emote\" width=25 height=25 src='"+imgsrc+"'></img></div>"
+		// "<div class=\"oMessage\">du bist doof! <img class=\"emote\" width=25
+		// height=25 src='"+imgsrc+"'></img></div>"
 		// +
-		// "<div class=\"myMessage\">danke! das werde ich mir bei gelegenheit mal ansehen, du blöder horst du!</div>");
+		// "<div class=\"myMessage\">danke! das werde ich mir bei gelegenheit
+		// mal ansehen, du blöder horst du!</div>");
 
 		messageBox.addHyperlinkListener(new HyperlinkListener() {
 			public void hyperlinkUpdate(HyperlinkEvent hle) {
-				if (HyperlinkEvent.EventType.ACTIVATED.equals(hle
-						.getEventType())) {
+				if (HyperlinkEvent.EventType.ACTIVATED.equals(hle.getEventType())) {
 					String url = hle.getURL().toString();
 					System.out.println(url);
 					Desktop desktop = Desktop.getDesktop();
@@ -311,19 +316,19 @@ public class ChatPanel extends JSplitPane implements DropTargetListener,
 			try {
 
 				@SuppressWarnings("unchecked")
-				List<File> transferData = (List<File>) transferable
-						.getTransferData(DataFlavor.javaFileListFlavor);
+				List<File> transferData = (List<File>) transferable.getTransferData(DataFlavor.javaFileListFlavor);
 				if (transferData != null && transferData.size() > 0) {
 					// importFiles(transferData);
 					for (Object object : transferData) {
-						File f = (File)object;
+						File f = (File) object;
 						if (f.isDirectory()) {
-							infoMessage("Senden von Ordnern nicht möglich, bitte vorher ZIPen!<br/>(\""+f.getAbsolutePath()+"\")");
+							infoMessage("Senden von Ordnern nicht möglich, bitte vorher ZIPen!<br/>(\""
+									+ f.getAbsolutePath() + "\")");
 							continue;
 						}
 						for (ContactDto c : contacts) {
 							FileTransferManager.INSTANCE.sendFileTo(f, c, this);
-							infoMessage("Sendeanfrage für Datei \""+f.getName()+"\" an "+c.name+" gesendet!");
+							infoMessage("Sendeanfrage für Datei \"" + f.getName() + "\" an " + c.name + " gesendet!");
 						}
 					}
 					dtde.dropComplete(true);
@@ -347,7 +352,7 @@ public class ChatPanel extends JSplitPane implements DropTargetListener,
 
 	public void receiveMessage(final ChatMessage m, final ContactDto contact) {
 		SwingUtilities.invokeLater(new Runnable() {
-			
+
 			public void run() {
 				sb.append("<div class=\"oMessage\">");
 				sb.append("<div class=\"from\"><span>");
@@ -380,7 +385,7 @@ public class ChatPanel extends JSplitPane implements DropTargetListener,
 				}
 			}
 		});
-//		updateScrollDownButtonShown();
+		// updateScrollDownButtonShown();
 		ChatMessage chatMessage = new ChatMessage();
 		chatMessage.text = m;
 		chatMessage.id = getChatID();
@@ -400,8 +405,8 @@ public class ChatPanel extends JSplitPane implements DropTargetListener,
 			}
 		});
 	}
-	
-	private String textToHtml(String s){
+
+	private String textToHtml(String s) {
 		return s.replaceAll("\n", "<br/>");
 	}
 
@@ -415,7 +420,7 @@ public class ChatPanel extends JSplitPane implements DropTargetListener,
 		this.chatID = chatID;
 	}
 
-	private void updateScrollDownButtonShown(){
+	private void updateScrollDownButtonShown() {
 		if (isScrolledDown()) {
 			if (layeredPane.isAncestorOf(scrollDownBtn)) {
 				layeredPane.remove(scrollDownBtn);
@@ -432,14 +437,16 @@ public class ChatPanel extends JSplitPane implements DropTargetListener,
 		int visibleAmount = sb.getVisibleAmount();
 		int lowest = val + visibleAmount;
 		int maxVal = sb.getMaximum();
-		boolean atBottom = maxVal == lowest || (visibleAmount==lowest && visibleAmount > maxVal) || messageBox.getHeight()<visibleAmount;
+		boolean atBottom = maxVal == lowest || (visibleAmount == lowest && visibleAmount > maxVal)
+				|| messageBox.getHeight() < visibleAmount;
 		return atBottom;
 	}
-	
+
 	private void setScrollDownBtnPosition() {
 		Rectangle b = layeredPane.getBounds();
-		int x = (int)b.getWidth()-scrollDownBtn.getWidth()-messageScrollPane.getVerticalScrollBar().getWidth()-SCROLLDOWN_BTN_MARGIN;
-		int y = (int)b.getHeight()-scrollDownBtn.getHeight()- SCROLLDOWN_BTN_MARGIN;
+		int x = (int) b.getWidth() - scrollDownBtn.getWidth() - messageScrollPane.getVerticalScrollBar().getWidth()
+				- SCROLLDOWN_BTN_MARGIN;
+		int y = (int) b.getHeight() - scrollDownBtn.getHeight() - SCROLLDOWN_BTN_MARGIN;
 		scrollDownBtn.setBounds(x, y, 32, 32);
 	}
 
@@ -449,11 +456,11 @@ public class ChatPanel extends JSplitPane implements DropTargetListener,
 		} else if (EButtonActions.SCROLL_DOWN.getActionCommand().equals(e.getActionCommand())) {
 			scrollDown();
 		} else if (EButtonActions.ADD_TO_GROUP.getActionCommand().equals(e.getActionCommand())) {
-			//TODO implement
+			// TODO implement
 		} else if (EButtonActions.ALARM.getActionCommand().equals(e.getActionCommand())) {
-			//TODO implement
+			// TODO implement
 		} else if (EButtonActions.ATTACH_FILE.getActionCommand().equals(e.getActionCommand())) {
-			//TODO implement
+			// TODO implement
 		} else if (EButtonActions.SEND.getActionCommand().equals(e.getActionCommand())) {
 			String input = inputArea.getText().trim();
 			if (input.isEmpty()) {
@@ -473,17 +480,12 @@ public class ChatPanel extends JSplitPane implements DropTargetListener,
 		sb.setValue(sb.getMaximum());
 		layeredPane.remove(scrollDownBtn);
 	}
-	
-	private enum EButtonActions{ 
-		SCROLL_DOWN("sd"),
-		ALARM("am"),
-		ADD_TO_GROUP("atg"),
-		SEND("snd"),
-		ATTACH_FILE("af"),
-		SHOW_SMILEYS("ssm");
-		
+
+	private enum EButtonActions {
+		SCROLL_DOWN("sd"), ALARM("am"), ADD_TO_GROUP("atg"), SEND("snd"), ATTACH_FILE("af"), SHOW_SMILEYS("ssm");
+
 		private String actionCommand;
-		
+
 		private EButtonActions(String actionCommand) {
 			this.actionCommand = actionCommand;
 		}
@@ -495,26 +497,25 @@ public class ChatPanel extends JSplitPane implements DropTargetListener,
 	}
 
 	public void started(File f, ContactDto c) {
-		infoMessage("Beginne mit der Dateiübertragung (\""+f.getName()+"\" an "+c.name+")...");
+		infoMessage("Beginne mit der Dateiübertragung (\"" + f.getName() + "\" an " + c.name + ")...");
 	}
 
 	public void abroted(File f, ContactDto c) {
-		infoMessage("Senden der Datei \""+f.getName()+"\" an "+c.name+" Fehlgeschlagen!");
+		infoMessage("Senden der Datei \"" + f.getName() + "\" an " + c.name + " Fehlgeschlagen!");
 	}
 
 	public void finnished(File f, ContactDto c) {
-		infoMessage("Datei \""+f.getName()+"\" wurde erfolgreich an "+c.name+" gesendet!");
+		infoMessage("Datei \"" + f.getName() + "\" wurde erfolgreich an " + c.name + " gesendet!");
 	}
 
 	public void declined(ContactDto contact, File file) {
-		infoMessage("Sendeanfrage fÜr Datei \""+file.getName()+"\" wurde von "+contact.name+" abgelehnt!");
+		infoMessage("Sendeanfrage fÜr Datei \"" + file.getName() + "\" wurde von " + contact.name + " abgelehnt!");
 	}
 
-	public void fileTransferRequestRecieved(ContactDto contact,
-			FileTransferRequest request) {
+	public void fileTransferRequestRecieved(ContactDto contact, FileTransferRequest request) {
 	}
 
 	public void smileySelected(ESmileys s) {
-		inputArea.insert(":"+s.getNr()+":", inputArea.getCaretPosition());
+		inputArea.insert(":" + s.getNr() + ":", inputArea.getCaretPosition());
 	}
 }
