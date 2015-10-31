@@ -18,6 +18,8 @@ import java.awt.dnd.DropTargetEvent;
 import java.awt.dnd.DropTargetListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.AdjustmentEvent;
+import java.awt.event.AdjustmentListener;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.KeyEvent;
@@ -118,6 +120,21 @@ public class ChatPanel extends JSplitPane implements DropTargetListener, Message
 		messageBox.setEditorKit(kit);
 		messageScrollPane = new JScrollPane(messageBox);
 		new SmartScroller(messageScrollPane);
+		messageScrollPane.getVerticalScrollBar().addAdjustmentListener(new AdjustmentListener() {
+			public void adjustmentValueChanged(AdjustmentEvent e) {
+				if (e.getValueIsAdjusting()) {
+					return;
+				}
+				if (isScrolledDown()) {
+					SwingUtilities.invokeLater(new Runnable() {
+						public void run() {
+							updateScrollDownButtonShown();
+							messageBox.repaint();
+						}
+					});
+				}
+			}
+		});
 
 		layeredPane.add(messageScrollPane, Integer.valueOf(0));
 		scrollDownBtn = new JButton(IconProvider.getAsScaledIcon(EIcons.ARROW_DOWN, 25, 25));
@@ -392,13 +409,13 @@ public class ChatPanel extends JSplitPane implements DropTargetListener, Message
 		Messenger.sendMessageTo(chatMessage, contacts);
 	}
 
-	public void infoMessage(String m) {
-		sb.append("<div class=\"nMessage\">");
-		sb.append(m);
-		sb.append("</div>");
-		messageBox.setText(sb.toString());
+	public void infoMessage(final String m) {
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
+				sb.append("<div class=\"nMessage\">");
+				sb.append(m);
+				sb.append("</div>");
+				messageBox.setText(sb.toString());
 				if (!isScrolledDown()) {
 					updateScrollDownButtonShown();
 				}
