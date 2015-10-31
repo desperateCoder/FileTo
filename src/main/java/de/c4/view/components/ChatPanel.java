@@ -145,13 +145,11 @@ public class ChatPanel extends JSplitPane implements DropTargetListener, Message
 
 		StyleSheet styleSheet = kit.getStyleSheet();
 		styleSheet.addRule("div {padding: 10px; margin-bottom: 3px;}");
-		styleSheet.addRule(".nMessage, .oMessage {text-align: left;}");
 		styleSheet.addRule(
-				".oMessage {background-color : #C6FFC6; border: 1px solid #AADDAA; border-left: 5px solid #AADDAA; margin-right: 20px;}");
-		styleSheet.addRule(
-				".myMessage {background-color : #C2EBFF; border: 1px solid #AACCFF; border-left: 5px solid #AACCFF; margin-left: 20px;}");
-		styleSheet.addRule(
-				".nMessage {background-color : #EEEEEE; border: 1px solid #CCCCCC; border-left: 5px solid #CCCCCC; color: #666;}");
+				".nMessage, .oMessage, .myMessage {text-align: left; border: 1px solid #000; border-left: 3px solid #000;}");
+		styleSheet.addRule(".oMessage {background-color : #C6FFC6; border-color: #AADDAA; margin-right: 20px;}");
+		styleSheet.addRule(".myMessage {background-color : #C2EBFF; border-color: #AACCFF; margin-left: 20px;}");
+		styleSheet.addRule(".nMessage {background-color : #EEEEEE; border-color: #CCCCCC; color: #666;}");
 		styleSheet.addRule(
 				".from {padding: 0; margin-bottom: 0; text-align: left; border: none; font-size: 11pt; color: #666666;}");
 		styleSheet.addRule(".emote {margin-bottom: -3px;}");
