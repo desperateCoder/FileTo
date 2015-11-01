@@ -175,6 +175,7 @@ public class ContactListFrame extends JFrame
 
 	public static void main(String[] args) {
 		// ImageIcon(IconProvider.getImage(EOnlineState.OFFLINE.getIcon())), 0);
+		Log.set(Log.LEVEL_DEBUG); //TODO: change before release!
 		System.setProperty("java.net.preferIPv4Stack", "true");
 		new Thread(new Runnable() {
 

@@ -27,7 +27,7 @@ public class I18N {
 						"resources/" + language + ".properties");
 				if (inputStream != null) {
 					i18nProperties.load(inputStream);
-					Log.debug("Language loaded: ");
+					Log.debug("Language loaded: "+language);
 					try {
 						inputStream.close();
 					} catch (IOException | NullPointerException e) {
