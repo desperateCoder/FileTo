@@ -21,6 +21,8 @@ public class SettingsFrame extends JFrame implements ActionListener {
 	private static final long serialVersionUID = 1L;
 	JLabel usernameLabel;
 	JTextField usernameField;
+	JLabel languageLabel;
+	JTextField languageField;
 	JLabel lookAndFeelLabel;
 	JComboBox<String> lookAndFeelBox;
 	JButton saveButton;
@@ -36,25 +38,31 @@ public class SettingsFrame extends JFrame implements ActionListener {
 		gbc.gridx = 0;
 		gbc.gridy = 0;
 		add(usernameLabel, gbc);
+		languageLabel = new JLabel(I18N.get("settingsframe.language"));
+		gbc.gridy++;
+		add(languageLabel, gbc);
 		lookAndFeelLabel = new JLabel(I18N.get("settingsframe.lookandfeel"));
-		gbc.gridy = 1;
+		gbc.gridy++;
 		add(lookAndFeelLabel, gbc);
 		usernameField = new JTextField();
 		gbc.gridx = 1;
 		gbc.gridy = 0;
 		gbc.weightx = 1.0;
 		add(usernameField, gbc);
+		languageField = new JTextField();
+		gbc.gridy++;
+		add(languageField, gbc);
 		lookAndFeelBox = new JComboBox<String>();
 		lookAndFeelBox.addItem("System");
 		for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
 			lookAndFeelBox.addItem(info.getName());
 		}
 		lookAndFeelBox.setSelectedIndex(0);
-		gbc.gridy = 1;
+		gbc.gridy++;
 		add(lookAndFeelBox, gbc);
 		saveButton = new JButton(I18N.get("settingsframe.save"));
 		saveButton.addActionListener(this);
-		gbc.gridy = 2;
+		gbc.gridy++;
 		add(saveButton, gbc);
 		loadValues();
 		this.pack();
@@ -63,6 +71,7 @@ public class SettingsFrame extends JFrame implements ActionListener {
 
 	private void loadValues() {
 		usernameField.setText(Settings.INSTANCE.get(Settings.CONTACT_NAME));
+		languageField.setText(Settings.INSTANCE.get(Settings.LANGUAGE));
 		String lookAndFeel = Settings.INSTANCE.get(Settings.LOOK_AND_FEEL);
 		if (lookAndFeel == null || lookAndFeel.isEmpty()) {
 			lookAndFeelBox.setSelectedIndex(0);
@@ -77,6 +86,7 @@ public class SettingsFrame extends JFrame implements ActionListener {
 
 	public void actionPerformed(ActionEvent e) {
 		Settings.INSTANCE.set(Settings.CONTACT_NAME, usernameField.getText());
+		Settings.INSTANCE.set(Settings.LANGUAGE, languageField.getText());
 		if (lookAndFeelBox.getSelectedIndex() == 0) {
 			Settings.INSTANCE.set(Settings.LOOK_AND_FEEL, "");
 		} else {

@@ -39,6 +39,7 @@ import main.java.de.c4.controller.shared.listener.OnlineStateChangeListener;
 import main.java.de.c4.model.messages.ContactDto;
 import main.java.de.c4.model.messages.EOnlineState;
 import main.java.de.c4.model.messages.OnlineStateChange;
+import main.java.de.c4.view.i18n.I18N;
 import main.java.de.c4.view.resources.IconProvider;
 import main.java.de.c4.view.settings.SettingsFrame;
 
@@ -59,8 +60,8 @@ public class ContactListFrame extends JFrame
 
 		JPanel labelPanel = new JPanel(new BorderLayout());
 		JMenuBar menuBar = new JMenuBar();
-		JMenu editMenu = new JMenu("Edit");
-		JMenuItem settingsMenuItem = new JMenuItem("Settings");
+		JMenu editMenu = new JMenu(I18N.get("contactlist.menu.edit"));
+		JMenuItem settingsMenuItem = new JMenuItem(I18N.get("contactlist.menu.settings"));
 		settingsMenuItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				new SettingsFrame();
@@ -68,7 +69,7 @@ public class ContactListFrame extends JFrame
 		});
 		editMenu.add(settingsMenuItem);
 		menuBar.add(editMenu);
-		
+
 		labelPanel.add(menuBar, BorderLayout.CENTER);
 		content.add(labelPanel, BorderLayout.NORTH);
 
@@ -139,7 +140,9 @@ public class ContactListFrame extends JFrame
 
 			@Override
 			public void windowClosing(WindowEvent e) {
-				String[] options = new String[] { "Abbrechen", "Minimieren", "Beenden" };
+				String[] options = new String[] { I18N.get("contactlist.cancel"), I18N.get("contactlist.minimize"),
+						I18N.get("contactlist.exit") };
+				// TODO i18n
 				int response = JOptionPane.showOptionDialog(me, "Soll die Anwendung beendet oder minimiert werden?",
 						"Wirklich beenden?", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options,
 						options[0]);
@@ -161,7 +164,7 @@ public class ContactListFrame extends JFrame
 				}
 			}
 		});
-		setTitle("Kontaktliste");
+		setTitle(I18N.get("contactlist.title"));
 		pack();
 		setVisible(true);
 	}
