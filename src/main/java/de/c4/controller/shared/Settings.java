@@ -17,6 +17,7 @@ public class Settings {
 	
 	public static final String CONTACT_NAME = "contactName";
 	public static final String CONTACT_ONLINE_STATE = "onlineState";
+	public static final String LOOK_AND_FEEL = "lookAndFeel";
 	
 	
 	private static final String SETTINGS_CONF = "./.fileto/settings.conf";
