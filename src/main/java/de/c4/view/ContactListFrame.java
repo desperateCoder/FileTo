@@ -160,10 +160,13 @@ public class ContactListFrame extends JFrame implements ActionListener, OnlineSt
 		}).start();
 		try {
 		    for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
-		        if ("Nimbus".equals(info.getName())) {
-		            UIManager.setLookAndFeel(info.getClassName());
-		            break;
-		        }
+		    	//TODO make configurable
+//		        if ("Nimbus".equals(info.getName())) {
+//		            UIManager.setLookAndFeel(info.getClassName());
+//		            break;
+//		        }
+		        UIManager.setLookAndFeel(
+		            UIManager.getSystemLookAndFeelClassName());
 		    }
 		} catch (Exception e) {
 		    // Nimbus is not available. Take default-LaF. Just do nothing.

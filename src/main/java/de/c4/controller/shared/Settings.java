@@ -19,7 +19,7 @@ public class Settings {
 	public static final String CONTACT_ONLINE_STATE = "onlineState";
 	
 	
-	private static final String SETTINGS_CONF = "./settings.conf";
+	private static final String SETTINGS_CONF = "./.fileto/settings.conf";
 	private Properties prop = null;
 
 	public Settings() {
