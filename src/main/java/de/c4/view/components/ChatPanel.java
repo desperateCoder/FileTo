@@ -25,9 +25,12 @@ import java.awt.event.ComponentListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.File;
+import java.net.URL;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.swing.JButton;
 import javax.swing.JEditorPane;
@@ -422,7 +425,21 @@ public class ChatPanel extends JSplitPane implements DropTargetListener, Message
 	}
 
 	private String textToHtml(String s) {
-		return s.replaceAll("\n", "<br/>");
+		// line breaks
+				String html = s.replaceAll("\n", "<br/>");
+				// smileys
+				Pattern smileyPattern = Pattern.compile(":[0-9]{1,3}:");
+			    Matcher smileyMatcher = smileyPattern.matcher(html);
+				while (smileyMatcher.find()) {
+					String finding = smileyMatcher.group();
+					finding = finding.substring(1,  finding.length()-1);
+					StringBuffer replacement = new StringBuffer("<img src=\"");
+					URL imageAsURL = IconProvider.getImageAsURL(ESmileys.getByNr(Integer.parseInt(finding)));
+					replacement.append(imageAsURL);
+					replacement.append("\" />");
+					smileyMatcher.replaceFirst(replacement.toString());
+				}
+				return html;
 	}
 
 	public void messageRecieved(ContactDto contact, ChatMessage message) {
