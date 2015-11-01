@@ -6,16 +6,16 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import main.java.de.c4.controller.shared.Network;
-import main.java.de.c4.controller.shared.listener.FileTransferListener;
-import main.java.de.c4.model.messages.file.FileChunk;
-import main.java.de.c4.model.messages.file.FileTransferAnswer;
-
 import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.kryonet.util.InputStreamSender;
 import com.esotericsoftware.minlog.Log;
+
+import main.java.de.c4.controller.shared.Network;
+import main.java.de.c4.controller.shared.listener.FileTransferListener;
+import main.java.de.c4.model.messages.file.FileChunk;
+import main.java.de.c4.model.messages.file.FileTransferAnswer;
 
 public class FileTransferClient extends Thread {
 	private Client client;

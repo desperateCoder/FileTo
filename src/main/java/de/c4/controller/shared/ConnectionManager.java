@@ -5,11 +5,11 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
-import main.java.de.c4.controller.client.ChatClient;
-import main.java.de.c4.model.messages.ContactDto;
-
 import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Connection;
+
+import main.java.de.c4.controller.client.ChatClient;
+import main.java.de.c4.model.messages.ContactDto;
 
 /**
  * Singleton providing all open Connections to Contacts

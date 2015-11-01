@@ -171,7 +171,6 @@ public class ContactListFrame extends JFrame
 	}
 
 	public static void main(String[] args) {
-		// new JLabel(new
 		// ImageIcon(IconProvider.getImage(EOnlineState.OFFLINE.getIcon())), 0);
 		System.setProperty("java.net.preferIPv4Stack", "true");
 		new Thread(new Runnable() {
@@ -183,7 +182,7 @@ public class ContactListFrame extends JFrame
 		try {
 			for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
 				String lookAndFeel = Settings.INSTANCE.get(Settings.LOOK_AND_FEEL);
-				if (lookAndFeel != null) {
+				if (lookAndFeel != null && !lookAndFeel.isEmpty()) {
 					if (lookAndFeel.equals(info.getName())) {
 						UIManager.setLookAndFeel(info.getClassName());
 						break;
