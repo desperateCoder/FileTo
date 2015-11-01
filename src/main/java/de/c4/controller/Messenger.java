@@ -117,6 +117,11 @@ public class Messenger {
 			l.messageRecieved(contact, message);
 		}
 	}
+	public static void receiveAlertFrom(ContactDto contact){
+		for (MessageRecievedListener l : LISTENER) {
+			l.alert(contact);
+		}
+	}
 	public static void addMessageReceivedListener(MessageRecievedListener l){
 		LISTENER.add(l);
 	}

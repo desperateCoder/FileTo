@@ -29,6 +29,9 @@ public class ChatFrame extends JFrame implements ActionListener, MessageRecieved
 	private static final long serialVersionUID = 1L;
 	
 	private ChatTabPane tabbedPane = new ChatTabPane(this);
+														
+	private final static int SHAKE_LENGTH = 20;
+	private final static int SHAKE_VELOCITY = 5;
 
 	
 	public ChatFrame() {
@@ -186,6 +189,34 @@ public class ChatFrame extends JFrame implements ActionListener, MessageRecieved
 				p.infoMessage(message);
 			}
 		});
+	}
+
+
+	@Override
+	public void alert(ContactDto contact) {
+		shake();//TODO: Don't shake, if Online-State is DND
+	}
+
+	/**
+	 * shakes around the frame
+	 */
+	private void shake() { // deren.exe ;)
+		try {
+			final int originalX = getLocationOnScreen().x;
+			final int originalY = getLocationOnScreen().y;
+			for (int i = 0; i < SHAKE_LENGTH; i++) {
+				Thread.sleep(10);
+				setLocation(originalX, originalY + SHAKE_VELOCITY);
+				Thread.sleep(10);
+				setLocation(originalX, originalY - SHAKE_VELOCITY);
+				Thread.sleep(10);
+				setLocation(originalX + SHAKE_VELOCITY, originalY);
+				Thread.sleep(10);
+				setLocation(originalX, originalY);
+			}
+		} catch (Exception err) {
+			err.printStackTrace();
+		}
 	}
 
 }

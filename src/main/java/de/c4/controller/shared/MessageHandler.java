@@ -8,6 +8,7 @@ import com.esotericsoftware.minlog.Log;
 
 import main.java.de.c4.controller.FileTransferManager;
 import main.java.de.c4.controller.Messenger;
+import main.java.de.c4.model.messages.Alert;
 import main.java.de.c4.model.messages.ContactDto;
 import main.java.de.c4.model.messages.ContactListDto;
 import main.java.de.c4.model.messages.EOnlineState;
@@ -56,6 +57,9 @@ public class MessageHandler extends Listener{
 			if (onlineState.newState!=EOnlineState.OFFLINE) {
 				ConnectionManager.registerConnection(onlineState.contact, c);
 			}
+		} else if (object instanceof Alert) {
+			ContactDto contact = ContactList.INSTANCE.findByAddr(c.getRemoteAddressTCP().getAddress());
+			Messenger.receiveAlertFrom(contact);
 		} else if (object instanceof RequestKnownOnlineClients) {
 			InetAddress address = c.getRemoteAddressTCP().getAddress();
 			ContactListDto contacts = ContactList.INSTANCE.getContactListForContactsRequest(address);

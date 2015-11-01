@@ -9,4 +9,6 @@ public interface MessageRecievedListener {
 
 	public void fileTransferRequestRecieved(ContactDto contact,
 			FileTransferRequest request);
+	
+	public void alert(ContactDto contact);
 }

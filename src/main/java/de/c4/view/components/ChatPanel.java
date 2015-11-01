@@ -54,6 +54,7 @@ import main.java.de.c4.controller.shared.ChatMessage;
 import main.java.de.c4.controller.shared.ContactList;
 import main.java.de.c4.controller.shared.listener.FileTransferInfoListener;
 import main.java.de.c4.controller.shared.listener.MessageRecievedListener;
+import main.java.de.c4.model.messages.Alert;
 import main.java.de.c4.model.messages.ContactDto;
 import main.java.de.c4.model.messages.file.FileTransferRequest;
 import main.java.de.c4.view.listener.SmartScroller;
@@ -490,7 +491,7 @@ public class ChatPanel extends JSplitPane implements DropTargetListener, Message
 		} else if (EButtonActions.ADD_TO_GROUP.getActionCommand().equals(e.getActionCommand())) {
 			// TODO implement
 		} else if (EButtonActions.ALARM.getActionCommand().equals(e.getActionCommand())) {
-			// TODO implement
+			Messenger.sendMessageTo(new Alert(), contacts);
 		} else if (EButtonActions.ATTACH_FILE.getActionCommand().equals(e.getActionCommand())) {
 			// TODO implement
 		} else if (EButtonActions.SEND.getActionCommand().equals(e.getActionCommand())) {
@@ -550,4 +551,7 @@ public class ChatPanel extends JSplitPane implements DropTargetListener, Message
 	public void smileySelected(ESmileys s) {
 		inputArea.insert(":" + s.getNr() + ":", inputArea.getCaretPosition());
 	}
+
+	@Override
+	public void alert(ContactDto contact) {}
 }
