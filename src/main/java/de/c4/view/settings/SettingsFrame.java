@@ -15,8 +15,10 @@ import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
 
 import main.java.de.c4.controller.shared.Settings;
+import main.java.de.c4.view.i18n.I18N;
 
 public class SettingsFrame extends JFrame implements ActionListener {
+	private static final long serialVersionUID = 1L;
 	JLabel usernameLabel;
 	JTextField usernameField;
 	JLabel lookAndFeelLabel;
@@ -24,17 +26,17 @@ public class SettingsFrame extends JFrame implements ActionListener {
 	JButton saveButton;
 
 	public SettingsFrame() {
-		setTitle("Settings"); // TODO i18n
+		setTitle(I18N.get("settingsframe.settings"));
 		setLayout(new GridBagLayout());
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.fill = GridBagConstraints.HORIZONTAL;
 		gbc.insets = new Insets(5, 5, 5, 5);
 		gbc.weightx = 0.0;
-		usernameLabel = new JLabel("Username"); // TODO i18n
+		usernameLabel = new JLabel(I18N.get("settingsframe.username"));
 		gbc.gridx = 0;
 		gbc.gridy = 0;
 		add(usernameLabel, gbc);
-		lookAndFeelLabel = new JLabel("Look & Feel"); // TODO i18n
+		lookAndFeelLabel = new JLabel(I18N.get("settingsframe.lookandfeel"));
 		gbc.gridy = 1;
 		add(lookAndFeelLabel, gbc);
 		usernameField = new JTextField();
@@ -50,7 +52,7 @@ public class SettingsFrame extends JFrame implements ActionListener {
 		lookAndFeelBox.setSelectedIndex(0);
 		gbc.gridy = 1;
 		add(lookAndFeelBox, gbc);
-		saveButton = new JButton("Save"); // TODO i18n
+		saveButton = new JButton(I18N.get("settingsframe.save"));
 		saveButton.addActionListener(this);
 		gbc.gridy = 2;
 		add(saveButton, gbc);
