@@ -19,6 +19,9 @@ import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -37,6 +40,7 @@ import main.java.de.c4.model.messages.ContactDto;
 import main.java.de.c4.model.messages.EOnlineState;
 import main.java.de.c4.model.messages.OnlineStateChange;
 import main.java.de.c4.view.resources.IconProvider;
+import main.java.de.c4.view.settings.SettingsFrame;
 
 public class ContactListFrame extends JFrame
 		implements ActionListener, OnlineStateChangeListener, ContactListReceivedListener, ItemListener {
@@ -54,7 +58,18 @@ public class ContactListFrame extends JFrame
 		JPanel content = new JPanel(new BorderLayout());
 
 		JPanel labelPanel = new JPanel(new BorderLayout());
-		labelPanel.add(new JLabel("Kontakte:"), BorderLayout.CENTER);
+		JMenuBar menuBar = new JMenuBar();
+		JMenu editMenu = new JMenu("Edit");
+		JMenuItem settingsMenuItem = new JMenuItem("Settings");
+		settingsMenuItem.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				new SettingsFrame();
+			}
+		});
+		editMenu.add(settingsMenuItem);
+		menuBar.add(editMenu);
+		
+		labelPanel.add(menuBar, BorderLayout.CENTER);
 		content.add(labelPanel, BorderLayout.NORTH);
 
 		content.add(new JScrollPane(contactList), BorderLayout.CENTER);
