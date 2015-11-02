@@ -19,33 +19,47 @@ public class I18N {
 	private static void initialize() {
 		InputStream inputStream = null;
 		try {
+			// load fallback
+			String language = Settings.INSTANCE.get(Settings.LANGUAGE);
+			inputStream = I18N.class.getResourceAsStream("resources/en_en.properties");
+			if (inputStream != null) {
+				i18nProperties.load(inputStream);
+				try {
+					inputStream.close();
+				} catch (IOException | NullPointerException e) {
+					Log.error(e.getMessage());
+				}
+				if ("en_en".equals(language)) {
+					return;
+				}
+			} else Log.error("Could not load default language!");
 			
 			// TODO prevent path hijacking (filter .)
-			String language = Settings.INSTANCE.get(Settings.LANGUAGE);
 			if (language != null) {
 				inputStream = I18N.class.getResourceAsStream(
 						"resources/" + language + ".properties");
 				if (inputStream != null) {
-					i18nProperties.load(inputStream);
+					Properties p = new Properties();
+					p.load(inputStream);
+					for (Object key : p.keySet()) {
+						i18nProperties.put(key, p.get(key));
+					}
 					Log.debug("Language loaded: "+language);
 					try {
 						inputStream.close();
 					} catch (IOException | NullPointerException e) {
 						Log.error(e.getMessage());
 					}
-					return;
 				} else Log.debug("Languagepack \""+language+"\" not found!");
 			}
 			
-			inputStream = I18N.class.getResourceAsStream("resources/en_en.properties");
-			if (inputStream != null) {
-				i18nProperties.load(inputStream);
-			} else Log.error("Could not load default language!");
 		} catch (IOException e) {
 			Log.error(e.getMessage());
 		} finally {
 			try {
-				inputStream.close();
+				if (inputStream!= null) {
+					inputStream.close();
+				}
 			} catch (IOException | NullPointerException e) {
 				Log.error(e.getMessage());
 			}
