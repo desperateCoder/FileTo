@@ -9,9 +9,9 @@ import javax.imageio.ImageIO;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 
-import com.esotericsoftware.minlog.Log;
-
 import main.java.de.c4.controller.shared.ExceptionUtil;
+
+import com.esotericsoftware.minlog.Log;
 
 public class IconProvider {
 	public static BufferedImage getImage(EIcons icon) {

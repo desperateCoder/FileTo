@@ -2,10 +2,10 @@ package main.java.de.c4.controller.client;
 import java.io.IOException;
 import java.net.InetAddress;
 
-import com.esotericsoftware.kryonet.Client;
-
 import main.java.de.c4.controller.shared.MessageHandler;
 import main.java.de.c4.controller.shared.Network;
+
+import com.esotericsoftware.kryonet.Client;
 
 public class ChatClient{
 	private Client client;

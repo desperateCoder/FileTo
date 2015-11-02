@@ -4,9 +4,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
-import com.esotericsoftware.minlog.Log;
-
 import main.java.de.c4.controller.shared.Settings;
+
+import com.esotericsoftware.minlog.Log;
 
 public class I18N {
 

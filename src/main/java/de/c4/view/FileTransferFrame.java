@@ -2,10 +2,10 @@ package main.java.de.c4.view;
 
 import javax.swing.JFrame;
 
-import com.esotericsoftware.minlog.Log;
-
 import main.java.de.c4.controller.shared.listener.FileTransferStateListener;
 import main.java.de.c4.model.messages.file.FileTransferState;
+
+import com.esotericsoftware.minlog.Log;
 
 public class FileTransferFrame extends JFrame implements
 		FileTransferStateListener {

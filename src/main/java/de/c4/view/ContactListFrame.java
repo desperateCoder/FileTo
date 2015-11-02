@@ -3,6 +3,7 @@ package main.java.de.c4.view;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Font;
+import java.awt.SystemTray;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -11,7 +12,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
 import java.util.ArrayList;
 
 import javax.swing.DefaultListModel;
@@ -30,8 +30,6 @@ import javax.swing.ListCellRenderer;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
 
-import com.esotericsoftware.minlog.Log;
-
 import main.java.de.c4.controller.Messenger;
 import main.java.de.c4.controller.shared.ContactList;
 import main.java.de.c4.controller.shared.Settings;
@@ -45,27 +43,34 @@ import main.java.de.c4.view.resources.EIcons;
 import main.java.de.c4.view.resources.IconProvider;
 import main.java.de.c4.view.settings.SettingsFrame;
 
-public class ContactListFrame extends JFrame
-		implements ActionListener, OnlineStateChangeListener, ContactListReceivedListener, ItemListener {
+import com.esotericsoftware.minlog.Log;
+
+public class ContactListFrame extends JFrame implements ActionListener,
+		OnlineStateChangeListener, ContactListReceivedListener, ItemListener {
 
 	private static final long serialVersionUID = 1L;
 
-	private JList<ContactDto> contactList = new JList<ContactDto>(new DefaultListModel<ContactDto>());
+	private JList<ContactDto> contactList = new JList<ContactDto>(
+			new DefaultListModel<ContactDto>());
 
 	private ChatFrame chatFrame = new ChatFrame();
+	private ChatTrayIcon trayIcon;
+	private JComboBox<EOnlineState> stateCombo;
 
 	public ContactListFrame() {
 		ContactList.INSTANCE.addReceivedContactListListener(this);
 		ContactList.INSTANCE.addOnlineStateChangeListener(this);
 
 		setIconImage(IconProvider.getImage(EIcons.APP_ICON));
-		
+		trayIcon = new ChatTrayIcon(IconProvider.getImage(EIcons.APP_ICON),
+				this);
 		JPanel content = new JPanel(new BorderLayout());
 
 		JPanel labelPanel = new JPanel(new BorderLayout());
 		JMenuBar menuBar = new JMenuBar();
 		JMenu editMenu = new JMenu(I18N.get("contactlist.menu.edit"));
-		JMenuItem settingsMenuItem = new JMenuItem(I18N.get("contactlist.menu.settings"));
+		JMenuItem settingsMenuItem = new JMenuItem(
+				I18N.get("contactlist.menu.settings"));
 		settingsMenuItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				new SettingsFrame();
@@ -83,8 +88,9 @@ public class ContactListFrame extends JFrame
 			private final Font FONT = new Font("SansSerif", Font.BOLD, 16);
 			private final Font IP_FONT = new Font("SansSerif", Font.PLAIN, 14);
 
-			public Component getListCellRendererComponent(JList<? extends ContactDto> list, ContactDto value, int index,
-					boolean isSelected, boolean cellHasFocus) {
+			public Component getListCellRendererComponent(
+					JList<? extends ContactDto> list, ContactDto value,
+					int index, boolean isSelected, boolean cellHasFocus) {
 				JPanel comp = new JPanel(new BorderLayout());
 				JLabel l = new JLabel(value.name);
 				l.setFont(FONT);
@@ -97,8 +103,9 @@ public class ContactListFrame extends JFrame
 				comp.add(text, BorderLayout.CENTER);
 
 				JLabel image = new JLabel(
-						new ImageIcon(IconProvider.getImage(value.state.getIcon()).getScaledInstance(SIZE, SIZE, 0)),
-						0);
+						new ImageIcon(IconProvider.getImage(
+								value.state.getIcon()).getScaledInstance(SIZE,
+								SIZE, 0)), 0);
 				comp.add(image, BorderLayout.WEST);
 				return comp;
 			}
@@ -115,20 +122,21 @@ public class ContactListFrame extends JFrame
 			}
 		});
 
-		JComboBox<EOnlineState> stateCombo = new JComboBox<EOnlineState>(EOnlineState.values());
+		stateCombo = new JComboBox<EOnlineState>(EOnlineState.values());
 		stateCombo.setRenderer(new ListCellRenderer<EOnlineState>() {
 			private static final int SIZE = 26;
 			private final Font FONT = new Font("SansSerif", Font.BOLD, 18);
 
-			public Component getListCellRendererComponent(JList<? extends EOnlineState> list, EOnlineState value,
+			public Component getListCellRendererComponent(
+					JList<? extends EOnlineState> list, EOnlineState value,
 					int index, boolean isSelected, boolean cellHasFocus) {
 				JPanel comp = new JPanel(new BorderLayout());
 				JLabel l = new JLabel(value.toString());
 				l.setFont(FONT);
 				comp.add(l, BorderLayout.CENTER);
 
-				JLabel image = new JLabel(
-						new ImageIcon(IconProvider.getImage(value.getIcon()).getScaledInstance(SIZE, SIZE, 0)), 0);
+				JLabel image = new JLabel(new ImageIcon(IconProvider.getImage(
+						value.getIcon()).getScaledInstance(SIZE, SIZE, 0)), 0);
 				comp.add(image, BorderLayout.WEST);
 				return comp;
 			}
@@ -140,40 +148,44 @@ public class ContactListFrame extends JFrame
 		final JFrame me = this;
 		setContentPane(content);
 
-		for (WindowListener l : getWindowListeners()) {
-			removeWindowListener(l);
-		}
+		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 		addWindowListener(new WindowAdapter() {
 
 			@Override
 			public void windowClosing(WindowEvent e) {
-				String[] options = new String[] { I18N.get("contactlist.cancel"), I18N.get("contactlist.minimize"),
-						I18N.get("contactlist.exit") };
-				// TODO i18n
-				int response = JOptionPane.showOptionDialog(me, "Soll die Anwendung beendet oder minimiert werden?",
-						"Wirklich beenden?", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options,
-						options[0]);
-				switch (response) {
-				case 0:
-					return;
-				case 1:
-					// TODO: minimize to tray
-					break;
-				case 2:
-					ContactList.INSTANCE.setOnlineState(EOnlineState.OFFLINE, false);
-					try {
-						Thread.sleep(1000);
-					} catch (InterruptedException e1) {
-						e1.printStackTrace();
+				if (SystemTray.isSupported()) {
+					trayIcon.addToTray();
+					setVisible(false);
+				} else {
+					String[] options = new String[] {
+							I18N.get("contactlist.cancel"),
+							I18N.get("contactlist.exit") };
+					// TODO i18n
+					int response = JOptionPane.showOptionDialog(me,
+							"Soll die Anwendung beendet werden?",
+							"Wirklich beenden?", JOptionPane.DEFAULT_OPTION,
+							JOptionPane.QUESTION_MESSAGE, null, options,
+							options[0]);
+					if (response == 1) {
+						exit();
 					}
-					System.exit(0);
-					break;
 				}
 			}
+
 		});
 		setTitle(I18N.get("contactlist.title"));
 		pack();
 		setVisible(true);
+	}
+
+	public void exit() {
+		ContactList.INSTANCE.setOnlineState(EOnlineState.OFFLINE, false);
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
+		}
+		System.exit(0);
 	}
 
 	public void actionPerformed(ActionEvent e) {
@@ -181,8 +193,7 @@ public class ContactListFrame extends JFrame
 	}
 
 	public static void main(String[] args) {
-		// ImageIcon(IconProvider.getImage(EOnlineState.OFFLINE.getIcon())), 0);
-		Log.set(Log.LEVEL_DEBUG); //TODO: change before release!
+		Log.set(Log.LEVEL_DEBUG); // TODO: change before release!
 		System.setProperty("java.net.preferIPv4Stack", "true");
 		new Thread(new Runnable() {
 
@@ -193,7 +204,8 @@ public class ContactListFrame extends JFrame
 		try {
 			String lookAndFeel = Settings.INSTANCE.get(Settings.LOOK_AND_FEEL);
 			if (lookAndFeel != null && !lookAndFeel.isEmpty()) {
-				for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+				for (LookAndFeelInfo info : UIManager
+						.getInstalledLookAndFeels()) {
 					System.out.println(info.getName());
 					if (lookAndFeel.equals(info.getName())) {
 						UIManager.setLookAndFeel(info.getClassName());
@@ -201,7 +213,8 @@ public class ContactListFrame extends JFrame
 					}
 				}
 			} else {
-				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+				UIManager.setLookAndFeel(UIManager
+						.getSystemLookAndFeelClassName());
 			}
 		} catch (Exception e) {
 			Log.error("Error settings Look and Feel.");
@@ -211,7 +224,8 @@ public class ContactListFrame extends JFrame
 
 	public void receivedContactList(ContactDto[] list) {
 		for (ContactDto c : list) {
-			((DefaultListModel<ContactDto>) (contactList.getModel())).addElement(c);
+			((DefaultListModel<ContactDto>) (contactList.getModel()))
+					.addElement(c);
 		}
 		Messenger.goOnline();
 	}
@@ -219,10 +233,17 @@ public class ContactListFrame extends JFrame
 	public void itemStateChanged(ItemEvent e) {
 		if (e.getStateChange() == ItemEvent.SELECTED) {
 			EOnlineState state = (EOnlineState) e.getItem();
-			ContactList.INSTANCE.setOnlineState(state);
-			if (state == EOnlineState.OFFLINE) {
-				((DefaultListModel<ContactDto>) (contactList.getModel())).clear();
-			}
+			setOnlineState(state);
+		}
+	}
+
+	public void setOnlineState(EOnlineState state) {
+		ContactList.INSTANCE.setOnlineState(state);
+		if (state == EOnlineState.OFFLINE) {
+			((DefaultListModel<ContactDto>) (contactList.getModel())).clear();
+		}
+		if ((EOnlineState) (stateCombo.getSelectedItem()) != state) {
+			stateCombo.setSelectedItem(state);
 		}
 	}
 
@@ -230,7 +251,8 @@ public class ContactListFrame extends JFrame
 		((DefaultListModel<ContactDto>) (contactList.getModel())).clear();
 		ArrayList<ContactDto> list = ContactList.INSTANCE.getContacts();
 		for (ContactDto c : list) {
-			((DefaultListModel<ContactDto>) (contactList.getModel())).addElement(c);
+			((DefaultListModel<ContactDto>) (contactList.getModel()))
+					.addElement(c);
 		}
 	}
 }
