@@ -26,6 +26,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.File;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -34,6 +35,7 @@ import java.util.regex.Pattern;
 
 import javax.swing.JButton;
 import javax.swing.JEditorPane;
+import javax.swing.JFileChooser;
 import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollBar;
@@ -43,6 +45,7 @@ import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
+import javax.swing.plaf.FileChooserUI;
 import javax.swing.text.Document;
 import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.text.html.StyleSheet;
@@ -71,6 +74,13 @@ public class ChatPanel extends JSplitPane implements DropTargetListener, Message
 
 	private static final long serialVersionUID = 1L;
 
+	
+	private static final JFileChooser FILE_CHOOSER = new JFileChooser();
+	static {
+		FILE_CHOOSER.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+		FILE_CHOOSER.setMultiSelectionEnabled(true);
+	}
+	
 	private Set<ContactDto> contacts = new HashSet<ContactDto>();
 
 	private JEditorPane messageBox = new JEditorPane();
@@ -173,7 +183,7 @@ public class ChatPanel extends JSplitPane implements DropTargetListener, Message
 		styleSheet.addRule(".nMessage {background-color : #EEEEEE; border-color: #CCCCCC; color: #666;}");
 		styleSheet.addRule(
 				".from {padding: 0; margin-bottom: 0; text-align: left; border: none; font-size: 11pt; color: #666666;}");
-		styleSheet.addRule(".emote {margin-bottom: -3px;}");
+		styleSheet.addRule(".emoticon {margin-bottom: -3px;}");
 
 		Document doc = kit.createDefaultDocument();
 		messageBox.setDocument(doc);
@@ -202,7 +212,6 @@ public class ChatPanel extends JSplitPane implements DropTargetListener, Message
 			public void hyperlinkUpdate(HyperlinkEvent hle) {
 				if (HyperlinkEvent.EventType.ACTIVATED.equals(hle.getEventType())) {
 					String url = hle.getURL().toString();
-					System.out.println(url);
 					Desktop desktop = Desktop.getDesktop();
 					try {
 						if (url.startsWith("file:")) {
@@ -338,18 +347,7 @@ public class ChatPanel extends JSplitPane implements DropTargetListener, Message
 				List<File> transferData = (List<File>) transferable.getTransferData(DataFlavor.javaFileListFlavor);
 				if (transferData != null && transferData.size() > 0) {
 					// importFiles(transferData);
-					for (Object object : transferData) {
-						File f = (File) object;
-						if (f.isDirectory()) {
-							infoMessage("Senden von Ordnern nicht möglich, bitte vorher ZIPen!<br/>(\""
-									+ f.getAbsolutePath() + "\")");
-							continue;
-						}
-						for (ContactDto c : contacts) {
-							FileTransferManager.INSTANCE.sendFileTo(f, c, this);
-							infoMessage("Sendeanfrage für Datei \"" + f.getName() + "\" an " + c.name + " gesendet!");
-						}
-					}
+					sendFiles(transferData);
 					dtde.dropComplete(true);
 				}
 
@@ -358,6 +356,21 @@ public class ChatPanel extends JSplitPane implements DropTargetListener, Message
 			}
 		} else {
 			dtde.rejectDrop();
+		}
+	}
+
+	private void sendFiles(List<File> transferData) {
+		for (Object object : transferData) {
+			File f = (File) object;
+			if (f.isDirectory()) {
+				infoMessage("Senden von Ordnern nicht möglich, bitte vorher ZIPen!<br/>(\""
+						+ f.getAbsolutePath() + "\")");
+				continue;
+			}
+			for (ContactDto c : contacts) {
+				FileTransferManager.INSTANCE.sendFileTo(f, c, this);
+				infoMessage("Sendeanfrage für Datei \"" + f.getName() + "\" an " + c.name + " gesendet!");
+			}
 		}
 	}
 
@@ -434,11 +447,12 @@ public class ChatPanel extends JSplitPane implements DropTargetListener, Message
 				while (smileyMatcher.find()) {
 					String finding = smileyMatcher.group();
 					finding = finding.substring(1,  finding.length()-1);
-					StringBuffer replacement = new StringBuffer("<img src=\"");
+					StringBuffer replacement = new StringBuffer("<img width=25 height=25 class=\"emoticon\" src=\"");
 					URL imageAsURL = IconProvider.getImageAsURL(ESmileys.getByNr(Integer.parseInt(finding)));
 					replacement.append(imageAsURL);
 					replacement.append("\" />");
-					smileyMatcher.replaceFirst(replacement.toString());
+					html = smileyMatcher.replaceFirst(replacement.toString());
+					smileyMatcher = smileyPattern.matcher(html);
 				}
 				return html;
 	}
@@ -493,7 +507,19 @@ public class ChatPanel extends JSplitPane implements DropTargetListener, Message
 		} else if (EButtonActions.ALARM.getActionCommand().equals(e.getActionCommand())) {
 			Messenger.sendMessageTo(new Alert(), contacts);
 		} else if (EButtonActions.ATTACH_FILE.getActionCommand().equals(e.getActionCommand())) {
-			// TODO implement
+			int returnVal = FILE_CHOOSER.showOpenDialog(this);
+
+	        if (returnVal == JFileChooser.APPROVE_OPTION) {
+	        	File[] selectedFiles = FILE_CHOOSER.getSelectedFiles();
+	        	if (selectedFiles.length<1) {
+					return;
+				}
+	        	ArrayList<File> files = new ArrayList<File>();
+				for (File file : selectedFiles) {
+					files.add(file);
+				}
+	        	sendFiles(files);
+	        }
 		} else if (EButtonActions.SEND.getActionCommand().equals(e.getActionCommand())) {
 			String input = inputArea.getText().trim();
 			if (input.isEmpty()) {

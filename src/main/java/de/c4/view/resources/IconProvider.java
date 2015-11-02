@@ -29,7 +29,7 @@ public class IconProvider {
 	}
 	
 	public static URL getImageAsURL(EIcons icon) {
-		return IconProvider.class.getResource("./"+icon.getPath());
+		return IconProvider.class.getResource(icon.getPath());
 	}
 
 	public static Icon getAsScaledIcon(EIcons icon, int width, int height) {
@@ -52,7 +52,7 @@ public class IconProvider {
 	}
 	
 	public static URL getImageAsURL(ESmileys icon) {
-		return IconProvider.class.getResource("./"+icon.getPath());
+		return IconProvider.class.getResource(icon.getPath());
 	}
 
 	public static Icon getAsScaledIcon(ESmileys icon, int width, int height) {

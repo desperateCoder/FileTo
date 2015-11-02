@@ -184,16 +184,17 @@ public class ContactListFrame extends JFrame
 			}
 		}).start();
 		try {
-			for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
-				String lookAndFeel = Settings.INSTANCE.get(Settings.LOOK_AND_FEEL);
-				if (lookAndFeel != null && !lookAndFeel.isEmpty()) {
+			String lookAndFeel = Settings.INSTANCE.get(Settings.LOOK_AND_FEEL);
+			if (lookAndFeel != null && !lookAndFeel.isEmpty()) {
+				for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+					System.out.println(info.getName());
 					if (lookAndFeel.equals(info.getName())) {
 						UIManager.setLookAndFeel(info.getClassName());
 						break;
 					}
-				} else {
-					UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 				}
+			} else {
+				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 			}
 		} catch (Exception e) {
 			Log.error("Error settings Look and Feel.");
