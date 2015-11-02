@@ -11,6 +11,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.util.ArrayList;
 
 import javax.swing.DefaultListModel;
@@ -40,6 +41,7 @@ import main.java.de.c4.model.messages.ContactDto;
 import main.java.de.c4.model.messages.EOnlineState;
 import main.java.de.c4.model.messages.OnlineStateChange;
 import main.java.de.c4.view.i18n.I18N;
+import main.java.de.c4.view.resources.EIcons;
 import main.java.de.c4.view.resources.IconProvider;
 import main.java.de.c4.view.settings.SettingsFrame;
 
@@ -56,6 +58,8 @@ public class ContactListFrame extends JFrame
 		ContactList.INSTANCE.addReceivedContactListListener(this);
 		ContactList.INSTANCE.addOnlineStateChangeListener(this);
 
+		setIconImage(IconProvider.getImage(EIcons.APP_ICON));
+		
 		JPanel content = new JPanel(new BorderLayout());
 
 		JPanel labelPanel = new JPanel(new BorderLayout());
@@ -136,6 +140,9 @@ public class ContactListFrame extends JFrame
 		final JFrame me = this;
 		setContentPane(content);
 
+		for (WindowListener l : getWindowListeners()) {
+			removeWindowListener(l);
+		}
 		addWindowListener(new WindowAdapter() {
 
 			@Override

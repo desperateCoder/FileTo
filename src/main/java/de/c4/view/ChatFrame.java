@@ -10,8 +10,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
 
-import com.esotericsoftware.minlog.Log;
-
 import main.java.de.c4.controller.FileTransferManager;
 import main.java.de.c4.controller.Messenger;
 import main.java.de.c4.controller.shared.ChatMessage;
@@ -22,6 +20,10 @@ import main.java.de.c4.model.messages.file.FileTransferAnswer;
 import main.java.de.c4.model.messages.file.FileTransferRequest;
 import main.java.de.c4.view.components.ChatPanel;
 import main.java.de.c4.view.components.ChatTabPane;
+import main.java.de.c4.view.resources.EIcons;
+import main.java.de.c4.view.resources.IconProvider;
+
+import com.esotericsoftware.minlog.Log;
 
 
 public class ChatFrame extends JFrame implements ActionListener, MessageRecievedListener{
@@ -35,7 +37,7 @@ public class ChatFrame extends JFrame implements ActionListener, MessageRecieved
 
 	
 	public ChatFrame() {
-
+		setIconImage(IconProvider.getImage(EIcons.BUBBLES));
 		Messenger.addMessageReceivedListener(this);
 		
 //		List<ContactDto> contacts = ContactList.INSTANCE.getContacts();

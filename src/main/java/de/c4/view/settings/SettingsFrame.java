@@ -20,6 +20,8 @@ import javax.swing.UnsupportedLookAndFeelException;
 
 import main.java.de.c4.controller.shared.Settings;
 import main.java.de.c4.view.i18n.I18N;
+import main.java.de.c4.view.resources.EIcons;
+import main.java.de.c4.view.resources.IconProvider;
 
 public class SettingsFrame extends JFrame implements ActionListener, ItemListener {
 	private static final long serialVersionUID = 1L;
@@ -32,6 +34,7 @@ public class SettingsFrame extends JFrame implements ActionListener, ItemListene
 	JButton saveButton;
 
 	public SettingsFrame() {
+		setIconImage(IconProvider.getImage(EIcons.SETTINGS));
 		setTitle(I18N.get("settingsframe.settings"));
 		setLayout(new GridBagLayout());
 		GridBagConstraints gbc = new GridBagConstraints();
