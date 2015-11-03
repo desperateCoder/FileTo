@@ -30,6 +30,10 @@ public class ChatTrayIcon extends TrayIcon implements ActionListener{
 	private final JPopupMenu popup = new JPopupMenu();
 	private JMenu stateItem;
 	private final ContactListFrame frame;
+	private JRadioButtonMenuItem onlineStateRadio;
+	private JRadioButtonMenuItem offlineStateRadio;
+	private JRadioButtonMenuItem afkStateRadio;
+	private JRadioButtonMenuItem dndStateRadio;
 
 	public ChatTrayIcon(Image image, final ContactListFrame frame) {
 		super(image);
@@ -44,24 +48,28 @@ public class ChatTrayIcon extends TrayIcon implements ActionListener{
 		radio.setActionCommand(STATE_ONLINE);
 		group.add(radio);
 		stateItem.add(radio);
+		onlineStateRadio = radio;
 		
 		radio = new JRadioButtonMenuItem("AFK (Abwesend)");
 		radio.addActionListener(this);
 		radio.setActionCommand(STATE_AFK);
 		group.add(radio);
 		stateItem.add(radio);
+		afkStateRadio = radio;
 		
 		radio = new JRadioButtonMenuItem("DND (Bitte nicht stören)");
 		radio.addActionListener(this);
 		radio.setActionCommand(STATE_DND);
 		group.add(radio);
 		stateItem.add(radio);
+		dndStateRadio = radio;
 		
 		radio = new JRadioButtonMenuItem("Offline");
 		radio.addActionListener(this);
 		radio.setActionCommand(STATE_OFFLINE);
 		group.add(radio);
 		stateItem.add(radio);
+		offlineStateRadio = radio;
 		
 		popup.add(openItem);
 		popup.add(stateItem);
@@ -129,8 +137,28 @@ public class ChatTrayIcon extends TrayIcon implements ActionListener{
 	}
 	
 	private void updatePopupLabels(){
-		String text = "Status: "+ContactList.getMe().state.toString();
+		EOnlineState state = ContactList.getMe().state;
+		String text = "Status: "+state.toString();
 		stateItem.setText(text);
 		setToolTip(text);
+		switch (state) {
+		case ONLINE:
+			setSelectedStateRadio(onlineStateRadio);
+			break;
+		case AFK:
+			setSelectedStateRadio(afkStateRadio);
+			break;
+		case DND:
+			setSelectedStateRadio(dndStateRadio);
+			break;
+		case OFFLINE:
+			setSelectedStateRadio(offlineStateRadio);
+			break;
+		}
+	}
+	private void setSelectedStateRadio(JRadioButtonMenuItem item){
+		item.removeActionListener(this);
+		item.setSelected(true);
+		item.addActionListener(this);
 	}
 }

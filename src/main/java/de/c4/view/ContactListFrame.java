@@ -62,7 +62,7 @@ public class ContactListFrame extends JFrame implements ActionListener,
 		ContactList.INSTANCE.addOnlineStateChangeListener(this);
 
 		setIconImage(IconProvider.getImage(EIcons.APP_ICON));
-		trayIcon = new ChatTrayIcon(IconProvider.getImage(EIcons.APP_ICON),
+		trayIcon = new ChatTrayIcon(IconProvider.getImage(EIcons.TRAY_ICON),
 				this);
 		JPanel content = new JPanel(new BorderLayout());
 

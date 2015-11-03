@@ -3,6 +3,7 @@ package main.java.de.c4.view.resources;
 public enum EIcons {
 
 	APP_ICON("icon.png"),
+	TRAY_ICON("tray.png"),
 	SETTINGS("settings.png"),
 	BUBBLES("conversation.png"),
 	STATE_ONLINE("states/online.png"),
