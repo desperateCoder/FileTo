@@ -68,6 +68,16 @@ public class ContactListFrame extends JFrame implements ActionListener,
 
 		JPanel labelPanel = new JPanel(new BorderLayout());
 		JMenuBar menuBar = new JMenuBar();
+		JMenu fileMenu = new JMenu(I18N.get("contactlist.menu.file"));
+		JMenuItem quitMenuItem = new JMenuItem(
+				I18N.get("contactlist.menu.file.quit"));
+		quitMenuItem.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				exit();
+			}
+		});
+		fileMenu.add(quitMenuItem);
+		menuBar.add(fileMenu);
 		JMenu editMenu = new JMenu(I18N.get("contactlist.menu.edit"));
 		JMenuItem settingsMenuItem = new JMenuItem(
 				I18N.get("contactlist.menu.settings"));
