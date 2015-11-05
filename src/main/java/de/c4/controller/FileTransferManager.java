@@ -2,7 +2,9 @@ package main.java.de.c4.controller;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import main.java.de.c4.controller.client.FileTransferClient;
@@ -25,6 +27,7 @@ public class FileTransferManager implements FileTransferListener{
 	
 	private Map<Long, FileTransferState> transfers = new HashMap<Long, FileTransferState>();
 	private Map<Long, PendingFileTransfer> pendingTransfers = new HashMap<Long, PendingFileTransfer>();
+	private List<FileTransferInfoListener> generalTransferListeners = new ArrayList<FileTransferInfoListener>();
 	
 	public FileTransferManager() {
 		this(false);
@@ -41,6 +44,15 @@ public class FileTransferManager implements FileTransferListener{
 		if (transfers.containsKey(lId)) {
 			FileTransferState state = transfers.get(lId);
 			state.bytesDone = bytesDone;
+			if (state.bytesDone==0 && bytesDone > 0) {
+				for (FileTransferInfoListener l : generalTransferListeners) {
+					l.started(new File(state.request.filenName), state.contact);
+				}
+			} else if (state.request.fileSize == bytesDone) {
+				for (FileTransferInfoListener l : generalTransferListeners) {
+					l.finnished(new File(state.request.filenName), state.contact);
+				}
+			}
 			state.listener.setTransferState(state);
 		}
 	}
@@ -64,15 +76,15 @@ public class FileTransferManager implements FileTransferListener{
 		}
 		FileTransferRequest request = new FileTransferRequest(t.file.getName(), t.file.length());
 		request.id = answer.id;
-		transfers.put(id, new FileTransferState(request, FileTransferFrame.INSTANCE));
+		transfers.put(id, new FileTransferState(request, FileTransferFrame.INSTANCE, t.contact));
 		new FileTransferClient(t.contact.ip, answer, t.file, this).start();
 		t.listener.started(t.file, t.contact);
 	}
 	
-	public synchronized int startFileServer(FileTransferRequest request){
+	public synchronized int startFileServer(FileTransferRequest request, ContactDto contact){
 		Long id = Long.valueOf(request.id);
 		if (!transfers.containsKey(id)) {
-			transfers.put(id, new FileTransferState(request, FileTransferFrame.INSTANCE));
+			transfers.put(id, new FileTransferState(request, FileTransferFrame.INSTANCE, contact));
 		}
 		try {
 			FileTransferServer server = new FileTransferServer(request, this);
@@ -84,7 +96,24 @@ public class FileTransferManager implements FileTransferListener{
 		return 0;
 	}
 	public void disconnected(long id) {
-		transfers.remove(Long.valueOf(id));
+		Long fId = Long.valueOf(id);
+		if (transfers.containsKey(fId)) {
+			FileTransferState state = transfers.get(fId);
+			if (state.bytesDone < state.request.fileSize) {
+				for (FileTransferInfoListener l : generalTransferListeners) {
+					l.abroted(new File(state.request.filenName), state.contact);
+				}
+			}
+			transfers.remove(fId);
+		}
+	}
+	
+	public void addFileTransferListener(FileTransferInfoListener l){
+		generalTransferListeners.add(l);
+	}
+	
+	public void removeFileTransferListener(FileTransferInfoListener l){
+		generalTransferListeners.remove(l);
 	}
 
 }
