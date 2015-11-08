@@ -58,6 +58,10 @@ public class FileTransferServer  extends Thread{
 						out.write(c.data);
 						bytesRecieved += c.data.length;
 						listener.updateState(request.id, bytesRecieved);
+						if (request.fileSize==bytesRecieved) {
+							out.flush();
+							out.close();
+						}
 					} catch (IOException e) {
 						Log.error("Failed Writing to file "+file+": "+e.getMessage());
 					}

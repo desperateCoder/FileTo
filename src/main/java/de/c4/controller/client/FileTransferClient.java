@@ -40,7 +40,7 @@ public class FileTransferClient extends Thread {
 				ByteArrayOutputStream output = new ByteArrayOutputStream((int)file.length());
 				for (long i = 0; i < file.length(); i++)
 					output.write((int) i);
-				FileInputStream input;
+				final FileInputStream input;
 				try {
 					input = new FileInputStream(file);
 					connection.addListener(new InputStreamSender(input, 1024) {
@@ -54,7 +54,11 @@ public class FileTransferClient extends Thread {
 							listener.updateState(id, sent);
 							return new FileChunk(id, bytes);
 						}
-						
+						@Override
+						public void disconnected(Connection connection) {
+							super.disconnected(connection);
+							
+						}
 					});
 				} catch (FileNotFoundException e) {
 					Log.error("File not found: "+e.getMessage());
