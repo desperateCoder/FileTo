@@ -73,6 +73,7 @@ public class FileTransferManager implements FileTransferListener{
 		}
 		PendingFileTransfer t = pendingTransfers.get(id);
 		if (!answer.accepted) {
+			pendingTransfers.remove(t);
 			t.listener.declined(t.contact, t.file);
 			return;
 		}
@@ -125,6 +126,21 @@ public class FileTransferManager implements FileTransferListener{
 	
 	public void removeFileTransferListener(long id){
 		generalTransferListeners.remove(Long.valueOf(id));
+	}
+	
+	/**
+	 * Turns the number of bytes to a human-readable format (kB, MB, GB, etc.)
+	 * (StackOverflow FTW! :D)
+	 * @param bytes number of bytes
+	 * @param si if true, base is 1000, else 1024
+	 * @return formated Byte-count as String
+	 */
+	public static String toReadableByteCount(long bytes, boolean si) {
+	    int unit = si ? 1000 : 1024;
+	    if (bytes < unit) return bytes + " B";
+	    int exp = (int) (Math.log(bytes) / Math.log(unit));
+	    String pre = (si ? "kMGTPE" : "KMGTPE").charAt(exp-1) + (si ? "" : "i");
+	    return String.format("%.1f %sB", bytes / Math.pow(unit, exp), pre);
 	}
 
 }

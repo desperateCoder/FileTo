@@ -144,12 +144,13 @@ public class ChatFrame extends JFrame implements ActionListener, MessageRecieved
 						}
 					});
 				}
+				String size = FileTransferManager.toReadableByteCount(request.fileSize, true);
 				infoMessage(panel, "Eingehende Dateiübertragung von "
-						+contact.name+" (\""+request.filenName+"\", "+request.fileSize+
-						" bytes)");
+						+contact.name+" (\""+request.filenName+"\", "+size+
+						")");
 				int i = JOptionPane.showConfirmDialog(null, "Angebot zur Dateiübertragung von "
-						+contact.name+" (\""+request.filenName+"\", "+request.fileSize+
-						" bytes) annehmen?", "Datei übertragen?", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+						+contact.name+" (\""+request.filenName+"\", "+size+
+						") annehmen?", "Datei übertragen?", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
 				boolean accepted = i == JOptionPane.YES_OPTION;
 				int port = 0;
 				if (accepted) {
@@ -157,13 +158,13 @@ public class ChatFrame extends JFrame implements ActionListener, MessageRecieved
 					FileTransferManager.INSTANCE.addFileTransferListener(request.id, panel);
 					if (port == 0) {
 						JOptionPane.showMessageDialog(null, "Dateiübertragung von "
-						+contact.name+" (\""+request.filenName+"\", "+request.fileSize+
-						" bytes) Fehlgeschlagen", "Dateiübertragung fehlgeschlagen! (Kein freier Port?)", JOptionPane.ERROR_MESSAGE);
+						+contact.name+" (\""+request.filenName+"\", "+size+
+						") Fehlgeschlagen", "Dateiübertragung fehlgeschlagen! (Kein freier Port?)", JOptionPane.ERROR_MESSAGE);
 					}
 				} else {
 					infoMessage(panel, "Dateiübertragung von "
-							+contact.name+" (\""+request.filenName+"\", "+request.fileSize+
-							" bytes) abgelehnt!");
+							+contact.name+" (\""+request.filenName+"\", "+size+
+							") abgelehnt!");
 				}
 				FileTransferAnswer answer = new FileTransferAnswer();
 				answer.accepted = accepted;
@@ -171,14 +172,16 @@ public class ChatFrame extends JFrame implements ActionListener, MessageRecieved
 				answer.serverPort = port;
 				try {
 					ConnectionManager.getConnectionsTo(contact, true).iterator().next().sendTCP(answer);
-					infoMessage(panel, "Dateiübertragung von "
-							+contact.name+" (\""+request.filenName+"\", "+request.fileSize+
-							" bytes) gestartet!");
+					if (accepted) {
+						infoMessage(panel, "Dateiübertragung von "
+								+contact.name+" (\""+request.filenName+"\", "+size+
+								") gestartet!");
+					}
 				} catch (Exception e) {
 					Log.debug("Could not establish connection");
 					infoMessage(panel, "Dateiübertragung von "
-							+contact.name+" (\""+request.filenName+"\", "+request.fileSize+
-							" bytes) fehlgeschlagen!<br/>Fehler:"+e.getMessage());
+							+contact.name+" (\""+request.filenName+"\", "+size+
+							") fehlgeschlagen!<br/>Fehler:"+e.getMessage());
 				}
 				
 			}

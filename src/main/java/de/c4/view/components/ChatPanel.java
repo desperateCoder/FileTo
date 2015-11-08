@@ -567,7 +567,7 @@ public class ChatPanel extends JSplitPane implements DropTargetListener, Message
 	}
 
 	public void declined(ContactDto contact, File file) {
-		infoMessage("Sendeanfrage fÜr Datei \"" + file.getName() + "\" wurde von " + contact.name + " abgelehnt!");
+		infoMessage("Sendeanfrage für Datei \"" + file.getName() + "\" wurde von " + contact.name + " abgelehnt!");
 	}
 
 	public void fileTransferRequestRecieved(ContactDto contact, FileTransferRequest request) {
