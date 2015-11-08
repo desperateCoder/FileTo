@@ -3,9 +3,6 @@ import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
 
-import com.esotericsoftware.kryo.Kryo;
-import com.esotericsoftware.kryonet.EndPoint;
-
 import main.java.de.c4.model.messages.Alert;
 import main.java.de.c4.model.messages.ContactDto;
 import main.java.de.c4.model.messages.ContactListDto;
@@ -15,6 +12,9 @@ import main.java.de.c4.model.messages.RequestKnownOnlineClients;
 import main.java.de.c4.model.messages.file.FileChunk;
 import main.java.de.c4.model.messages.file.FileTransferAnswer;
 import main.java.de.c4.model.messages.file.FileTransferRequest;
+
+import com.esotericsoftware.kryo.Kryo;
+import com.esotericsoftware.kryonet.EndPoint;
 
 // This class is a convenient place to keep things common to both the client and server.
 public class Network {
@@ -27,6 +27,16 @@ public class Network {
 	// This registers objects that are going to be sent over the network.
 	static public void register (EndPoint endPoint) {
 		Kryo kryo = endPoint.getKryo();
+//		byte[] key = null;
+//		try {
+//			key = KeyGenerator.getInstance("Blowfish").generateKey().getEncoded();
+//		} catch (NoSuchAlgorithmException e) {
+//			Log.error("Could not generate Key for Encryption: "+e.getMessage());
+//			System.exit(2);
+//		}
+
+		
+//		kryo.register(OnlineStateChange.class, new BlowfishSerializer(kryo.getSerializer(OnlineStateChange.class), key));
 		kryo.register(OnlineStateChange.class);
 		kryo.register(RequestKnownOnlineClients.class);
 		kryo.register(ContactDto.class);
