@@ -3,7 +3,6 @@ package main.java.de.c4.view;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -11,11 +10,12 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
 
+import com.esotericsoftware.minlog.Log;
+
 import main.java.de.c4.controller.FileTransferManager;
 import main.java.de.c4.controller.Messenger;
 import main.java.de.c4.controller.shared.ChatMessage;
 import main.java.de.c4.controller.shared.ConnectionManager;
-import main.java.de.c4.controller.shared.listener.FileTransferInfoListener;
 import main.java.de.c4.controller.shared.listener.MessageRecievedListener;
 import main.java.de.c4.model.messages.ContactDto;
 import main.java.de.c4.model.messages.file.FileTransferAnswer;
@@ -25,10 +25,8 @@ import main.java.de.c4.view.components.ChatTabPane;
 import main.java.de.c4.view.resources.EIcons;
 import main.java.de.c4.view.resources.IconProvider;
 
-import com.esotericsoftware.minlog.Log;
 
-
-public class ChatFrame extends JFrame implements ActionListener, MessageRecievedListener, FileTransferInfoListener{
+public class ChatFrame extends JFrame implements ActionListener, MessageRecievedListener{
 	
 	private static final long serialVersionUID = 1L;
 	
@@ -41,7 +39,6 @@ public class ChatFrame extends JFrame implements ActionListener, MessageRecieved
 	public ChatFrame() {
 		setIconImage(IconProvider.getImage(EIcons.BUBBLES));
 		Messenger.addMessageReceivedListener(this);
-		FileTransferManager.INSTANCE.addFileTransferListener(this);
 //		List<ContactDto> contacts = ContactList.INSTANCE.getContacts();
 //		
 //		for (ContactDto contactDto : contacts) {
@@ -157,6 +154,7 @@ public class ChatFrame extends JFrame implements ActionListener, MessageRecieved
 				int port = 0;
 				if (accepted) {
 					port = FileTransferManager.INSTANCE.startFileServer(request, contact);
+					FileTransferManager.INSTANCE.addFileTransferListener(request.id, panel);
 					if (port == 0) {
 						JOptionPane.showMessageDialog(null, "Dateiübertragung von "
 						+contact.name+" (\""+request.filenName+"\", "+request.fileSize+
@@ -222,33 +220,4 @@ public class ChatFrame extends JFrame implements ActionListener, MessageRecieved
 			err.printStackTrace();
 		}
 	}
-
-
-	@Override
-	public void started(File f, ContactDto c) {
-		//TODO: implement
-		Log.debug("Started transfer of File "+f.getName()+" (Contact: "+c.name+")");
-	}
-
-
-	@Override
-	public void abroted(File f, ContactDto c) {
-		//TODO: implement
-		Log.debug("transfer of File "+f.getName()+" (Contact: "+c.name+") abroted!");
-	}
-
-
-	@Override
-	public void finnished(File f, ContactDto c) {
-		//TODO: implement
-		Log.debug("transfer of File "+f.getName()+" (Contact: "+c.name+") finnished!!");
-	}
-
-
-	@Override
-	public void declined(ContactDto contact, File file) {
-		//TODO: implement
-		Log.debug("transfer of File "+file.getName()+" (Contact: "+contact.name+") declined!");
-	}
-
 }

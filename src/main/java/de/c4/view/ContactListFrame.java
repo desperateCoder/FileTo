@@ -30,6 +30,8 @@ import javax.swing.ListCellRenderer;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
 
+import com.esotericsoftware.minlog.Log;
+
 import main.java.de.c4.controller.Messenger;
 import main.java.de.c4.controller.shared.ContactList;
 import main.java.de.c4.controller.shared.Settings;
@@ -42,8 +44,6 @@ import main.java.de.c4.view.i18n.I18N;
 import main.java.de.c4.view.resources.EIcons;
 import main.java.de.c4.view.resources.IconProvider;
 import main.java.de.c4.view.settings.SettingsFrame;
-
-import com.esotericsoftware.minlog.Log;
 
 public class ContactListFrame extends JFrame implements ActionListener,
 		OnlineStateChangeListener, ContactListReceivedListener, ItemListener {

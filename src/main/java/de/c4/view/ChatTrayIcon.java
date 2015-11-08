@@ -15,10 +15,10 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.JRadioButtonMenuItem;
 
+import com.esotericsoftware.minlog.Log;
+
 import main.java.de.c4.controller.shared.ContactList;
 import main.java.de.c4.model.messages.EOnlineState;
-
-import com.esotericsoftware.minlog.Log;
 
 public class ChatTrayIcon extends TrayIcon implements ActionListener{
 	private static final String BTN_QUIT = "qui";
