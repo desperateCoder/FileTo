@@ -8,10 +8,12 @@ public class FileTransferState {
 	public FileTransferStateListener listener;
 	public ContactDto contact;
 	public long bytesDone = 0;
+	public boolean isUpload = false;
 	
-	public FileTransferState(FileTransferRequest request, FileTransferStateListener l, ContactDto contact) {
+	public FileTransferState(FileTransferRequest request, FileTransferStateListener l, ContactDto contact, boolean isUpload) {
 		this.request = request;
 		this.listener = l;
+		this.isUpload = isUpload;
 		this.contact = contact;
 	}
 }

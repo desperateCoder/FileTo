@@ -15,7 +15,10 @@ public enum EIcons {
 	ADD("add.png"),
 	ALARM("alarm.png"),
 	ATTACH("attach.png"),
-	ARROW_DOWN("arrow_down.png");
+	ARROW_DOWN("arrow_down.png"), 
+	TRANSFER("transfer.png"), 
+	UPLOAD("upload.png"),
+	DOWNLOAD("download.png");
 	
 	private String path;
 	
