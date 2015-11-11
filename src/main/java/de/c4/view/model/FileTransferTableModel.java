@@ -6,6 +6,8 @@ import java.util.List;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
+import main.java.de.c4.model.messages.ContactDto;
+import main.java.de.c4.model.messages.file.FileTransferRequest;
 import main.java.de.c4.model.messages.file.FileTransferState;
 
 public class FileTransferTableModel extends DefaultTableModel {
@@ -20,6 +22,8 @@ public class FileTransferTableModel extends DefaultTableModel {
 	
 	public FileTransferTableModel(JTable table) {
 		table.setModel(this);
+		TRANSFERS.add(new FileTransferState(new FileTransferRequest("datei.txt", 10567), null, new ContactDto("peter"), true));
+		TRANSFERS.add(new FileTransferState(new FileTransferRequest("datei.txt", 10567), null, new ContactDto("peter"), false));
 	}
 
 	@Override

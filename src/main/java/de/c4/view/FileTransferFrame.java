@@ -2,6 +2,7 @@ package main.java.de.c4.view;
 
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -33,6 +34,8 @@ public class FileTransferFrame extends JFrame implements
 		
 		JTable table = new JTable();
 		new FileTransferTableModel(table);
+		table.setRowHeight(ICON_SIZE);
+		table.setFont(new Font("Sans", Font.PLAIN, 14));
 		TableColumn column = table.getColumnModel().getColumn(0);
 		column.setCellRenderer(new TableCellRenderer() {
 			
