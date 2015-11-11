@@ -1,26 +1,24 @@
 package main.java.de.c4.view.model;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
 import main.java.de.c4.model.messages.file.FileTransferState;
-import main.java.de.c4.view.resources.EIcons;
-import main.java.de.c4.view.resources.IconProvider;
 
 public class FileTransferTableModel extends DefaultTableModel {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	
 	private static final String[] COLS = new String[]{" ", "Status", "Dateiname", "Kontakt", " "};
 	private static final List<FileTransferState> TRANSFERS = new ArrayList<FileTransferState>();
-	private JTable table;
 	
 	public FileTransferTableModel(JTable table) {
-		this.table = table;
 		table.setModel(this);
 	}
 
