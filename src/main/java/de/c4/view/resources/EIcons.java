@@ -12,6 +12,7 @@ public enum EIcons {
 	STATE_OFFLINE("states/offline.png"),
 	CONTACTS("contacts.png"),
 	SEND("send.png"),
+	ABROT("abrot.png"),
 	ADD("add.png"),
 	ALARM("alarm.png"),
 	ATTACH("attach.png"),

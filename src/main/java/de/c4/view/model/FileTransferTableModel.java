@@ -1,13 +1,11 @@
 package main.java.de.c4.view.model;
 
 import java.util.ArrayList;
-import java.util.List;
 
+import javax.swing.JProgressBar;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
-import main.java.de.c4.model.messages.ContactDto;
-import main.java.de.c4.model.messages.file.FileTransferRequest;
 import main.java.de.c4.model.messages.file.FileTransferState;
 
 public class FileTransferTableModel extends DefaultTableModel {
@@ -18,12 +16,17 @@ public class FileTransferTableModel extends DefaultTableModel {
 	private static final long serialVersionUID = 1L;
 	
 	private static final String[] COLS = new String[]{" ", "Status", "Dateiname", "Kontakt", " "};
-	private static final List<FileTransferState> TRANSFERS = new ArrayList<FileTransferState>();
+	private static final ArrayList<FileTransferState> TRANSFERS = new ArrayList<FileTransferState>();
+	//	private JTable table;
 	
 	public FileTransferTableModel(JTable table) {
 		table.setModel(this);
-		TRANSFERS.add(new FileTransferState(new FileTransferRequest("datei.txt", 10567), null, new ContactDto("peter"), true));
-		TRANSFERS.add(new FileTransferState(new FileTransferRequest("datei.txt", 10567), null, new ContactDto("peter"), false));
+//		this.table = table;
+	}
+	
+	@Override
+	public boolean isCellEditable(int row, int column) {
+		return false;
 	}
 
 	@Override
@@ -54,5 +57,16 @@ public class FileTransferTableModel extends DefaultTableModel {
 			return Long.valueOf(state.request.id);
 		}
 		return TRANSFERS.get(row);
+	}
+	public void setState(FileTransferState state) {
+		if (TRANSFERS.contains(state)) {
+			int index = TRANSFERS.indexOf(state);
+			TRANSFERS.set(index, state);
+			fireTableCellUpdated(index, 1);
+		} else {
+			TRANSFERS.add(state);
+			int index = TRANSFERS.indexOf(state);
+			fireTableRowsInserted(index, index);
+		}
 	}
 }

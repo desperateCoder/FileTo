@@ -88,6 +88,17 @@ public class ContactListFrame extends JFrame implements ActionListener,
 		});
 		editMenu.add(settingsMenuItem);
 		menuBar.add(editMenu);
+		
+		JMenu windowMenu = new JMenu(I18N.get("contactlist.menu.window"));
+		JMenuItem ftMenuItem = new JMenuItem(
+				I18N.get("contactlist.menu.fileTransferFrame"));
+		ftMenuItem.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				FileTransferFrame.INSTANCE.setVisible(true);
+			}
+		});
+		windowMenu.add(ftMenuItem);
+		menuBar.add(windowMenu);
 
 		labelPanel.add(menuBar, BorderLayout.CENTER);
 		content.add(labelPanel, BorderLayout.NORTH);
