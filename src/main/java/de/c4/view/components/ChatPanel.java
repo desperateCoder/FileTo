@@ -579,4 +579,9 @@ public class ChatPanel extends JSplitPane implements DropTargetListener, Message
 
 	@Override
 	public void alert(ContactDto contact) {}
+
+	@Override
+	public void smileySelectionAbroted() {
+		inputArea.grabFocus();
+	}
 }

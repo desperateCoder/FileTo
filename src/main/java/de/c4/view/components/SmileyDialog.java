@@ -105,6 +105,7 @@ public class SmileyDialog extends JDialog implements WindowFocusListener, Action
 	public void windowGainedFocus(WindowEvent e) {/* do nothing! */}
 
 	public void windowLostFocus(WindowEvent e) {
+		listener.smileySelectionAbroted();
 		dispose();
 	}
 	
@@ -118,6 +119,11 @@ public class SmileyDialog extends JDialog implements WindowFocusListener, Action
 		new SmileyDialog(true).popUp(new SmileySelectionListener() {
 			public void smileySelected(ESmileys s) {
 				System.out.println(s.name());
+			}
+
+			@Override
+			public void smileySelectionAbroted() {
+				
 			}
 		}, new Point(0, 0));
 	}
