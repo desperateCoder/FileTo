@@ -8,6 +8,7 @@ public enum EOnlineState {
 	DND(3, "DND (Bitte nicht stören)", EIcons.STATE_DND),
 	OFFLINE(4, "Offline", EIcons.STATE_OFFLINE); 
 	
+
 	private int nr;
 	private String title;
 	private EIcons icon;

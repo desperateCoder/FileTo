@@ -114,7 +114,7 @@ public class ContactListFrame extends JFrame implements ActionListener,
 
 				JLabel image = new JLabel(
 						new ImageIcon(IconProvider.getImage(
-								value.state.getIcon()).getScaledInstance(SIZE,
+								EOnlineState.getByNr(value.state).getIcon()).getScaledInstance(SIZE,
 								SIZE, 0)), 0);
 				comp.add(image, BorderLayout.WEST);
 				return comp;
@@ -151,7 +151,7 @@ public class ContactListFrame extends JFrame implements ActionListener,
 				return comp;
 			}
 		});
-		stateCombo.setSelectedItem(ContactList.getMe().state);
+		stateCombo.setSelectedItem(EOnlineState.getByNr(ContactList.getMe().state));
 		stateCombo.addItemListener(this);
 
 		content.add(stateCombo, BorderLayout.SOUTH);

@@ -54,7 +54,7 @@ public class MessageHandler extends Listener{
 			OnlineStateChange onlineState = (OnlineStateChange) object;
 			Log.debug("Online-State changed:  "+onlineState.contact.name+" ("+onlineState.newState+")");
 			ContactList.INSTANCE.contactStateChanged(onlineState, ip);
-			if (onlineState.newState!=EOnlineState.OFFLINE) {
+			if (onlineState.newState!=EOnlineState.OFFLINE.getNr()) {
 				ConnectionManager.registerConnection(onlineState.contact, c);
 			}
 		} else if (object instanceof Alert) {

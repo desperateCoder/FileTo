@@ -9,6 +9,7 @@ import main.java.de.c4.controller.shared.ChatMessage;
 import main.java.de.c4.controller.shared.ContactList;
 import main.java.de.c4.controller.shared.listener.OnlineStateChangeListener;
 import main.java.de.c4.model.messages.ContactDto;
+import main.java.de.c4.model.messages.EOnlineState;
 import main.java.de.c4.model.messages.OnlineStateChange;
 import main.java.de.c4.view.ChatFrame;
 import main.java.de.c4.view.listener.TabCloseListener;
@@ -36,7 +37,7 @@ public class ChatTabPane extends JTabbedPane implements TabCloseListener, Online
 		super.addTab(title, component);
 		ChatPanel pane = (ChatPanel) component;
 		ContactDto c = pane.getContacts().iterator().next();
-		setTabComponentAt(indexOfComponent(component), new ButtonTabComponent(this,c.state, this));
+		setTabComponentAt(indexOfComponent(component), new ButtonTabComponent(this,EOnlineState.getByNr(c.state), this));
 	}
 	
 	public int indexOf(ContactDto c){
@@ -110,7 +111,7 @@ public class ChatTabPane extends JTabbedPane implements TabCloseListener, Online
 	public void onlineStateChanged(OnlineStateChange change) {
 		int index = indexOf(change.contact);
 		if (index > -1) {
-			setTabComponentAt(index, new ButtonTabComponent(this, change.newState, this));
+			setTabComponentAt(index, new ButtonTabComponent(this, EOnlineState.getByNr(change.newState), this));
 		}
 	}
 

@@ -137,7 +137,7 @@ public class ChatTrayIcon extends TrayIcon implements ActionListener{
 	}
 	
 	private void updatePopupLabels(){
-		EOnlineState state = ContactList.getMe().state;
+		EOnlineState state = EOnlineState.getByNr(ContactList.getMe().state);
 		String text = "Status: "+state.toString();
 		stateItem.setText(text);
 		setToolTip(text);

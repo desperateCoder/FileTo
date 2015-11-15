@@ -3,7 +3,7 @@ package main.java.de.c4.model.messages;
 public class ContactDto {
 	public String name;
 	public String ip;
-	public EOnlineState state;
+	public int state;
 	
 	
 	public ContactDto() {
@@ -13,7 +13,7 @@ public class ContactDto {
 		super();
 		this.name = name;
 	}
-	public ContactDto(String name, EOnlineState state) {
+	public ContactDto(String name, int state) {
 		super();
 		this.name = name;
 		this.state = state;

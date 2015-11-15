@@ -126,7 +126,7 @@ public class ContactList {
 		contact.state = onlineState.newState;
 		
 		
-		switch (onlineState.newState) {
+		switch (EOnlineState.getByNr(onlineState.newState)) {
 		case ONLINE:
 			if (!knownOnlineContacts.contains(contact)) {
 				knownOnlineContacts.add(contact);
@@ -169,7 +169,7 @@ public class ContactList {
 		}
 		me.ip = LOCAL_IP;
 		me.name = name;
-		me.state = onlineState;
+		me.state = onlineState.getNr();
 	}
 
 	/**
@@ -189,13 +189,13 @@ public class ContactList {
 	 */
 	public void setOnlineState(final EOnlineState onlineState, boolean setInSettings) {
 		boolean isFromOffToOn = false;
-		if (me.state==EOnlineState.OFFLINE && onlineState != EOnlineState.OFFLINE) {
+		if (me.state==EOnlineState.OFFLINE.getNr() && onlineState != EOnlineState.OFFLINE) {
 			isFromOffToOn = true;
 		} else if (onlineState == EOnlineState.OFFLINE) {
 			Messenger.goOffline();
 		}
-		if (me.state != onlineState) {
-			me.state = onlineState;
+		if (me.state != onlineState.getNr()) {
+			me.state = onlineState.getNr();
 			OnlineStateChange change = new OnlineStateChange();
 			change.contact = me;
 			change.newState = me.state;
