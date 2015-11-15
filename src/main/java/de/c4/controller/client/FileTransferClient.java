@@ -1,10 +1,14 @@
 package main.java.de.c4.controller.client;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+
+import main.java.de.c4.controller.shared.Network;
+import main.java.de.c4.controller.shared.listener.FileTransferListener;
+import main.java.de.c4.model.messages.file.FileChunk;
+import main.java.de.c4.model.messages.file.FileTransferAnswer;
 
 import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Connection;
@@ -12,12 +16,8 @@ import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.kryonet.util.InputStreamSender;
 import com.esotericsoftware.minlog.Log;
 
-import main.java.de.c4.controller.shared.Network;
-import main.java.de.c4.controller.shared.listener.FileTransferListener;
-import main.java.de.c4.model.messages.file.FileChunk;
-import main.java.de.c4.model.messages.file.FileTransferAnswer;
-
 public class FileTransferClient extends Thread {
+	private static final int CHUNK_SIZE = 1024;
 	private Client client;
 	private String host;
 	private int port;
@@ -37,13 +37,10 @@ public class FileTransferClient extends Thread {
 
 		client.addListener(new Listener(){
 			public void connected (Connection connection) {
-				ByteArrayOutputStream output = new ByteArrayOutputStream((int)file.length());
-				for (long i = 0; i < file.length(); i++)
-					output.write((int) i);
 				final FileInputStream input;
 				try {
 					input = new FileInputStream(file);
-					connection.addListener(new InputStreamSender(input, 1024) {
+					connection.addListener(new InputStreamSender(input, CHUNK_SIZE) {
 						protected void start () {
 							Log.info("starting FileUpload: "+file.getAbsolutePath());
 						}
