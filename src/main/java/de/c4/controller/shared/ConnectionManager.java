@@ -55,13 +55,7 @@ public class ConnectionManager extends HashMap<ContactDto, Set<Connection>> {
 			INSTANCE.put(contact, list);
 		}
 		Client c = client.getClient();
-		try {
-			while (!Diffie.isReady(c)) {
-				Thread.sleep(5L);
-			}
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
+		Diffie.wait(c);
 		list.add(c);
 		return c;
 	}

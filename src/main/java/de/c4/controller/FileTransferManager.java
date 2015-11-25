@@ -46,11 +46,11 @@ public class FileTransferManager implements FileTransferListener{
 			state.bytesDone = bytesDone;
 			if (state.bytesDone==0 && bytesDone > 0) {
 				for (FileTransferInfoListener l : transferListeners.get(lId)) {
-					l.started(new File(state.request.filenName), state.contact);
+					l.started(new File(state.request.filenName), state.contact, state.isUpload);
 				}
 			} else if (state.request.fileSize == bytesDone) {
 				for (FileTransferInfoListener l : transferListeners.get(lId)) {
-					l.finnished(new File(state.request.filenName), state.contact);
+					l.finnished(new File(state.request.filenName), state.contact, state.isUpload);
 				}
 				transfers.remove(lId);
 				removeFileTransferListener(lId);
@@ -105,7 +105,7 @@ public class FileTransferManager implements FileTransferListener{
 			FileTransferState state = transfers.get(fId);
 			if (state.bytesDone < state.request.fileSize) {
 				for (FileTransferInfoListener l : transferListeners.get(id)) {
-					l.abroted(new File(state.request.filenName), state.contact);
+					l.abroted(new File(state.request.filenName), state.contact, state.isUpload);
 				}
 			}
 			transfers.remove(fId);

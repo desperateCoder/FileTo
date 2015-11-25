@@ -554,16 +554,27 @@ public class ChatPanel extends JSplitPane implements DropTargetListener, Message
 
 	}
 
-	public void started(File f, ContactDto c) {
-		infoMessage("Beginne mit der Dateiübertragung (\"" + f.getName() + "\" an " + c.name + ")...");
+	public void started(File f, ContactDto c, boolean isUpload) {
+		infoMessage("Beginne mit der Dateiübertragung (\"" + f.getName() + (isUpload?"\" an ":"\" von ") + c.name + ")...");
 	}
 
-	public void abroted(File f, ContactDto c) {
-		infoMessage("Senden der Datei \"" + f.getName() + "\" an " + c.name + " Fehlgeschlagen!");
+	public void abroted(File f, ContactDto c, boolean isUpload) {
+		if (isUpload) {
+			infoMessage("Senden der Datei \"" + f.getName() + "\" an " + c.name + " Fehlgeschlagen!");
+		} else {
+			infoMessage("Empfangen der Datei \"" + f.getName() + "\" von " + c.name + " Fehlgeschlagen!");
+		}
 	}
 
-	public void finnished(File f, ContactDto c) {
-		infoMessage("Datei \"" + f.getName() + "\" wurde erfolgreich an " + c.name + " gesendet!");
+	public void finnished(File f, ContactDto c, boolean isUpload) {
+		if (isUpload) {
+			infoMessage("Datei \"" + f.getName() + "\" wurde erfolgreich an " + c.name + " gesendet!");
+		} else {
+			String path = f.getAbsolutePath();
+			infoMessage("Empfang der Datei \"" + f.getName() + "\" von " + c.name + " ist nun vollständig!<br/>"
+					+ "<a href=\"file://"+path.substring(0,path.length()-f.getName().length())+"\">Ordner anzeigen</a>  "
+							+ "<a href=\"file://"+path+"\">Datei öffnen</a>");
+		}
 	}
 
 	public void declined(ContactDto contact, File file) {

@@ -2,7 +2,6 @@ package main.java.de.c4.view.model;
 
 import java.util.ArrayList;
 
-import javax.swing.JProgressBar;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
