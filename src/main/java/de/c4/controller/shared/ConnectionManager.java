@@ -35,15 +35,13 @@ public class ConnectionManager extends HashMap<ContactDto, Set<Connection>> {
 		if (INSTANCE.containsKey(contact) && INSTANCE.get(contact).size()>0) {
 			return INSTANCE.get(contact);
 		}
-		Set<Connection> list = new HashSet<Connection>();
 		if (createIfNone) {
-			ChatClient client = new ChatClient(contact.ip);
-			client.connect();
-			list.add(client.getClient());
+			createConnectionTo(contact);
+			return INSTANCE.get(contact);
 		}
-		INSTANCE.put(contact, list);
+//		INSTANCE.put(contact, list);
 		
-		return list;
+		return new HashSet<Connection>();
 	}
 	
 	public static Connection createConnectionTo(ContactDto contact){
@@ -57,6 +55,13 @@ public class ConnectionManager extends HashMap<ContactDto, Set<Connection>> {
 			INSTANCE.put(contact, list);
 		}
 		Client c = client.getClient();
+		try {
+			while (!Diffie.isReady(c)) {
+				Thread.sleep(5L);
+			}
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 		list.add(c);
 		return c;
 	}

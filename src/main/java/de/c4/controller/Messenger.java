@@ -15,6 +15,7 @@ import main.java.de.c4.controller.server.ChatServer;
 import main.java.de.c4.controller.shared.ChatMessage;
 import main.java.de.c4.controller.shared.ConnectionManager;
 import main.java.de.c4.controller.shared.ContactList;
+import main.java.de.c4.controller.shared.Diffie;
 import main.java.de.c4.controller.shared.ExceptionUtil;
 import main.java.de.c4.controller.shared.listener.MessageRecievedListener;
 import main.java.de.c4.model.messages.ContactDto;
@@ -58,6 +59,7 @@ public class Messenger {
 			ChatClient chatClient = new ChatClient(ChatClient.discoverRandomServer());
 			chatClient.connect();
 			Client client = chatClient.getClient();
+			Diffie.wait(client);
 			Log.debug("TCP Connected to Server: "+client.getRemoteAddressTCP());
 			
 			RequestKnownOnlineClients req = new RequestKnownOnlineClients();

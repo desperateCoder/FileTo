@@ -13,6 +13,7 @@ import main.java.de.c4.model.messages.ContactDto;
 import main.java.de.c4.model.messages.ContactListDto;
 import main.java.de.c4.model.messages.EOnlineState;
 import main.java.de.c4.model.messages.OnlineStateChange;
+import main.java.de.c4.model.messages.PubKey;
 import main.java.de.c4.model.messages.RequestKnownOnlineClients;
 import main.java.de.c4.model.messages.file.FileTransferAnswer;
 import main.java.de.c4.model.messages.file.FileTransferRequest;
@@ -41,6 +42,13 @@ public class MessageHandler extends Listener{
 			Log.debug("Nachricht von "+contact.name+" ("+contact.ip+") bekommen: "+message);
 			Messenger.receiveMessageFrom(contact, chatMessage);
 			
+		} else if (object instanceof PubKey) {
+			PubKey pubKey = (PubKey) object;
+			try {
+				Diffie.finalize(c, pubKey.key);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		} else if (object instanceof FileTransferRequest) {
 			FileTransferRequest request = (FileTransferRequest)object;
 			ContactDto contact = ContactList.INSTANCE.findByAddr(c.getRemoteAddressTCP().getAddress());
@@ -78,8 +86,5 @@ public class MessageHandler extends Listener{
 		ConnectionManager.removeConnection(c);
 	}
 	
-	@Override
-	public void connected(Connection connection) {
-		super.connected(connection);
-	}
+	
 }

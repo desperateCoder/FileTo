@@ -19,8 +19,6 @@ import com.sun.xml.internal.messaging.saaj.packaging.mime.util.BASE64EncoderStre
 public class AESerializer<T> extends Serializer<T>{
 	private final Serializer<T> serializer;
 	private static final int BUFFER_SIZE = 256;
-	private static final byte[] salt = "ThisIsASecretKey".getBytes();
-	private static final SecretKeySpec keySpec = new SecretKeySpec(salt, 0, 16, "AES");
 	private static final IvParameterSpec IV = new IvParameterSpec("1234567812345678".getBytes());
 	public AESerializer (Serializer<T> serializer) {
 		this.serializer = serializer;
@@ -28,7 +26,7 @@ public class AESerializer<T> extends Serializer<T>{
 
 	@SuppressWarnings("unchecked")
 	public void write (Kryo kryo, Output output, Object object) {
-		Cipher cipher = getCipher(Cipher.ENCRYPT_MODE);
+		Cipher cipher = getCipher(Cipher.ENCRYPT_MODE, (byte[]) kryo.getContext().get("Sec"));
 		CipherOutputStream cipherStream = new CipherOutputStream(new BASE64EncoderStream(output), cipher);
 		Output cipherOutput = new Output(cipherStream, BUFFER_SIZE) {
 			public void close () throws KryoException {
@@ -45,7 +43,7 @@ public class AESerializer<T> extends Serializer<T>{
 	}
 
 	public T read (Kryo kryo, Input input, Class<T> type) {
-		Cipher cipher = getCipher(Cipher.DECRYPT_MODE);
+		Cipher cipher = getCipher(Cipher.DECRYPT_MODE,  Diffie.getSecretKey(kryo));
 		
 		CipherInputStream cipherInput = new CipherInputStream(new BASE64DecoderStream(input), cipher);
 		return serializer.read(kryo, new Input(cipherInput, BUFFER_SIZE), type); 
@@ -56,13 +54,19 @@ public class AESerializer<T> extends Serializer<T>{
 		return serializer.copy(kryo, (T)original);
 	}
 
-	static private Cipher getCipher (int mode) {
+	static private Cipher getCipher (int mode, byte[] key) {
 		try {
 			Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+			SecretKeySpec keySpec = new SecretKeySpec(key, 5, 16, "AES");
 			cipher.init(mode, keySpec, IV);
 			return cipher;
 		} catch (Exception ex) {
 			throw new KryoException(ex);
 		}
 	}
+	
+	
+
+	
+
 }

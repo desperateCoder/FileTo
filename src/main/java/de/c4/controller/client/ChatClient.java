@@ -3,7 +3,10 @@ import java.io.IOException;
 import java.net.InetAddress;
 
 import com.esotericsoftware.kryonet.Client;
+import com.esotericsoftware.kryonet.Connection;
+import com.esotericsoftware.kryonet.Listener;
 
+import main.java.de.c4.controller.shared.Diffie;
 import main.java.de.c4.controller.shared.MessageHandler;
 import main.java.de.c4.controller.shared.Network;
 
@@ -18,6 +21,18 @@ public class ChatClient{
 
 		Network.register(client);
 
+		client.addListener(new Listener(){
+			@Override
+			public void connected(Connection connection) {
+				super.connected(connection);
+				try {
+					Diffie.start(connection);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				
+			}
+		});
 		client.addListener(new MessageHandler());
 
 		host = hostAdress;

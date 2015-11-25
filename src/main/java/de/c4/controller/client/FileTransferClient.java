@@ -5,8 +5,10 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
+import main.java.de.c4.controller.shared.Diffie;
 import main.java.de.c4.controller.shared.Network;
 import main.java.de.c4.controller.shared.listener.FileTransferListener;
+import main.java.de.c4.model.messages.PubKey;
 import main.java.de.c4.model.messages.file.FileChunk;
 import main.java.de.c4.model.messages.file.FileTransferAnswer;
 
@@ -37,28 +39,45 @@ public class FileTransferClient extends Thread {
 
 		client.addListener(new Listener(){
 			public void connected (Connection connection) {
-				final FileInputStream input;
 				try {
-					input = new FileInputStream(file);
-					connection.addListener(new InputStreamSender(input, CHUNK_SIZE) {
-						protected void start () {
-							Log.info("starting FileUpload: "+file.getAbsolutePath());
-						}
-						
-						protected Object next (byte[] bytes) {
-							sent += bytes.length;
-							long id = answer.id;
-							listener.updateState(id, sent);
-							return new FileChunk(id, bytes);
-						}
-						@Override
-						public void disconnected(Connection connection) {
-							super.disconnected(connection);
+					Diffie.start(client);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+			@Override
+			public void received(Connection connection, Object object) {
+				if (object instanceof PubKey) {
+					byte[] pubKey = ((PubKey)object).key;
+					try {
+						Diffie.finalize(connection, pubKey);
+					} catch (Exception e1) {
+						e1.printStackTrace();
+						return;
+					}
+					final FileInputStream input;
+					try {
+						input = new FileInputStream(file);
+						connection.addListener(new InputStreamSender(input, CHUNK_SIZE) {
+							protected void start () {
+								Log.info("starting FileUpload: "+file.getAbsolutePath());
+							}
 							
-						}
-					});
-				} catch (FileNotFoundException e) {
-					Log.error("File not found: "+e.getMessage());
+							protected Object next (byte[] bytes) {
+								sent += bytes.length;
+								long id = answer.id;
+								listener.updateState(id, sent);
+								return new FileChunk(id, bytes);
+							}
+							@Override
+							public void disconnected(Connection connection) {
+								super.disconnected(connection);
+								
+							}
+						});
+					} catch (FileNotFoundException e) {
+						Log.error("File not found: "+e.getMessage());
+					}
 				}
 			}
 			@Override

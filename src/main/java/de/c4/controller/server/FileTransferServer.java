@@ -10,9 +10,11 @@ import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.kryonet.Server;
 import com.esotericsoftware.minlog.Log;
 
+import main.java.de.c4.controller.shared.Diffie;
 import main.java.de.c4.controller.shared.Network;
 import main.java.de.c4.controller.shared.listener.FileTransferListener;
 import main.java.de.c4.model.connections.ChatConnection;
+import main.java.de.c4.model.messages.PubKey;
 import main.java.de.c4.model.messages.file.FileChunk;
 import main.java.de.c4.model.messages.file.FileTransferRequest;
 
@@ -52,7 +54,15 @@ public class FileTransferServer  extends Thread{
 			}
 			@Override
 			public void received(Connection connection, Object object) {
-				if (object instanceof FileChunk) {
+				if (object instanceof PubKey) {
+					byte[] pubKey = ((PubKey)object).key;
+					try {
+						Diffie.finalize(connection, pubKey);
+					} catch (Exception e1) {
+						e1.printStackTrace();
+						return;
+					}
+				} else if (object instanceof FileChunk) {
 					FileChunk c = (FileChunk) object;
 					try {
 						out.write(c.data);

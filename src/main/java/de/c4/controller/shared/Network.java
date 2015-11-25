@@ -3,19 +3,20 @@ import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
 
-import main.java.de.c4.model.messages.Alert;
-import main.java.de.c4.model.messages.ContactDto;
-import main.java.de.c4.model.messages.ContactListDto;
-import main.java.de.c4.model.messages.OnlineStateChange;
-import main.java.de.c4.model.messages.RequestKnownOnlineClients;
-import main.java.de.c4.model.messages.file.FileChunk;
-import main.java.de.c4.model.messages.file.FileTransferAnswer;
-import main.java.de.c4.model.messages.file.FileTransferRequest;
-
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.serializers.DefaultArraySerializers;
 import com.esotericsoftware.kryo.serializers.FieldSerializer;
 import com.esotericsoftware.kryonet.EndPoint;
+
+import main.java.de.c4.model.messages.Alert;
+import main.java.de.c4.model.messages.ContactDto;
+import main.java.de.c4.model.messages.ContactListDto;
+import main.java.de.c4.model.messages.OnlineStateChange;
+import main.java.de.c4.model.messages.PubKey;
+import main.java.de.c4.model.messages.RequestKnownOnlineClients;
+import main.java.de.c4.model.messages.file.FileChunk;
+import main.java.de.c4.model.messages.file.FileTransferAnswer;
+import main.java.de.c4.model.messages.file.FileTransferRequest;
 
 // This class is a convenient place to keep things common to both the client and server.
 public class Network {
@@ -28,7 +29,9 @@ public class Network {
 	// This registers objects that are going to be sent over the network.
 	static public void register (EndPoint endPoint) {
 		Kryo kryo = endPoint.getKryo();
-		
+
+		kryo.register(byte[].class);
+		kryo.register(PubKey.class);
 		kryo.register(OnlineStateChange.class, new AESerializer<OnlineStateChange>(new FieldSerializer<OnlineStateChange>(kryo, OnlineStateChange.class)));
 		kryo.register(RequestKnownOnlineClients.class, new AESerializer<RequestKnownOnlineClients>(new FieldSerializer<RequestKnownOnlineClients>(kryo, RequestKnownOnlineClients.class)));
 		kryo.register(ContactDto.class);
@@ -44,6 +47,7 @@ public class Network {
 
 	public static void registerFileTransfer(EndPoint endPoint) {
 		Kryo kryo = endPoint.getKryo();
+		kryo.register(PubKey.class);
 		kryo.register(byte[].class);
 		kryo.register(FileChunk.class, new AESerializer<FileChunk>(new FieldSerializer<FileChunk>(kryo, FileChunk.class)));
 	}
