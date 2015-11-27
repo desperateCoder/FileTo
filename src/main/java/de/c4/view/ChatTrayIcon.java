@@ -17,7 +17,7 @@ import javax.swing.JRadioButtonMenuItem;
 
 import com.esotericsoftware.minlog.Log;
 
-import main.java.de.c4.controller.shared.ContactList;
+import main.java.de.c4.model.messages.ContactList;
 import main.java.de.c4.model.messages.EOnlineState;
 
 public class ChatTrayIcon extends TrayIcon implements ActionListener{
@@ -34,6 +34,8 @@ public class ChatTrayIcon extends TrayIcon implements ActionListener{
 	private JRadioButtonMenuItem offlineStateRadio;
 	private JRadioButtonMenuItem afkStateRadio;
 	private JRadioButtonMenuItem dndStateRadio;
+	
+	private boolean isInTray = false;
 
 	public ChatTrayIcon(Image image, final ContactListFrame frame) {
 		super(image);
@@ -99,9 +101,10 @@ public class ChatTrayIcon extends TrayIcon implements ActionListener{
 		
 	}
 
-	private void openFrame() {
+	public void openFrame() {
 		SystemTray.getSystemTray().remove(this);
-		frame.setVisible(true);
+		FrameUtil.bringToFront(frame);
+		isInTray = false;
 	}
 
 	@Override
@@ -131,6 +134,7 @@ public class ChatTrayIcon extends TrayIcon implements ActionListener{
 		updatePopupLabels();
 		try {
 			SystemTray.getSystemTray().add(this);
+			isInTray = true;
 		} catch (AWTException e) {
 			Log.error("Could not add systemtray icon: "+e.getMessage());
 		}
@@ -161,4 +165,9 @@ public class ChatTrayIcon extends TrayIcon implements ActionListener{
 		item.setSelected(true);
 		item.addActionListener(this);
 	}
+
+	public boolean isInTray() {
+		return isInTray;
+	}
+
 }

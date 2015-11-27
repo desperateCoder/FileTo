@@ -1,6 +1,6 @@
 package main.java.de.c4.controller.shared.listener;
 
-import main.java.de.c4.controller.shared.ChatMessage;
+import main.java.de.c4.model.messages.ChatMessage;
 import main.java.de.c4.model.messages.ContactDto;
 import main.java.de.c4.model.messages.file.FileTransferRequest;
 
@@ -11,4 +11,9 @@ public interface MessageRecievedListener {
 			FileTransferRequest request);
 	
 	public void alert(ContactDto contact);
+	
+	/**
+	 * Is called, when the user tries to start a second instance of this application.
+	 */
+	public void secondClientStarted();
 }

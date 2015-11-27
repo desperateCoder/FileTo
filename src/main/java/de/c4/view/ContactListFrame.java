@@ -33,20 +33,23 @@ import javax.swing.UIManager.LookAndFeelInfo;
 import com.esotericsoftware.minlog.Log;
 
 import main.java.de.c4.controller.Messenger;
-import main.java.de.c4.controller.shared.ContactList;
 import main.java.de.c4.controller.shared.Settings;
 import main.java.de.c4.controller.shared.listener.ContactListReceivedListener;
+import main.java.de.c4.controller.shared.listener.MessageRecievedListener;
 import main.java.de.c4.controller.shared.listener.OnlineStateChangeListener;
+import main.java.de.c4.model.messages.ChatMessage;
 import main.java.de.c4.model.messages.ContactDto;
+import main.java.de.c4.model.messages.ContactList;
 import main.java.de.c4.model.messages.EOnlineState;
 import main.java.de.c4.model.messages.OnlineStateChange;
+import main.java.de.c4.model.messages.file.FileTransferRequest;
 import main.java.de.c4.view.i18n.I18N;
 import main.java.de.c4.view.resources.EIcons;
 import main.java.de.c4.view.resources.IconProvider;
 import main.java.de.c4.view.settings.SettingsFrame;
 
 public class ContactListFrame extends JFrame implements ActionListener,
-		OnlineStateChangeListener, ContactListReceivedListener, ItemListener {
+		OnlineStateChangeListener, ContactListReceivedListener, ItemListener, MessageRecievedListener {
 
 	private static final long serialVersionUID = 1L;
 
@@ -60,6 +63,12 @@ public class ContactListFrame extends JFrame implements ActionListener,
 	public ContactListFrame() {
 		ContactList.INSTANCE.addReceivedContactListListener(this);
 		ContactList.INSTANCE.addOnlineStateChangeListener(this);
+		new Thread(new Runnable() {
+			@Override
+			public void run() {
+				Messenger.addMessageReceivedListener(ContactListFrame.this);
+			}
+		}).start();
 
 		setIconImage(IconProvider.getImage(EIcons.APP_ICON));
 		trayIcon = new ChatTrayIcon(IconProvider.getImage(EIcons.TRAY_ICON),
@@ -216,12 +225,7 @@ public class ContactListFrame extends JFrame implements ActionListener,
 	public static void main(String[] args) {
 		Log.set(Log.LEVEL_DEBUG); // TODO: change before release!
 		System.setProperty("java.net.preferIPv4Stack", "true");
-		new Thread(new Runnable() {
-
-			public void run() {
-				Messenger.init();
-			}
-		}).start();
+		
 		try {
 			String lookAndFeel = Settings.INSTANCE.get(Settings.LOOK_AND_FEEL);
 			if (lookAndFeel != null && !lookAndFeel.isEmpty()) {
@@ -275,5 +279,29 @@ public class ContactListFrame extends JFrame implements ActionListener,
 			((DefaultListModel<ContactDto>) (contactList.getModel()))
 					.addElement(c);
 		}
+	}
+
+	@Override
+	public void messageRecieved(ContactDto contact, ChatMessage message) {
+		// TODO maybe show icon for recieved message
+	}
+
+	@Override
+	public void fileTransferRequestRecieved(ContactDto contact, FileTransferRequest request) {
+		// ignore
+	}
+
+	@Override
+	public void alert(ContactDto contact) {
+		// nothing
+	}
+
+	@Override
+	public void secondClientStarted() {
+		if (trayIcon.isInTray()) {
+			trayIcon.openFrame();
+		} 
+		FrameUtil.bringToFront(this);
+		FrameUtil.shake(this);
 	}
 }

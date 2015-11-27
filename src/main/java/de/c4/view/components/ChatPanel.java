@@ -52,12 +52,12 @@ import javax.swing.text.html.StyleSheet;
 import main.java.de.c4.controller.FileTransferManager;
 import main.java.de.c4.controller.Messenger;
 import main.java.de.c4.controller.TimestampUtil;
-import main.java.de.c4.controller.shared.ChatMessage;
-import main.java.de.c4.controller.shared.ContactList;
 import main.java.de.c4.controller.shared.listener.FileTransferInfoListener;
 import main.java.de.c4.controller.shared.listener.MessageRecievedListener;
 import main.java.de.c4.model.messages.Alert;
+import main.java.de.c4.model.messages.ChatMessage;
 import main.java.de.c4.model.messages.ContactDto;
+import main.java.de.c4.model.messages.ContactList;
 import main.java.de.c4.model.messages.file.FileTransferRequest;
 import main.java.de.c4.view.listener.SmartScroller;
 import main.java.de.c4.view.listener.SmileySelectionListener;
@@ -594,5 +594,10 @@ public class ChatPanel extends JSplitPane implements DropTargetListener, Message
 	@Override
 	public void smileySelectionAbroted() {
 		inputArea.grabFocus();
+	}
+
+	@Override
+	public void secondClientStarted() {
+		// we don't care here.
 	}
 }

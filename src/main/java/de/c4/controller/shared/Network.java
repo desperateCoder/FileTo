@@ -9,11 +9,13 @@ import com.esotericsoftware.kryo.serializers.FieldSerializer;
 import com.esotericsoftware.kryonet.EndPoint;
 
 import main.java.de.c4.model.messages.Alert;
+import main.java.de.c4.model.messages.ChatMessage;
 import main.java.de.c4.model.messages.ContactDto;
 import main.java.de.c4.model.messages.ContactListDto;
 import main.java.de.c4.model.messages.OnlineStateChange;
 import main.java.de.c4.model.messages.PubKey;
 import main.java.de.c4.model.messages.RequestKnownOnlineClients;
+import main.java.de.c4.model.messages.SecondClientStarted;
 import main.java.de.c4.model.messages.file.FileChunk;
 import main.java.de.c4.model.messages.file.FileTransferAnswer;
 import main.java.de.c4.model.messages.file.FileTransferRequest;
@@ -32,6 +34,7 @@ public class Network {
 
 		kryo.register(byte[].class);
 		kryo.register(PubKey.class);
+		kryo.register(SecondClientStarted.class);
 		kryo.register(OnlineStateChange.class, new AESerializer<OnlineStateChange>(new FieldSerializer<OnlineStateChange>(kryo, OnlineStateChange.class)));
 		kryo.register(RequestKnownOnlineClients.class, new AESerializer<RequestKnownOnlineClients>(new FieldSerializer<RequestKnownOnlineClients>(kryo, RequestKnownOnlineClients.class)));
 		kryo.register(ContactDto.class);

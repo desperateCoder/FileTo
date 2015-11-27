@@ -1,4 +1,4 @@
-package main.java.de.c4.controller.shared;
+package main.java.de.c4.model.messages;
 
 import java.net.InetAddress;
 import java.net.NetworkInterface;
@@ -12,12 +12,11 @@ import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.minlog.Log;
 
 import main.java.de.c4.controller.Messenger;
+import main.java.de.c4.controller.shared.ConnectionManager;
+import main.java.de.c4.controller.shared.ExceptionUtil;
+import main.java.de.c4.controller.shared.Settings;
 import main.java.de.c4.controller.shared.listener.ContactListReceivedListener;
 import main.java.de.c4.controller.shared.listener.OnlineStateChangeListener;
-import main.java.de.c4.model.messages.ContactDto;
-import main.java.de.c4.model.messages.ContactListDto;
-import main.java.de.c4.model.messages.EOnlineState;
-import main.java.de.c4.model.messages.OnlineStateChange;
 /**
  * Singleton, which provides the ContactList and States of the Contacts
  * @author Artur Dawtjan

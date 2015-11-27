@@ -5,10 +5,10 @@ import java.util.Set;
 
 import javax.swing.JTabbedPane;
 
-import main.java.de.c4.controller.shared.ChatMessage;
-import main.java.de.c4.controller.shared.ContactList;
 import main.java.de.c4.controller.shared.listener.OnlineStateChangeListener;
+import main.java.de.c4.model.messages.ChatMessage;
 import main.java.de.c4.model.messages.ContactDto;
+import main.java.de.c4.model.messages.ContactList;
 import main.java.de.c4.model.messages.EOnlineState;
 import main.java.de.c4.model.messages.OnlineStateChange;
 import main.java.de.c4.view.ChatFrame;

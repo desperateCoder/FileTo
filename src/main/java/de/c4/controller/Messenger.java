@@ -1,6 +1,7 @@
 package main.java.de.c4.controller;
 
 import java.io.IOException;
+import java.net.Socket;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -12,15 +13,17 @@ import com.esotericsoftware.minlog.Log;
 
 import main.java.de.c4.controller.client.ChatClient;
 import main.java.de.c4.controller.server.ChatServer;
-import main.java.de.c4.controller.shared.ChatMessage;
 import main.java.de.c4.controller.shared.ConnectionManager;
-import main.java.de.c4.controller.shared.ContactList;
 import main.java.de.c4.controller.shared.Diffie;
 import main.java.de.c4.controller.shared.ExceptionUtil;
+import main.java.de.c4.controller.shared.Network;
 import main.java.de.c4.controller.shared.listener.MessageRecievedListener;
+import main.java.de.c4.model.messages.ChatMessage;
 import main.java.de.c4.model.messages.ContactDto;
+import main.java.de.c4.model.messages.ContactList;
 import main.java.de.c4.model.messages.OnlineStateChange;
 import main.java.de.c4.model.messages.RequestKnownOnlineClients;
+import main.java.de.c4.model.messages.SecondClientStarted;
 import main.java.de.c4.model.messages.file.FileTransferRequest;
 
 public class Messenger {
@@ -38,7 +41,7 @@ public class Messenger {
 			throw new RuntimeException("This Class is a Singleton and " +
 					"should be accessed by its Instance-Field");
 		}
-
+		detectRunningInstance();
 		requestContacts(false);
 		try {
 			chatServer = new ChatServer();
@@ -48,37 +51,76 @@ public class Messenger {
 			
 		}
 	}
-	public static void requestContacts() {
-		requestContacts(true);
-	}
-	private static void requestContacts(boolean killUDP) {
-		if (killUDP) {
-			INSTANCE.chatServer.killUDP();
-		}
-		try {
-			ChatClient chatClient = new ChatClient(ChatClient.discoverRandomServer());
-			chatClient.connect();
-			Client client = chatClient.getClient();
-			Diffie.wait(client);
-			Log.debug("TCP Connected to Server: "+client.getRemoteAddressTCP());
-			
-			RequestKnownOnlineClients req = new RequestKnownOnlineClients();
-			client.sendTCP(req);
-		} catch (NullPointerException e) {
-			Log.info("Server started, but: " + e.getMessage());
-		} finally {
+	private void detectRunningInstance() {
+		if (!isPortAvailable(Network.TCP_PORT)) {
 			try {
-				if (killUDP) {
-					INSTANCE.chatServer.startUDP();
-				}
-			} catch (IOException e) {
-				Log.error("Cannot start UDP-Server: "+ExceptionUtil.getStacktrace(e));
+				ChatClient chatClient = new ChatClient("localhost");
+				chatClient.connect();
+				Client client = chatClient.getClient();
+				Diffie.wait(client);
+				client.sendTCP(new SecondClientStarted());
+			} catch (NullPointerException e) {
+				Log.info("Server started, but: " + e.getMessage());
+			} finally {
+				System.exit(6);
 			}
 		}
 	}
+	private boolean isPortAvailable(int port) {
+	    Socket s = null;
+	    try {
+	        s = new Socket("localhost", port);
 
-	public static void init() {/* nichts! laedt die klasse, das reicht! */
-	};
+	        // If the code makes it this far without an exception it means
+	        // something is using the port and has responded.
+	        return false;
+	    } catch (IOException e) {
+	        return true;
+	    } finally {
+	        if( s != null){
+	            try {
+	                s.close();
+	            } catch (IOException e) {
+	                throw new RuntimeException("You should handle this error." , e);
+	            }
+	        }
+	    }
+	}
+
+	public static void requestContacts() {
+		requestContacts(true);
+	}
+	private static void requestContacts(final boolean killUDP) {
+		new Thread(new Runnable() {
+			
+			@Override
+			public void run() {
+				if (killUDP) {
+					INSTANCE.chatServer.killUDP();
+				}
+				try {
+					ChatClient chatClient = new ChatClient(ChatClient.discoverRandomServer());
+					chatClient.connect();
+					Client client = chatClient.getClient();
+					Diffie.wait(client);
+					Log.debug("TCP Connected to Server: "+client.getRemoteAddressTCP());
+					
+					RequestKnownOnlineClients req = new RequestKnownOnlineClients();
+					client.sendTCP(req);
+				} catch (NullPointerException e) {
+					Log.info("Server started, but: " + e.getMessage());
+				} finally {
+					try {
+						if (killUDP) {
+							INSTANCE.chatServer.startUDP();
+						}
+					} catch (IOException e) {
+						Log.error("Cannot start UDP-Server: "+ExceptionUtil.getStacktrace(e));
+					}
+				}
+			}
+		}).start();
+	}
 
 	/**
 	 * @param args
@@ -139,6 +181,12 @@ public class Messenger {
 			ContactDto contact) {
 		for (MessageRecievedListener l : LISTENER) {
 			l.fileTransferRequestRecieved(contact, request);
+		}
+	}
+
+	public static void secondClientStarted() {
+		for (MessageRecievedListener l : LISTENER) {
+			l.secondClientStarted();
 		}
 	}
 }

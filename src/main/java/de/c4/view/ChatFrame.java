@@ -1,6 +1,5 @@
 package main.java.de.c4.view;
 
-import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -14,10 +13,12 @@ import com.esotericsoftware.minlog.Log;
 
 import main.java.de.c4.controller.FileTransferManager;
 import main.java.de.c4.controller.Messenger;
-import main.java.de.c4.controller.shared.ChatMessage;
 import main.java.de.c4.controller.shared.ConnectionManager;
 import main.java.de.c4.controller.shared.listener.MessageRecievedListener;
+import main.java.de.c4.model.messages.ChatMessage;
 import main.java.de.c4.model.messages.ContactDto;
+import main.java.de.c4.model.messages.ContactList;
+import main.java.de.c4.model.messages.EOnlineState;
 import main.java.de.c4.model.messages.file.FileTransferAnswer;
 import main.java.de.c4.model.messages.file.FileTransferRequest;
 import main.java.de.c4.view.components.ChatPanel;
@@ -31,10 +32,6 @@ public class ChatFrame extends JFrame implements ActionListener, MessageRecieved
 	private static final long serialVersionUID = 1L;
 	
 	private ChatTabPane tabbedPane = new ChatTabPane(this);
-														
-	private final static int SHAKE_LENGTH = 20;
-	private final static int SHAKE_VELOCITY = 5;
-
 	
 	public ChatFrame() {
 		setIconImage(IconProvider.getImage(EIcons.BUBBLES));
@@ -58,7 +55,6 @@ public class ChatFrame extends JFrame implements ActionListener, MessageRecieved
 	
 	
 	public static void main(String[] args) {
-		Messenger.init();
 		Log.set(Log.LEVEL_DEBUG);
 		try {
 		    for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
@@ -92,31 +88,19 @@ public class ChatFrame extends JFrame implements ActionListener, MessageRecieved
 			setSize(400, 500);
 		}
 		if (!isVisible()) {
-			bringToFront();
+			FrameUtil.bringToFront(this);
 		}
-	}
-
-
-	private void bringToFront() {
-		EventQueue.invokeLater(new Runnable() {
-		    public void run() {
-		    	setVisible(true);
-		        toFront();
-		        repaint();
-		    }
-		});
 	}
 
 
 	public void messageRecieved(ContactDto contact, ChatMessage message) {
 		//TODO: Make window blink or something to get Attention
 		tabbedPane.messageReceived(contact, message);
-		
 		if (!isVisible()) {
 			if (getSize().getHeight()<10) {
 				setSize(400, 500);
 			}
-			bringToFront();
+			FrameUtil.bringToFront(this);
 		}
 	}
 
@@ -139,7 +123,7 @@ public class ChatFrame extends JFrame implements ActionListener, MessageRecieved
 								if (getSize().getHeight()<10) {
 									setSize(400, 500);
 								}
-								bringToFront();
+								FrameUtil.bringToFront(ChatFrame.this);
 							}
 						}
 					});
@@ -199,28 +183,14 @@ public class ChatFrame extends JFrame implements ActionListener, MessageRecieved
 
 	@Override
 	public void alert(ContactDto contact) {
-		shake();//TODO: Don't shake, if Online-State is DND
+		if (ContactList.getMe().state!=EOnlineState.DND.getNr()) {
+			FrameUtil.bringToFront(this);
+			FrameUtil.shake(this);
+		}
 	}
 
-	/**
-	 * shakes around the frame
-	 */
-	private void shake() { // deren.exe ;)
-		try {
-			final int originalX = getLocationOnScreen().x;
-			final int originalY = getLocationOnScreen().y;
-			for (int i = 0; i < SHAKE_LENGTH; i++) {
-				Thread.sleep(10);
-				setLocation(originalX, originalY + SHAKE_VELOCITY);
-				Thread.sleep(10);
-				setLocation(originalX, originalY - SHAKE_VELOCITY);
-				Thread.sleep(10);
-				setLocation(originalX + SHAKE_VELOCITY, originalY);
-				Thread.sleep(10);
-				setLocation(originalX, originalY);
-			}
-		} catch (Exception err) {
-			err.printStackTrace();
-		}
+	@Override
+	public void secondClientStarted() {
+		// /dev/null ;)
 	}
 }
