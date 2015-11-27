@@ -600,4 +600,9 @@ public class ChatPanel extends JSplitPane implements DropTargetListener, Message
 	public void secondClientStarted() {
 		// we don't care here.
 	}
+
+	public void setContact(ContactDto contact) {
+		contacts.remove(contact);
+		contacts.add(contact);
+	}
 }

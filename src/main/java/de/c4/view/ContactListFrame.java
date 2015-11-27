@@ -209,9 +209,13 @@ public class ContactListFrame extends JFrame implements ActionListener,
 	}
 
 	public void exit() {
+		setVisible(false);
+		chatFrame.setVisible(false);
+		FileTransferFrame.INSTANCE.setVisible(false);
+		long millisTimeout = ContactList.INSTANCE.getContacts().size()*100L;
 		ContactList.INSTANCE.setOnlineState(EOnlineState.OFFLINE, false);
 		try {
-			Thread.sleep(1000);
+			Thread.sleep(millisTimeout);
 		} catch (InterruptedException e1) {
 			e1.printStackTrace();
 		}

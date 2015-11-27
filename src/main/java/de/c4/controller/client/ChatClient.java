@@ -62,7 +62,7 @@ public class ChatClient{
 	public static String discoverRandomServer() throws NullPointerException{
 		Client client = new Client();
 		client.start();
-		InetAddress addr = client.discoverHost(Network.UDP_PORT, 2000);
+		InetAddress addr = client.discoverHost(Network.UDP_PORT, 700);
 		client.stop();
 		if (addr == null) {
 			throw new NullPointerException("There is no other server online.");

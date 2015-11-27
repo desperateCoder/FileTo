@@ -1,6 +1,7 @@
 package main.java.de.c4.view;
 
 import java.awt.EventQueue;
+import java.awt.Frame;
 
 import javax.swing.JFrame;
 
@@ -36,11 +37,23 @@ public class FrameUtil {
 	}
 	
 	public static void bringToFront(final JFrame f) {
+		bringToFront(f, true, true);
+	}
+	
+	public static void bringToFront(final JFrame f, final boolean grabFocus, final boolean forceBringToFront) {
 		EventQueue.invokeLater(new Runnable() {
 		    public void run() {
+		    	if (forceBringToFront) {
+					f.setAlwaysOnTop(true);
+					f.setAlwaysOnTop(false);
+				}
 		    	f.setVisible(true);
+		    	f.setState(Frame.NORMAL);
 		    	f.toFront();
 		    	f.repaint();
+		    	if (grabFocus) {
+					f.requestFocus();
+				}
 		    }
 		});
 	}

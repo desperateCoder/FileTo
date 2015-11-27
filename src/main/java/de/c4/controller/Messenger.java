@@ -42,7 +42,7 @@ public class Messenger {
 					"should be accessed by its Instance-Field");
 		}
 		detectRunningInstance();
-		requestContacts(false);
+		requestContacts(getRandomServer(), false);
 		try {
 			chatServer = new ChatServer();
 			chatServer.start();
@@ -50,6 +50,16 @@ public class Messenger {
 			Log.error("I/O-Error starting the server: " + ExceptionUtil.getStacktrace(e));
 			
 		}
+	}
+
+	private static String getRandomServer() {
+		String host = null;
+		try {
+			host=ChatClient.discoverRandomServer();
+		} catch (NullPointerException e) {
+			Log.info("No UDP-Server availible.");
+		}
+		return host;
 	}
 	private void detectRunningInstance() {
 		if (!isPortAvailable(Network.TCP_PORT)) {
@@ -70,9 +80,6 @@ public class Messenger {
 	    Socket s = null;
 	    try {
 	        s = new Socket("localhost", port);
-
-	        // If the code makes it this far without an exception it means
-	        // something is using the port and has responded.
 	        return false;
 	    } catch (IOException e) {
 	        return true;
@@ -88,9 +95,9 @@ public class Messenger {
 	}
 
 	public static void requestContacts() {
-		requestContacts(true);
+		requestContacts(getRandomServer(), true);
 	}
-	private static void requestContacts(final boolean killUDP) {
+	private static void requestContacts(final String host, final boolean killUDP) {
 		new Thread(new Runnable() {
 			
 			@Override
@@ -98,8 +105,8 @@ public class Messenger {
 				if (killUDP) {
 					INSTANCE.chatServer.killUDP();
 				}
-				try {
-					ChatClient chatClient = new ChatClient(ChatClient.discoverRandomServer());
+				if (host!=null) {
+					ChatClient chatClient = new ChatClient(host);
 					chatClient.connect();
 					Client client = chatClient.getClient();
 					Diffie.wait(client);
@@ -107,17 +114,15 @@ public class Messenger {
 					
 					RequestKnownOnlineClients req = new RequestKnownOnlineClients();
 					client.sendTCP(req);
-				} catch (NullPointerException e) {
-					Log.info("Server started, but: " + e.getMessage());
-				} finally {
+				}
+				if (killUDP) {
 					try {
-						if (killUDP) {
-							INSTANCE.chatServer.startUDP();
-						}
+						INSTANCE.chatServer.startUDP();
 					} catch (IOException e) {
 						Log.error("Cannot start UDP-Server: "+ExceptionUtil.getStacktrace(e));
 					}
 				}
+					
 			}
 		}).start();
 	}
@@ -138,7 +143,7 @@ public class Messenger {
 	public static void goOnline(){
 		OnlineStateChange change = new OnlineStateChange();
 		change.contact = ContactList.getMe();
-		change.newState = ContactList.getMe().state;
+		change.newState = change.contact.state;
 		ContactList.INSTANCE.broadcast(change);
 	}
 	
