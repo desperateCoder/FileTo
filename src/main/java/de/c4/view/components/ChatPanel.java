@@ -59,6 +59,7 @@ import main.java.de.c4.model.messages.ChatMessage;
 import main.java.de.c4.model.messages.ContactDto;
 import main.java.de.c4.model.messages.ContactList;
 import main.java.de.c4.model.messages.file.FileTransferRequest;
+import main.java.de.c4.view.i18n.I18N;
 import main.java.de.c4.view.listener.SmartScroller;
 import main.java.de.c4.view.listener.SmileySelectionListener;
 import main.java.de.c4.view.resources.EIcons;
@@ -257,7 +258,7 @@ public class ChatPanel extends JSplitPane implements DropTargetListener, Message
 		removeSpacing(addContactBtn);
 		addContactBtn.addActionListener(this);
 		addContactBtn.setActionCommand(EButtonActions.ADD_TO_GROUP.getActionCommand());
-		addContactBtn.setToolTipText("Kontakt zur Konversation hinzufügen...");
+		addContactBtn.setToolTipText(I18N.get("chatpanel.addcontacttoconversation"));
 		addContactBtn.setPreferredSize(buttonSize);
 		left.add(addContactBtn);
 
@@ -268,13 +269,13 @@ public class ChatPanel extends JSplitPane implements DropTargetListener, Message
 		removeSpacing(alarmBtn);
 		alarmBtn.addActionListener(this);
 		alarmBtn.setActionCommand(EButtonActions.ALARM.getActionCommand());
-		alarmBtn.setToolTipText("Aufmerksamkeit holen!");
+		alarmBtn.setToolTipText(I18N.get("chatpanel.attention"));
 		alarmBtn.setPreferredSize(buttonSize);
 		right.add(alarmBtn);
-		JButton sendBtn = new JButton("senden", IconProvider.getAsScaledIcon(EIcons.SEND, iconSize, iconSize));
+		JButton sendBtn = new JButton(I18N.get("chatpanel.send"), IconProvider.getAsScaledIcon(EIcons.SEND, iconSize, iconSize));
 		sendBtn.addActionListener(this);
 		sendBtn.setActionCommand(EButtonActions.SEND.getActionCommand());
-		sendBtn.setToolTipText("Nachricht senden");
+		sendBtn.setToolTipText(I18N.get("chatpanel.sendmessage"));
 		removeSpacing(sendBtn);
 		Dimension sendDimension = new Dimension(85, buttonSize.height);
 		sendBtn.setPreferredSize(sendDimension);
@@ -298,311 +299,315 @@ public class ChatPanel extends JSplitPane implements DropTargetListener, Message
 		infoMessage("Chat mit " + contact.name + " gestartet");
 	}
 
-	private void removeSpacing(final JButton btn) {
-		btn.setBorder(null);
-		btn.setBorderPainted(false);
-		btn.setMargin(ZERO_INSETS);
-	}
+    private void removeSpacing(final JButton btn) {
+        btn.setBorder(null);
+        btn.setBorderPainted(false);
+        btn.setMargin(ZERO_INSETS);
+    }
 
-	public String getTitle() {
-		String buf = "";
-		if (getContacts().size() > 1) {
-			buf += "[G] ";
-		}
-		buf += getContacts().iterator().next().name;
-		return buf;
-	}
+    public String getTitle() {
+        String buf = "";
+        if (getContacts().size() > 1) {
+            buf += "[G] ";
+        }
+        buf += getContacts().iterator().next().name;
+        return buf;
+    }
 
-	protected void processDrag(DropTargetDragEvent dtde) {
-		if (dtde.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
-			dtde.acceptDrag(DnDConstants.ACTION_COPY);
-		} else {
-			dtde.rejectDrag();
-		}
-	}
+    protected void processDrag(DropTargetDragEvent dtde) {
+        if (dtde.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
+            dtde.acceptDrag(DnDConstants.ACTION_COPY);
+        } else {
+            dtde.rejectDrag();
+        }
+    }
 
-	public void dragEnter(DropTargetDragEvent dtde) {
-		processDrag(dtde);
-	}
+    public void dragEnter(DropTargetDragEvent dtde) {
+        processDrag(dtde);
+    }
 
-	public void dragOver(DropTargetDragEvent dtde) {
-		processDrag(dtde);
-	}
+    public void dragOver(DropTargetDragEvent dtde) {
+        processDrag(dtde);
+    }
 
-	public void dropActionChanged(DropTargetDragEvent dtde) {
-	}
+    public void dropActionChanged(DropTargetDragEvent dtde) {
+    }
 
-	public void dragExit(DropTargetEvent dte) {
-	}
+    public void dragExit(DropTargetEvent dte) {
+    }
 
-	public void drop(DropTargetDropEvent dtde) {
+    public void drop(DropTargetDropEvent dtde) {
 
-		Transferable transferable = dtde.getTransferable();
-		if (dtde.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
-			dtde.acceptDrop(dtde.getDropAction());
-			try {
+        Transferable transferable = dtde.getTransferable();
+        if (dtde.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
+            dtde.acceptDrop(dtde.getDropAction());
+            try {
 
-				@SuppressWarnings("unchecked")
-				List<File> transferData = (List<File>) transferable.getTransferData(DataFlavor.javaFileListFlavor);
-				if (transferData != null && transferData.size() > 0) {
-					// importFiles(transferData);
-					sendFiles(transferData);
-					dtde.dropComplete(true);
-				}
+                @SuppressWarnings("unchecked")
+                List<File> transferData = (List<File>) transferable.getTransferData(DataFlavor.javaFileListFlavor);
+                if (transferData != null && transferData.size() > 0) {
+                    // importFiles(transferData);
+                    sendFiles(transferData);
+                    dtde.dropComplete(true);
+                }
 
-			} catch (Exception ex) {
-				ex.printStackTrace();
-			}
-		} else {
-			dtde.rejectDrop();
-		}
-	}
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        } else {
+            dtde.rejectDrop();
+        }
+    }
 
-	private void sendFiles(List<File> transferData) {
-		for (Object object : transferData) {
-			File f = (File) object;
-			if (f.isDirectory()) {
-				infoMessage("Senden von Ordnern nicht möglich, bitte vorher ZIPen!<br/>(\""
-						+ f.getAbsolutePath() + "\")");
-				continue;
-			}
-			for (ContactDto c : contacts) {
-				FileTransferManager.INSTANCE.sendFileTo(f, c, this);
-				infoMessage("Sendeanfrage für Datei \"" + f.getName() + "\" an " + c.name + " gesendet!");
-			}
-		}
-	}
+    private void sendFiles(List<File> transferData) {
+        for (Object object : transferData) {
+            File f = (File) object;
+            if (f.isDirectory()) {
+                infoMessage("Senden von Ordnern nicht möglich, bitte vorher ZIPen!<br/>(\"" + f.getAbsolutePath() + "\")");
+                continue;
+            }
+            for (ContactDto c : contacts) {
+                FileTransferManager.INSTANCE.sendFileTo(f, c, this);
+                infoMessage("Sendeanfrage für Datei \"" + f.getName() + "\" an " + c.name + " gesendet!");
+            }
+        }
+    }
 
-	public long getChatID() {
-		return chatID;
-	}
+    public long getChatID() {
+        return chatID;
+    }
 
-	public Set<ContactDto> getContacts() {
-		return contacts;
-	}
+    public Set<ContactDto> getContacts() {
+        return contacts;
+    }
 
-	public void receiveMessage(final ChatMessage m, final ContactDto contact) {
-		SwingUtilities.invokeLater(new Runnable() {
+    public void receiveMessage(final ChatMessage m, final ContactDto contact) {
+        SwingUtilities.invokeLater(new Runnable() {
 
-			public void run() {
-				sb.append("<div class=\"oMessage\">");
-				sb.append("<div class=\"from\"><span>");
-				sb.append(contact.name);
-				sb.append(" (");
-				sb.append(TimestampUtil.getCurrentTimestamp());
-				sb.append("):</span></div>");
-				sb.append(textToHtml(m.text));
-				sb.append("</div>");
-				messageBox.setText(sb.toString());
-				updateScrollDownButtonShown();
-			}
-		});
-	}
+            public void run() {
+                sb.append("<div class=\"oMessage\">");
+                sb.append("<div class=\"from\"><span>");
+                sb.append(contact.name);
+                sb.append(" (");
+                sb.append(TimestampUtil.getCurrentTimestamp());
+                sb.append("):</span></div>");
+                sb.append(textToHtml(m.text));
+                sb.append("</div>");
+                messageBox.setText(sb.toString());
+                updateScrollDownButtonShown();
+            }
+        });
+    }
 
-	public void sendMessage(String m) {
-		sb.append("<div class=\"myMessage\">");
-		sb.append("<div class=\"from\"><span>");
-		sb.append(ContactList.getMe().name);
-		sb.append(" (");
-		sb.append(TimestampUtil.getCurrentTimestamp());
-		sb.append("):</span></div>");
-		sb.append(textToHtml(m));
-		sb.append("</div>");
-		messageBox.setText(sb.toString());
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				if (!isScrolledDown()) {
-					scrollDown();
-				}
-			}
-		});
-		// updateScrollDownButtonShown();
-		ChatMessage chatMessage = new ChatMessage();
-		chatMessage.text = m;
-		chatMessage.id = getChatID();
-		Messenger.sendMessageTo(chatMessage, contacts);
-	}
+    public void sendMessage(String m) {
+        sb.append("<div class=\"myMessage\">");
+        sb.append("<div class=\"from\"><span>");
+        sb.append(ContactList.getMe().name);
+        sb.append(" (");
+        sb.append(TimestampUtil.getCurrentTimestamp());
+        sb.append("):</span></div>");
+        sb.append(textToHtml(m));
+        sb.append("</div>");
+        messageBox.setText(sb.toString());
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                if (!isScrolledDown()) {
+                    scrollDown();
+                }
+            }
+        });
+        // updateScrollDownButtonShown();
+        ChatMessage chatMessage = new ChatMessage();
+        chatMessage.text = m;
+        chatMessage.id = getChatID();
+        Messenger.sendMessageTo(chatMessage, contacts);
+    }
 
-	public void infoMessage(final String m) {
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				sb.append("<div class=\"nMessage\">");
-				sb.append(m);
-				sb.append("</div>");
-				messageBox.setText(sb.toString());
-				if (!isScrolledDown()) {
-					updateScrollDownButtonShown();
-				}
-			}
-		});
-	}
+    public void infoMessage(final String m) {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                sb.append("<div class=\"nMessage\">");
+                sb.append(m);
+                sb.append("</div>");
+                messageBox.setText(sb.toString());
+                if (!isScrolledDown()) {
+                    updateScrollDownButtonShown();
+                }
+            }
+        });
+    }
 
-	private String textToHtml(String s) {
-		// line breaks
-				String html = s.replaceAll("\n", "<br/>");
-				// smileys
-				Pattern smileyPattern = Pattern.compile(":[0-9]{1,3}:");
-			    Matcher smileyMatcher = smileyPattern.matcher(html);
-				while (smileyMatcher.find()) {
-					String finding = smileyMatcher.group();
-					finding = finding.substring(1,  finding.length()-1);
-					StringBuffer replacement = new StringBuffer("<img width=25 height=25 class=\"emoticon\" src=\"");
-					URL imageAsURL = IconProvider.getImageAsURL(ESmileys.getByNr(Integer.parseInt(finding)));
-					replacement.append(imageAsURL);
-					replacement.append("\" />");
-					html = smileyMatcher.replaceFirst(replacement.toString());
-					smileyMatcher = smileyPattern.matcher(html);
-				}
-				return html;
-	}
+    private String textToHtml(String s) {
+        // line breaks
+        String html = s.replaceAll("\n", "<br/>");
+        // smileys
+        Pattern smileyPattern = Pattern.compile(":[0-9]{1,3}:");
+        Matcher smileyMatcher = smileyPattern.matcher(html);
+        while (smileyMatcher.find()) {
+            String finding = smileyMatcher.group();
+            finding = finding.substring(1, finding.length() - 1);
+            StringBuffer replacement = new StringBuffer("<img width=25 height=25 class=\"emoticon\" src=\"");
+            URL imageAsURL = IconProvider.getImageAsURL(ESmileys.getByNr(Integer.parseInt(finding)));
+            replacement.append(imageAsURL);
+            replacement.append("\" />");
+            html = smileyMatcher.replaceFirst(replacement.toString());
+            smileyMatcher = smileyPattern.matcher(html);
+        }
+        return html;
+    }
 
-	public void messageRecieved(ContactDto contact, ChatMessage message) {
-		if (message.id == getChatID() && contacts.contains(contact)) {
-			receiveMessage(message, contact);
-		}
-	}
+    public void messageRecieved(ContactDto contact, ChatMessage message) {
+        if (message.id == getChatID() && contacts.contains(contact)) {
+            receiveMessage(message, contact);
+        }
+    }
 
-	public void setChatID(long chatID) {
-		this.chatID = chatID;
-	}
+    public void setChatID(long chatID) {
+        this.chatID = chatID;
+    }
 
-	private void updateScrollDownButtonShown() {
-		if (isScrolledDown()) {
-			if (layeredPane.isAncestorOf(scrollDownBtn)) {
-				layeredPane.remove(scrollDownBtn);
-			}
-		} else if (!layeredPane.isAncestorOf(scrollDownBtn)) {
-			layeredPane.add(scrollDownBtn, Integer.valueOf(5));
-			setScrollDownBtnPosition();
-		}
-	}
+    private void updateScrollDownButtonShown() {
+        if (isScrolledDown()) {
+            if (layeredPane.isAncestorOf(scrollDownBtn)) {
+                layeredPane.remove(scrollDownBtn);
+            }
+        } else if (!layeredPane.isAncestorOf(scrollDownBtn)) {
+            layeredPane.add(scrollDownBtn, Integer.valueOf(5));
+            setScrollDownBtnPosition();
+        }
+    }
 
-	private boolean isScrolledDown() {
-		Adjustable sb = messageScrollPane.getVerticalScrollBar();
-		int val = sb.getValue();
-		int visibleAmount = sb.getVisibleAmount();
-		int lowest = val + visibleAmount;
-		int maxVal = sb.getMaximum();
-		boolean atBottom = maxVal == lowest || (visibleAmount == lowest && visibleAmount > maxVal)
-				|| messageBox.getHeight() < visibleAmount;
-		return atBottom;
-	}
+    private boolean isScrolledDown() {
+        Adjustable sb = messageScrollPane.getVerticalScrollBar();
+        int val = sb.getValue();
+        int visibleAmount = sb.getVisibleAmount();
+        int lowest = val + visibleAmount;
+        int maxVal = sb.getMaximum();
+        boolean atBottom = maxVal == lowest || (visibleAmount == lowest && visibleAmount > maxVal)
+                || messageBox.getHeight() < visibleAmount;
+        return atBottom;
+    }
 
-	private void setScrollDownBtnPosition() {
-		Rectangle b = layeredPane.getBounds();
-		int x = (int) b.getWidth() - scrollDownBtn.getWidth() - messageScrollPane.getVerticalScrollBar().getWidth()
-				- SCROLLDOWN_BTN_MARGIN;
-		int y = (int) b.getHeight() - scrollDownBtn.getHeight() - SCROLLDOWN_BTN_MARGIN;
-		scrollDownBtn.setBounds(x, y, 32, 32);
-	}
+    private void setScrollDownBtnPosition() {
+        Rectangle b = layeredPane.getBounds();
+        int x = (int) b.getWidth() - scrollDownBtn.getWidth() - messageScrollPane.getVerticalScrollBar().getWidth()
+                - SCROLLDOWN_BTN_MARGIN;
+        int y = (int) b.getHeight() - scrollDownBtn.getHeight() - SCROLLDOWN_BTN_MARGIN;
+        scrollDownBtn.setBounds(x, y, 32, 32);
+    }
 
-	public void actionPerformed(ActionEvent e) {
-		if (EButtonActions.SCROLL_DOWN.getActionCommand().equals(e.getActionCommand())) {
-			scrollDown();
-		} else if (EButtonActions.SCROLL_DOWN.getActionCommand().equals(e.getActionCommand())) {
-			scrollDown();
-		} else if (EButtonActions.ADD_TO_GROUP.getActionCommand().equals(e.getActionCommand())) {
-			// TODO implement
-		} else if (EButtonActions.ALARM.getActionCommand().equals(e.getActionCommand())) {
-			Messenger.sendMessageTo(new Alert(), contacts);
-		} else if (EButtonActions.ATTACH_FILE.getActionCommand().equals(e.getActionCommand())) {
-			int returnVal = FILE_CHOOSER.showOpenDialog(this);
+    public void actionPerformed(ActionEvent e) {
+        if (EButtonActions.SCROLL_DOWN.getActionCommand().equals(e.getActionCommand())) {
+            scrollDown();
+        } else if (EButtonActions.SCROLL_DOWN.getActionCommand().equals(e.getActionCommand())) {
+            scrollDown();
+        } else if (EButtonActions.ADD_TO_GROUP.getActionCommand().equals(e.getActionCommand())) {
+            // TODO implement
+        } else if (EButtonActions.ALARM.getActionCommand().equals(e.getActionCommand())) {
+            Messenger.sendMessageTo(new Alert(), contacts);
+        } else if (EButtonActions.ATTACH_FILE.getActionCommand().equals(e.getActionCommand())) {
+            int returnVal = FILE_CHOOSER.showOpenDialog(this);
 
-	        if (returnVal == JFileChooser.APPROVE_OPTION) {
-	        	File[] selectedFiles = FILE_CHOOSER.getSelectedFiles();
-	        	if (selectedFiles.length<1) {
-					return;
-				}
-	        	ArrayList<File> files = new ArrayList<File>();
-				for (File file : selectedFiles) {
-					files.add(file);
-				}
-	        	sendFiles(files);
-	        }
-		} else if (EButtonActions.SEND.getActionCommand().equals(e.getActionCommand())) {
-			String input = inputArea.getText().trim();
-			if (input.isEmpty()) {
-				return;
-			}
-			sendMessage(input);
-			inputArea.setText("");
-		} else if (EButtonActions.SHOW_SMILEYS.getActionCommand().equals(e.getActionCommand())) {
-			Point locationOnScreen = smileyBtn.getLocationOnScreen();
-			locationOnScreen.y += smileyBtn.getHeight();
-			SmileyDialog.showUp(this, locationOnScreen);
-		}
-	}
+            if (returnVal == JFileChooser.APPROVE_OPTION) {
+                File[] selectedFiles = FILE_CHOOSER.getSelectedFiles();
+                if (selectedFiles.length < 1) {
+                    return;
+                }
+                ArrayList<File> files = new ArrayList<File>();
+                for (File file : selectedFiles) {
+                    files.add(file);
+                }
+                sendFiles(files);
+            }
+        } else if (EButtonActions.SEND.getActionCommand().equals(e.getActionCommand())) {
+            String input = inputArea.getText().trim();
+            if (input.isEmpty()) {
+                return;
+            }
+            sendMessage(input);
+            inputArea.setText("");
+        } else if (EButtonActions.SHOW_SMILEYS.getActionCommand().equals(e.getActionCommand())) {
+            Point locationOnScreen = smileyBtn.getLocationOnScreen();
+            locationOnScreen.y += smileyBtn.getHeight();
+            SmileyDialog.showUp(this, locationOnScreen);
+        }
+    }
 
-	private void scrollDown() {
-		JScrollBar sb = messageScrollPane.getVerticalScrollBar();
-		sb.setValue(sb.getMaximum());
-		layeredPane.remove(scrollDownBtn);
-	}
+    private void scrollDown() {
+        JScrollBar sb = messageScrollPane.getVerticalScrollBar();
+        sb.setValue(sb.getMaximum());
+        layeredPane.remove(scrollDownBtn);
+    }
 
-	private enum EButtonActions {
-		SCROLL_DOWN("sd"), ALARM("am"), ADD_TO_GROUP("atg"), SEND("snd"), ATTACH_FILE("af"), SHOW_SMILEYS("ssm");
+    private enum EButtonActions {
+        SCROLL_DOWN("sd"), ALARM("am"), ADD_TO_GROUP("atg"), SEND("snd"), ATTACH_FILE("af"), SHOW_SMILEYS("ssm");
 
-		private String actionCommand;
+        private String actionCommand;
 
-		private EButtonActions(String actionCommand) {
-			this.actionCommand = actionCommand;
-		}
+        private EButtonActions(String actionCommand) {
+            this.actionCommand = actionCommand;
+        }
 
-		public String getActionCommand() {
-			return actionCommand;
-		}
+        public String getActionCommand() {
+            return actionCommand;
+        }
 
-	}
+    }
 
-	public void started(File f, ContactDto c, boolean isUpload) {
-		infoMessage("Beginne mit der Dateiübertragung (\"" + f.getName() + (isUpload?"\" an ":"\" von ") + c.name + ")...");
-	}
+    public void started(File f, ContactDto c, boolean isUpload) {
+        infoMessage(I18N.get("chatpanel.startfiletransfer")
+                + " (\""
+                + f.getName()
+                + (isUpload ? "\" " + I18N.get("chatpanel.filetransfer.to") + " " : "\" " + I18N.get("chatpanel.filetransfer.from")
+                        + " ") + c.name + ")...");
+    }
 
-	public void abroted(File f, ContactDto c, boolean isUpload) {
-		if (isUpload) {
-			infoMessage("Senden der Datei \"" + f.getName() + "\" an " + c.name + " Fehlgeschlagen!");
-		} else {
-			infoMessage("Empfangen der Datei \"" + f.getName() + "\" von " + c.name + " Fehlgeschlagen!");
-		}
-	}
+    public void abroted(File f, ContactDto c, boolean isUpload) {
+        if (isUpload) {
+            infoMessage("Senden der Datei \"" + f.getName() + "\" an " + c.name + " Fehlgeschlagen!");
+        } else {
+            infoMessage("Empfangen der Datei \"" + f.getName() + "\" von " + c.name + " Fehlgeschlagen!");
+        }
+    }
 
-	public void finnished(File f, ContactDto c, boolean isUpload) {
-		if (isUpload) {
-			infoMessage("Datei \"" + f.getName() + "\" wurde erfolgreich an " + c.name + " gesendet!");
-		} else {
-			String path = f.getAbsolutePath();
-			infoMessage("Empfang der Datei \"" + f.getName() + "\" von " + c.name + " ist nun vollständig!<br/>"
-					+ "<a href=\"file://"+path.substring(0,path.length()-f.getName().length())+"\">Ordner anzeigen</a>  "
-							+ "<a href=\"file://"+path+"\">Datei öffnen</a>");
-		}
-	}
+    public void finnished(File f, ContactDto c, boolean isUpload) {
+        if (isUpload) {
+            infoMessage("Datei \"" + f.getName() + "\" wurde erfolgreich an " + c.name + " gesendet!");
+        } else {
+            String path = f.getAbsolutePath();
+            infoMessage("Empfang der Datei \"" + f.getName() + "\" von " + c.name + " ist nun vollständig!<br/>"
+                    + "<a href=\"file://" + path.substring(0, path.length() - f.getName().length()) + "\">Ordner anzeigen</a>  "
+                    + "<a href=\"file://" + path + "\">Datei öffnen</a>");
+        }
+    }
 
-	public void declined(ContactDto contact, File file) {
-		infoMessage("Sendeanfrage für Datei \"" + file.getName() + "\" wurde von " + contact.name + " abgelehnt!");
-	}
+    public void declined(ContactDto contact, File file) {
+        infoMessage("Sendeanfrage für Datei \"" + file.getName() + "\" wurde von " + contact.name + " abgelehnt!");
+    }
 
-	public void fileTransferRequestRecieved(ContactDto contact, FileTransferRequest request) {
-	}
+    public void fileTransferRequestRecieved(ContactDto contact, FileTransferRequest request) {
+    }
 
-	public void smileySelected(ESmileys s) {
-		inputArea.insert(":" + s.getNr() + ":", inputArea.getCaretPosition());
-	}
+    public void smileySelected(ESmileys s) {
+        inputArea.insert(":" + s.getNr() + ":", inputArea.getCaretPosition());
+    }
 
-	@Override
-	public void alert(ContactDto contact) {}
+    @Override
+    public void alert(ContactDto contact) {
+    }
 
-	@Override
-	public void smileySelectionAbroted() {
-		inputArea.grabFocus();
-	}
+    @Override
+    public void smileySelectionAbroted() {
+        inputArea.grabFocus();
+    }
 
-	@Override
-	public void secondClientStarted() {
-		// we don't care here.
-	}
+    @Override
+    public void secondClientStarted() {
+        // we don't care here.
+    }
 
-	public void setContact(ContactDto contact) {
-		contacts.remove(contact);
-		contacts.add(contact);
-	}
+    public void setContact(ContactDto contact) {
+        contacts.remove(contact);
+        contacts.add(contact);
+    }
 }
