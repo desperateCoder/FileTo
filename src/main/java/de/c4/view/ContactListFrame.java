@@ -14,6 +14,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 
+import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 import javax.swing.JComboBox;
@@ -154,14 +155,16 @@ public class ContactListFrame extends JFrame implements ActionListener,
 
 		stateCombo = new JComboBox<EOnlineState>(EOnlineState.values());
 		stateCombo.setRenderer(new ListCellRenderer<EOnlineState>() {
-			private static final int SIZE = 26;
-			private final Font FONT = new Font("SansSerif", Font.BOLD, 18);
+			private static final int SIZE = 20;
+			private final Font FONT = new Font(Font.SANS_SERIF, Font.PLAIN, 14);
 
 			public Component getListCellRendererComponent(
 					JList<? extends EOnlineState> list, EOnlineState value,
 					int index, boolean isSelected, boolean cellHasFocus) {
 				JPanel comp = new JPanel(new BorderLayout());
+				comp.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 				JLabel l = new JLabel(value.toString());
+				l.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 0));
 				l.setFont(FONT);
 				comp.add(l, BorderLayout.CENTER);
 
