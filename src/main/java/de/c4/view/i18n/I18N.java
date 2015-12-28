@@ -34,7 +34,7 @@ public class I18N {
 				}
 			} else Log.error("Could not load default language!");
 			
-			// TODO prevent path hijacking (filter .)
+			// TODO prevent path hijacking (Regex has to match letter-letter-underscore-letter-letter)
 			if (language != null) {
 				inputStream = I18N.class.getResourceAsStream(
 						"resources/" + language + ".properties");

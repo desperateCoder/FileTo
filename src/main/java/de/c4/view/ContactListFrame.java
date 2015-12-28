@@ -14,6 +14,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 
+import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 import javax.swing.JComboBox;
@@ -154,14 +155,16 @@ public class ContactListFrame extends JFrame implements ActionListener,
 
 		stateCombo = new JComboBox<EOnlineState>(EOnlineState.values());
 		stateCombo.setRenderer(new ListCellRenderer<EOnlineState>() {
-			private static final int SIZE = 26;
-			private final Font FONT = new Font("SansSerif", Font.BOLD, 18);
+			private static final int SIZE = 20;
+			private final Font FONT = new Font(Font.SANS_SERIF, Font.PLAIN, 14);
 
 			public Component getListCellRendererComponent(
 					JList<? extends EOnlineState> list, EOnlineState value,
 					int index, boolean isSelected, boolean cellHasFocus) {
 				JPanel comp = new JPanel(new BorderLayout());
+				comp.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 				JLabel l = new JLabel(value.toString());
+				l.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 0));
 				l.setFont(FONT);
 				comp.add(l, BorderLayout.CENTER);
 
@@ -190,10 +193,9 @@ public class ContactListFrame extends JFrame implements ActionListener,
 					String[] options = new String[] {
 							I18N.get("contactlist.cancel"),
 							I18N.get("contactlist.exit") };
-					// TODO i18n
 					int response = JOptionPane.showOptionDialog(me,
-							"Soll die Anwendung beendet werden?",
-							"Wirklich beenden?", JOptionPane.DEFAULT_OPTION,
+							I18N.get("contactlist.exitonclose"),
+							I18N.get("contactlist.exitonclose.title"), JOptionPane.DEFAULT_OPTION,
 							JOptionPane.QUESTION_MESSAGE, null, options,
 							options[0]);
 					if (response == 1) {
