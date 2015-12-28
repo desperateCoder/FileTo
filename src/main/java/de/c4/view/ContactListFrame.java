@@ -190,10 +190,9 @@ public class ContactListFrame extends JFrame implements ActionListener,
 					String[] options = new String[] {
 							I18N.get("contactlist.cancel"),
 							I18N.get("contactlist.exit") };
-					// TODO i18n
 					int response = JOptionPane.showOptionDialog(me,
-							"Soll die Anwendung beendet werden?",
-							"Wirklich beenden?", JOptionPane.DEFAULT_OPTION,
+							I18N.get("contactlist.exitonclose"),
+							I18N.get("contactlist.exitonclose.title"), JOptionPane.DEFAULT_OPTION,
 							JOptionPane.QUESTION_MESSAGE, null, options,
 							options[0]);
 					if (response == 1) {
