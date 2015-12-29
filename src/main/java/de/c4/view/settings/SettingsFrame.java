@@ -29,77 +29,112 @@ import main.java.de.c4.view.resources.IconProvider;
  * @author stnieder
  *
  */
-public class SettingsFrame extends JFrame implements ActionListener, ItemListener {
+public class SettingsFrame extends JFrame implements ItemListener {
     private static final long serialVersionUID = 1L;
-    JLabel usernameLabel;
-    JTextField usernameField;
-    JLabel languageLabel;
-    JComboBox<String> languageBox;
-    JLabel lookAndFeelLabel;
-    JComboBox<String> lookAndFeelBox;
-    JButton saveButton;
-    JButton cancelButton;
-    private static final String action_save = "settingsframe.save";
-    private static final String action_cancel = "settingsframe.cancel";
+    private JLabel usernameLabel;
+    private JTextField usernameField;
+    private JLabel languageLabel;
+    private JComboBox<String> languageBox;
+    private JLabel lookAndFeelLabel;
+    private JComboBox<String> lookAndFeelBox;
+    private JButton saveButton;
+    private JButton cancelButton;
 
     public SettingsFrame() {
-        setIconImage(IconProvider.getImage(EIcons.SETTINGS));
-        setTitle(I18N.get("settingsframe.settings"));
-        setLayout(new GridBagLayout());
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.insets = new Insets(5, 5, 5, 5);
-        gbc.weightx = 0.0;
-        usernameLabel = new JLabel(I18N.get("settingsframe.username"));
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        add(usernameLabel, gbc);
-        languageLabel = new JLabel(I18N.get("settingsframe.language"));
-        gbc.gridy++;
-        add(languageLabel, gbc);
-        lookAndFeelLabel = new JLabel(I18N.get("settingsframe.lookandfeel"));
-        gbc.gridy++;
-        add(lookAndFeelLabel, gbc);
-        usernameField = new JTextField();
-        gbc.gridx = 1;
-        gbc.gridy = 0;
-        gbc.gridwidth++;
-        add(usernameField, gbc);
-        languageBox = new JComboBox<String>(I18N.getAvailableTranslations());
-        gbc.gridy++;
-        add(languageBox, gbc);
-        lookAndFeelBox = new JComboBox<String>();
-        lookAndFeelBox.addItem("System");
-        for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
-            lookAndFeelBox.addItem(info.getName());
-        }
-        lookAndFeelBox.setSelectedIndex(0);
-        lookAndFeelBox.addItemListener(this);
-        gbc.gridy++;
-        add(lookAndFeelBox, gbc);
-        gbc.gridwidth--;
-        cancelButton = new JButton(I18N.get("settingsframe.cancel"));
-        cancelButton.setActionCommand(action_cancel);
-        cancelButton.addActionListener(this);
-        gbc.gridy++;
-        add(cancelButton, gbc);
-        saveButton = new JButton(I18N.get("settingsframe.save"));
-        saveButton.setActionCommand(action_save);
-        saveButton.addActionListener(this);
-        gbc.gridx++;
-        add(saveButton, gbc);
-        loadValues();
+        this.setIconImage(IconProvider.getImage(EIcons.SETTINGS));
+        this.setTitle(I18N.get("settingsframe.settings"));
+        this.initUsername();
+        this.initLanguage();
+        this.initLookAndFeel();
+        this.initActionButtons();
+        this.buildSurface();
+        this.setExistingValues();
         this.pack();
         this.setLocationRelativeTo(null);
         this.setVisible(true);
     }
 
-    /**
-     * Loads existing Settings as initial values
-     */
-    private void loadValues() {
-        usernameField.setText(Settings.INSTANCE.get(Settings.CONTACT_NAME));
+    /** Aggregates all Components to one surface */
+    private void buildSurface() {
+        setLayout(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.weightx = 0.0;
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        this.add(usernameLabel, gbc);
+        gbc.gridy++;
+        this.add(languageLabel, gbc);
+        gbc.gridy++;
+        this.add(lookAndFeelLabel, gbc);
+        gbc.gridx = 1;
+        gbc.gridy = 0;
+        gbc.gridwidth++;
+        this.add(usernameField, gbc);
+        gbc.gridy++;
+        this.add(languageBox, gbc);
+        gbc.gridy++;
+        this.add(lookAndFeelBox, gbc);
+        gbc.gridwidth--;
+        gbc.gridy++;
+        this.add(cancelButton, gbc);
+        gbc.gridx++;
+        this.add(saveButton, gbc);
+    }
 
+    /** Initializes Look and Feel Label and Combobox. */
+    private void initLookAndFeel() {
+        lookAndFeelLabel = new JLabel(I18N.get("settingsframe.lookandfeel"));
+        lookAndFeelBox = new JComboBox<String>();
+        lookAndFeelBox.addItemListener(this);
+        lookAndFeelBox.addItem("System");
+        for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+            lookAndFeelBox.addItem(info.getName());
+        }
+        lookAndFeelBox.setSelectedIndex(0);
+    }
+
+    /** Initializes Language Label and Combobox. */
+    private void initLanguage() {
+        languageLabel = new JLabel(I18N.get("settingsframe.language"));
+        languageBox = new JComboBox<String>(I18N.getAvailableTranslations());
+    }
+
+    /** Initializes Username Label and Textfield. */
+    private void initUsername() {
+        usernameLabel = new JLabel(I18N.get("settingsframe.username"));
+        usernameField = new JTextField();
+    }
+
+    /** Initializes Cancel and Save Button. */
+    private void initActionButtons() {
+        cancelButton = new JButton(I18N.get("settingsframe.cancel"));
+        cancelButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                dispose();
+            }
+        });
+        saveButton = new JButton(I18N.get("settingsframe.save"));
+        saveButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Settings.INSTANCE.set(Settings.CONTACT_NAME, usernameField.getText());
+                Settings.INSTANCE.set(Settings.LANGUAGE, (String) languageBox.getSelectedItem());
+                if (lookAndFeelBox.getSelectedIndex() == 0) {
+                    Settings.INSTANCE.set(Settings.LOOK_AND_FEEL, "");
+                } else {
+                    Settings.INSTANCE.set(Settings.LOOK_AND_FEEL, lookAndFeelBox.getSelectedItem().toString());
+                }
+                Settings.INSTANCE.save();
+            }
+        });
+    }
+
+    /** Loads existing Settings as initial values */
+    private void setExistingValues() {
+        usernameField.setText(Settings.INSTANCE.get(Settings.CONTACT_NAME));
         String language = Settings.INSTANCE.get(Settings.LANGUAGE);
         if (language == null || language.isEmpty()) {
             languageBox.setSelectedIndex(0);
@@ -111,7 +146,6 @@ public class SettingsFrame extends JFrame implements ActionListener, ItemListene
                 }
             }
         }
-
         String lookAndFeel = Settings.INSTANCE.get(Settings.LOOK_AND_FEEL);
         if (lookAndFeel == null || lookAndFeel.isEmpty()) {
             lookAndFeelBox.setSelectedIndex(0);
@@ -125,29 +159,10 @@ public class SettingsFrame extends JFrame implements ActionListener, ItemListene
         }
     }
 
-    /**
-     * Handles the Save and Cancel Button
-     */
-    public void actionPerformed(ActionEvent e) {
-        if (action_save.equals(e.getActionCommand())) {
-            Settings.INSTANCE.set(Settings.CONTACT_NAME, usernameField.getText());
-            Settings.INSTANCE.set(Settings.LANGUAGE, (String) languageBox.getSelectedItem());
-            if (lookAndFeelBox.getSelectedIndex() == 0) {
-                Settings.INSTANCE.set(Settings.LOOK_AND_FEEL, "");
-            } else {
-                Settings.INSTANCE.set(Settings.LOOK_AND_FEEL, lookAndFeelBox.getSelectedItem().toString());
-            }
-            Settings.INSTANCE.save();
-        }
-        dispose();
-    }
-
-    /**
-     * Provides an instant Look and Feel Change as preview
-     */
+    /** Provides an instant Look and Feel Change as preview */
     @Override
-    public void itemStateChanged(ItemEvent arg0) {
-        String name = arg0.getItem().toString();
+    public void itemStateChanged(ItemEvent event) {
+        String name = event.getItem().toString();
         try {
             for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
                 System.out.println(info.getName());
