@@ -3,6 +3,7 @@ package main.java.de.c4.view;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Font;
+import java.awt.Image;
 import java.awt.SystemTray;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -81,6 +82,7 @@ public class ContactListFrame extends JFrame implements ActionListener,
 		JMenu fileMenu = new JMenu(I18N.get("contactlist.menu.file"));
 		JMenuItem quitMenuItem = new JMenuItem(
 				I18N.get("contactlist.menu.file.quit"));
+        quitMenuItem.setIcon(new ImageIcon(IconProvider.getImage(EIcons.ABORT).getScaledInstance(16, 16, Image.SCALE_SMOOTH)));
 		quitMenuItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				exit();
@@ -91,6 +93,7 @@ public class ContactListFrame extends JFrame implements ActionListener,
 		JMenu editMenu = new JMenu(I18N.get("contactlist.menu.edit"));
 		JMenuItem settingsMenuItem = new JMenuItem(
 				I18N.get("contactlist.menu.settings"));
+		settingsMenuItem.setIcon(new ImageIcon(IconProvider.getImage(EIcons.SETTINGS).getScaledInstance(16, 16, Image.SCALE_SMOOTH)));
 		settingsMenuItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				new SettingsFrame();
@@ -102,6 +105,7 @@ public class ContactListFrame extends JFrame implements ActionListener,
 		JMenu windowMenu = new JMenu(I18N.get("contactlist.menu.window"));
 		JMenuItem ftMenuItem = new JMenuItem(
 				I18N.get("contactlist.menu.fileTransferFrame"));
+        ftMenuItem.setIcon(new ImageIcon(IconProvider.getImage(EIcons.TRANSFER).getScaledInstance(16, 16, Image.SCALE_SMOOTH)));
 		ftMenuItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				FileTransferFrame.INSTANCE.setVisible(true);

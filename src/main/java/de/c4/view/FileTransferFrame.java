@@ -112,7 +112,7 @@ public class FileTransferFrame extends JFrame implements
 			@Override
 			public Component getTableCellRendererComponent(JTable table, Object value,
 					boolean isSelected, boolean hasFocus, int row, int col) {
-				JLabel label = new JLabel(IconProvider.getAsScaledIcon(EIcons.ABROT, ICON_SIZE, ICON_SIZE));
+				JLabel label = new JLabel(IconProvider.getAsScaledIcon(EIcons.ABORT, ICON_SIZE, ICON_SIZE));
 				return label;
 			}
 		});
