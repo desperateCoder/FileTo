@@ -9,8 +9,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
 
-import com.esotericsoftware.minlog.Log;
-
 import main.java.de.c4.controller.FileTransferManager;
 import main.java.de.c4.controller.Messenger;
 import main.java.de.c4.controller.shared.ConnectionManager;
@@ -25,6 +23,8 @@ import main.java.de.c4.view.components.ChatPanel;
 import main.java.de.c4.view.components.ChatTabPane;
 import main.java.de.c4.view.resources.EIcons;
 import main.java.de.c4.view.resources.IconProvider;
+
+import com.esotericsoftware.minlog.Log;
 
 
 public class ChatFrame extends JFrame implements ActionListener, MessageRecievedListener{

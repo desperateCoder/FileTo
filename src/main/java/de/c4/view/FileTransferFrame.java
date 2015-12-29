@@ -43,7 +43,6 @@ public class FileTransferFrame extends JFrame implements
 	private final Map<Long, JProgressBar> BARS = new HashMap<Long, JProgressBar>();
 
 	public FileTransferFrame() {
-		
 		table.addMouseListener(this);
 		table.setRowHeight(ICON_SIZE);
 		table.setFont(new Font("Sans", Font.PLAIN, 14));
@@ -117,11 +116,12 @@ public class FileTransferFrame extends JFrame implements
 			}
 		});
 		table.setFillsViewportHeight(true);
-		setContentPane(new JScrollPane(table));
-		setPreferredSize(new Dimension(500, 300));
-		setTitle("Dateiübertragungen");
-		setIconImage(IconProvider.getImage(EIcons.TRANSFER));
-		pack();
+		this.setContentPane(new JScrollPane(table));
+		this.setPreferredSize(new Dimension(500, 300));
+		this.setTitle("Dateiübertragungen");
+		this.setIconImage(IconProvider.getImage(EIcons.TRANSFER));
+		this.pack();
+		this.setLocationRelativeTo(null);
 	}
 
 	public void setTransferState(FileTransferState state) {
