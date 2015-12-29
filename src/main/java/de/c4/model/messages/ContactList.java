@@ -8,15 +8,15 @@ import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.esotericsoftware.kryonet.Connection;
-import com.esotericsoftware.minlog.Log;
-
 import main.java.de.c4.controller.Messenger;
 import main.java.de.c4.controller.shared.ConnectionManager;
 import main.java.de.c4.controller.shared.ExceptionUtil;
 import main.java.de.c4.controller.shared.Settings;
 import main.java.de.c4.controller.shared.listener.ContactListReceivedListener;
 import main.java.de.c4.controller.shared.listener.OnlineStateChangeListener;
+
+import com.esotericsoftware.kryonet.Connection;
+import com.esotericsoftware.minlog.Log;
 /**
  * Singleton, which provides the ContactList and States of the Contacts
  * @author Artur Dawtjan

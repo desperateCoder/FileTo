@@ -2,6 +2,7 @@ package main.java.de.c4.view;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Image;
 import java.awt.SystemTray;
@@ -32,8 +33,6 @@ import javax.swing.ListCellRenderer;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
 
-import com.esotericsoftware.minlog.Log;
-
 import main.java.de.c4.controller.Messenger;
 import main.java.de.c4.controller.shared.Settings;
 import main.java.de.c4.controller.shared.listener.ContactListReceivedListener;
@@ -50,6 +49,8 @@ import main.java.de.c4.view.resources.EIcons;
 import main.java.de.c4.view.resources.IconProvider;
 import main.java.de.c4.view.settings.SettingsFrame;
 
+import com.esotericsoftware.minlog.Log;
+
 public class ContactListFrame extends JFrame implements ActionListener,
 		OnlineStateChangeListener, ContactListReceivedListener, ItemListener, MessageRecievedListener {
 
@@ -63,6 +64,8 @@ public class ContactListFrame extends JFrame implements ActionListener,
 	private JComboBox<EOnlineState> stateCombo;
 
 	public ContactListFrame() {
+        this.setLocation(100, 100);
+        this.setMinimumSize(new Dimension(300, 600));
 		ContactList.INSTANCE.addReceivedContactListListener(this);
 		ContactList.INSTANCE.addOnlineStateChangeListener(this);
 		new Thread(new Runnable() {
