@@ -2,6 +2,10 @@ package main.java.de.c4.controller.shared;
 
 import java.net.InetAddress;
 
+import com.esotericsoftware.kryonet.Connection;
+import com.esotericsoftware.kryonet.Listener;
+import com.esotericsoftware.minlog.Log;
+
 import main.java.de.c4.controller.FileTransferManager;
 import main.java.de.c4.controller.Messenger;
 import main.java.de.c4.model.messages.Alert;
@@ -16,10 +20,6 @@ import main.java.de.c4.model.messages.RequestKnownOnlineClients;
 import main.java.de.c4.model.messages.SecondClientStarted;
 import main.java.de.c4.model.messages.file.FileTransferAnswer;
 import main.java.de.c4.model.messages.file.FileTransferRequest;
-
-import com.esotericsoftware.kryonet.Connection;
-import com.esotericsoftware.kryonet.Listener;
-import com.esotericsoftware.minlog.Log;
 
 public class MessageHandler extends Listener{
 

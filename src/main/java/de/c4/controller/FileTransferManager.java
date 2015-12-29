@@ -7,6 +7,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.esotericsoftware.minlog.Log;
+
 import main.java.de.c4.controller.client.FileTransferClient;
 import main.java.de.c4.controller.server.FileTransferServer;
 import main.java.de.c4.controller.shared.ConnectionManager;
@@ -18,8 +20,6 @@ import main.java.de.c4.model.messages.file.FileTransferAnswer;
 import main.java.de.c4.model.messages.file.FileTransferRequest;
 import main.java.de.c4.model.messages.file.FileTransferState;
 import main.java.de.c4.view.FileTransferFrame;
-
-import com.esotericsoftware.minlog.Log;
 
 public class FileTransferManager implements FileTransferListener{
 

@@ -12,11 +12,11 @@ import javax.crypto.KeyAgreement;
 import javax.crypto.interfaces.DHPublicKey;
 import javax.crypto.spec.DHParameterSpec;
 
-import main.java.de.c4.model.messages.PubKey;
-
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Connection;
+
+import main.java.de.c4.model.messages.PubKey;
 
 public class Diffie {
 

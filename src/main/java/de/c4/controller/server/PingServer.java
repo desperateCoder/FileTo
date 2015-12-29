@@ -1,10 +1,10 @@
 package main.java.de.c4.controller.server;
 import java.io.IOException;
 
-import main.java.de.c4.controller.shared.Network;
-
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Server;
+
+import main.java.de.c4.controller.shared.Network;
 
 /**
  * Einfacher Thread, in dem der UDP-Server laeuft, der host discoverys beantwortet

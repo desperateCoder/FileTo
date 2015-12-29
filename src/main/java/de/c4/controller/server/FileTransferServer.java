@@ -5,6 +5,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
+import com.esotericsoftware.kryonet.Connection;
+import com.esotericsoftware.kryonet.Listener;
+import com.esotericsoftware.kryonet.Server;
+import com.esotericsoftware.minlog.Log;
+
 import main.java.de.c4.controller.shared.Diffie;
 import main.java.de.c4.controller.shared.Network;
 import main.java.de.c4.controller.shared.listener.FileTransferListener;
@@ -12,11 +17,6 @@ import main.java.de.c4.model.connections.ChatConnection;
 import main.java.de.c4.model.messages.PubKey;
 import main.java.de.c4.model.messages.file.FileChunk;
 import main.java.de.c4.model.messages.file.FileTransferRequest;
-
-import com.esotericsoftware.kryonet.Connection;
-import com.esotericsoftware.kryonet.Listener;
-import com.esotericsoftware.kryonet.Server;
-import com.esotericsoftware.minlog.Log;
 
 public class FileTransferServer  extends Thread{
 	

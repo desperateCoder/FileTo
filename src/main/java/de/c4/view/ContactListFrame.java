@@ -64,8 +64,8 @@ public class ContactListFrame extends JFrame implements ActionListener,
 	private JComboBox<EOnlineState> stateCombo;
 
 	public ContactListFrame() {
-        this.setLocation(100, 100);
-        this.setMinimumSize(new Dimension(300, 600));
+        setLocation(100, 100);
+        setMinimumSize(new Dimension(300, 600));
 		ContactList.INSTANCE.addReceivedContactListListener(this);
 		ContactList.INSTANCE.addOnlineStateChangeListener(this);
 		new Thread(new Runnable() {
