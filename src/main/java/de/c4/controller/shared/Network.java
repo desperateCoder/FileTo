@@ -25,7 +25,7 @@ public class Network {
 	static public final int TCP_PORT = 55555;
 	static public final int UDP_PORT = 54555;
 	static Set<Integer> usedPorts = new HashSet<Integer>();
-	static public final int DEFAULT_TIMEOUT = 3000;
+	static public final int DEFAULT_TIMEOUT = 10000;
 	private static final Random RANDOM = new Random(System.currentTimeMillis());
 
 	// This registers objects that are going to be sent over the network.

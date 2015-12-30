@@ -110,8 +110,8 @@ public class ChatTabPane extends JTabbedPane implements TabCloseListener, Online
 
 	public void onlineStateChanged(OnlineStateChange change) {
 		int index = indexOf(change.contact);
-		((ChatPanel)getComponentAt(index)).setContact(change.contact);
 		if (index > -1) {
+			((ChatPanel)getComponentAt(index)).setContact(change.contact);
 			setTabComponentAt(index, new ButtonTabComponent(this, EOnlineState.getByNr(change.newState), this));
 		}
 	}
