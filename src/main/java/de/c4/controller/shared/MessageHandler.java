@@ -75,10 +75,10 @@ public class MessageHandler extends Listener{
 			InetAddress address = c.getRemoteAddressTCP().getAddress();
 			ContactListDto contacts = ContactList.INSTANCE.getContactListForContactsRequest(address);
 			c.sendTCP(contacts);
-			c.close();
 		} else if (object instanceof ContactListDto){
 			ContactListDto list = (ContactListDto)object;
 			ContactList.INSTANCE.setOnlineContacts(list.contacts);
+			c.close();
 			Log.info("Recieved ContactList!");
 		} else if (object instanceof SecondClientStarted){
 			Messenger.secondClientStarted();
