@@ -128,6 +128,7 @@ public class SettingsFrame extends JFrame implements ItemListener {
                     Settings.INSTANCE.set(Settings.LOOK_AND_FEEL, lookAndFeelBox.getSelectedItem().toString());
                 }
                 Settings.INSTANCE.save();
+                dispose();
             }
         });
     }
